@@ -1,3 +1,113 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* General Styles */
+
+  
+  .login-page {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .login-left {
+    flex: 1;
+    background-color: #FFEDE1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .cartoon-img {
+    max-width: 80%;
+    height: auto;
+  }
+  
+  .login-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+  }
+  
+  .login-form {
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  h2 {
+    margin-bottom: 10px;
+  }
+  
+  p {
+    margin-bottom: 20px;
+    color: #777;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 5px;
+  }
+  
+  input.error {
+    border-color: red;
+  }
+  
+  .error-msg {
+    color: red;
+    font-size: 0.9em;
+  }
+  
+  .forgot-password {
+    display: block;
+    text-align: right;
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #e74c3c;
+    text-decoration: none;
+  }
+  
+  .login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  
+  .login-btn:hover {
+    background-color: #333;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .login-page {
+      flex-direction: column;
+    }
+  
+    .login-left {
+      flex: none;
+      height: 40%;
+    }
+  
+    .login-right {
+      flex: none;
+      height: 60%;
+    }
+  }
+  
