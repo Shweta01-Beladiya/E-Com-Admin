@@ -1,25 +1,29 @@
-import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+// Sidebar.jsx
+import React, { useState } from 'react';
+import { styled } from '@mui/material/styles';
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Drawer as MuiDrawer,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { CgArrowsShrinkH } from 'react-icons/cg';
+import { AiFillHome, AiFillInfoCircle, AiFillMessage } from 'react-icons/ai';
+import { FaListUl, FaUser, FaUserSlash } from 'react-icons/fa';
+import { IoBagCheck, IoGrid, IoHelpCircleSharp } from 'react-icons/io5';
+import { BiSolidCategory, BiSolidDiscount, BiSolidMessage, BiSolidPurchaseTag } from 'react-icons/bi';
+import { PiPackageBold } from 'react-icons/pi';
+import { BsArrowRepeat, BsBoxes, BsBoxSeamFill } from 'react-icons/bs';
+import { GiStarsStack } from 'react-icons/gi';
+import { RiDiscountPercentFill } from 'react-icons/ri';
+import { HiGiftTop } from 'react-icons/hi2';
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -50,26 +54,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-const Drawer = styled(MuiDrawer, { 
-  shouldForwardProp: (prop) => prop !== 'open' 
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== 'open'
 })(({ theme, open }) => ({
   width: drawerWidth,
   flexShrink: 0,
@@ -85,84 +71,145 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const Sidebar = () => {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+const menuItems = [
+  { text: 'Dashboard', icon: <AiFillHome size={20} />, path: '/dashboard' },
+  { text: 'User', icon: <FaUser size={20} />, path: '/' },
+  { text: 'Main Category', icon: <BiSolidCategory size={20} />, path: '/' },
+  { text: 'Category', icon: <FaListUl size={20} />, path: '/' },
+  { text: 'Sub Category', icon: <IoGrid size={20} />, path: '/' },
+  { text: 'Products', icon: <PiPackageBold size={20} />, path: '/' },
+  { text: 'Unit', icon: <IoBagCheck size={20} />, path: '/' },
+  { text: 'Size', icon: <CgArrowsShrinkH size={20} />, path: '/' },
+  { text: 'Stock', icon: <BsBoxSeamFill size={20} />, path: '/' },
+  { text: 'Order', icon: <BsBoxes size={20} />, path: '/' },
+  { text: 'Review', icon: <GiStarsStack size={20} />, path: '/' },
+  { text: 'Coupen', icon: <BiSolidDiscount size={20} />, path: '/' },
+  {
+    text: 'Offers',
+    icon: <RiDiscountPercentFill size={20} />,
+    dropdown: true,
+    children: [
+      { text: 'Product Offer', path: '/' },
+      { text: 'Offer', path: '/' },
+    ],
+  },
+  { text: 'Return Order', icon: <BsArrowRepeat  size={20} />, path: '/' },
+  { text: 'Cancel Order', icon: <BsBoxSeamFill  size={20} />, path: '/' },
+  { text: 'Reason for Cancellation', icon: <BsBoxSeamFill  size={20} />, path: '/' },
+  { text: 'Terms & Conditions', icon: <BsBoxSeamFill  size={20} />, path: '/' },
+  { text: 'FAQ', icon: <BiSolidMessage size={20} />, path: '/' },
+  { text: 'Account Policy', icon: <BiSolidMessage size={20} />, path: '/' },
+  { text: 'Deactivated Account', icon: <FaUserSlash  size={20} />, path: '/' },
+  { text: 'Help', icon: <IoHelpCircleSharp  size={20} />, path: '/' },
+  { text: 'Contect Us', icon: <AiFillMessage  size={20} />, path: '/' },
+  { text: 'About Us', icon: <AiFillInfoCircle  size={20} />, path: '/' },
+  { text: 'Card', icon: <HiGiftTop  size={20} />, path: '/' },
+  { text: 'Popular Brands', icon: <BiSolidPurchaseTag  size={20} />, path: '/' },
+];
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+const Sidebar = ({ open, handleDrawerClose, theme }) => {
+  const navigate = useNavigate();
+  const [offersOpen, setOffersOpen] = useState(false);
+
+  const handleNavigation = (path) => {
+    navigate(path);
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const toggleOffersDropdown = () => {
+    setOffersOpen(!offersOpen);
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open} >
-        <Toolbar  className='bg-white'>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon className='text-[#2B221E]' />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" className='text-black'>
-           E Commerce
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open} >
-        <DrawerHeader className='bg-[#2B221E] '>
-            <h1 className='text-xl font-bold'>LOGO</h1>
-          <IconButton onClick={handleDrawerClose} >
-            {theme.direction === 'rtl' ? <ChevronRightIcon className='text-white' /> : <ChevronLeftIcon className='text-white' />}
-          </IconButton>
-        </DrawerHeader>
-        {/* <Divider /> */}
-        <List >
-          {['Inbox', 'Starred', 'Send email', 'Drafts','All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+    <Drawer variant="permanent" open={open}>
+      <DrawerHeader className='bg-[#2B221E]'>
+        <h1 className='text-3xl pe-5 text-white'>LOGO</h1>
+        <IconButton onClick={handleDrawerClose}>
+          {theme.direction === 'rtl' ?
+            <FiChevronRight className='text-white w-6 h-6' /> :
+            <FiChevronLeft className='text-white w-6 h-6' />
+          }
+        </IconButton>
+      </DrawerHeader>
+      <List className='bg-[#2B221E] h-full'>
+        {menuItems.map((item) => (
+          <React.Fragment key={item.text}>
+            <ListItem disablePadding sx={{ display: 'block' }}>
               <ListItemButton
+                onClick={item.dropdown ? toggleOffersDropdown : () => handleNavigation(item.path)}
                 sx={{
                   minHeight: 48,
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                className='fill-[#ffffff]'
+                className='text-white hover:bg-[#3f322d] transition-colors duration-200'
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
                     mr: open ? 3 : 'auto',
                     justifyContent: 'center',
+                    color: 'white',
                   }}
+                  className='text-white'
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {item.icon}
                 </ListItemIcon>
-                <ListItemText 
-                  primary={text} 
-                  sx={{ opacity: open ? 1 : 0 }} 
+                <ListItemText
+                  primary={item.text}
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    color: 'white',
+                  }}
                 />
+                {item.dropdown && (
+                  <IconButton
+                    sx={{
+                      color: 'white',
+                      marginLeft: open ? 'auto' : 0,
+                      display: open ? 'block' : 'none',
+                      transition: 'transform 0.3s ease',
+                      transform: open ? 'rotate(0deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    {offersOpen ? <FiChevronUp /> : <FiChevronDown />}
+                  </IconButton>
+                )}
               </ListItemButton>
             </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
-        <Typography>
-          Lorem ipsum dolor sit amet...
-        </Typography>
-      </Box>
-    </Box>
+            {item.dropdown && offersOpen && item.children.map((child) => (
+              <ListItem
+                key={child.id || child.text}
+                disablePadding
+                sx={{ display: 'block', pl: 4, color: 'white', position: 'relative' }}
+              >
+                <ListItemButton
+                  onClick={() => handleNavigation(child.path)}
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
+                    // '&:hover': {
+                    //   backgroundColor: '#3f322d',
+                    // },
+                  }}
+                  className='text-white  before:content-["•"] before:absolute before:text-white'
+                >
+                  <ListItemText
+                    primary={child.text}
+                    sx={{
+                      opacity: open ? 1 : 0,
+                      color: 'inherit', 
+                      paddingLeft:'20px'
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+
+          </React.Fragment>
+        ))}
+      </List>
+    </Drawer>
   );
 };
 
