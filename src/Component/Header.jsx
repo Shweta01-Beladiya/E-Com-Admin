@@ -1,9 +1,106 @@
-const Header = () => {
-    return(
-        <div>
-            <h1>Header</h1>
+// Header.jsx
+import React from 'react';
+import { styled } from '@mui/material/styles';
+import {
+  AppBar as MuiAppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+} from '@mui/material';
+import { FiMenu } from 'react-icons/fi';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+
+const drawerWidth = 280;
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+
+
+const Header = ({ open, handleDrawerOpen }) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const isMenuOpen = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <AppBar position="fixed" open={open}>
+      <Toolbar className='bg-white text-black'>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={handleDrawerOpen}
+          edge="start"
+          sx={{
+            marginRight: 5,
+            ...(open && { display: 'none' }),
+          }}
+        >
+          <FiMenu className='text-[#2B221E] w-6 h-6' />
+        </IconButton>
+        <Typography variant="h6" noWrap component="div" >
+          E Commerce
+        </Typography>
+        {/* <div className='ml-auto'>
+       <img src={require('../s_img/loginUser.png')} alt=""  />
+       </div> */}
+        <div className='ml-auto'>
+          <Button
+            id="basic-button"
+            aria-controls={isMenuOpen ? 'basic-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={isMenuOpen ? 'true' : undefined}
+            onClick={handleClick}
+          >
+            <img src={require('../s_img/loginUser.png')} alt="" />
+          </Button>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={isMenuOpen}
+            onClose={handleClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem onClick={handleClose}>
+              <div className='flex'>
+                <div>
+                  <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-2' />
+                </div>
+                <div>
+                  <p><b>John Patel</b></p>
+                  <p className='text-[#7D7D7D]'>example@gmail.com</p>
+                </div>
+              </div>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
         </div>
-    )
-}
+      </Toolbar>
+    </AppBar>
+  );
+};
 
 export default Header;

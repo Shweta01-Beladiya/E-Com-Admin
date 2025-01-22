@@ -7,4 +7,6 @@
     background-color: #2B221E !important;
     color: white !important;
  }
- 
+ .css-1n6jaw4-MuiListItemText-root::after{
+    content: "'•'",
+ }
