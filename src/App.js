@@ -3,12 +3,13 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './Component/Layout';
 import './CSS/s_style.css';
 import Dashboard from './Pages/Dashboard';
-
+import LoginPage from './Pages/login';
 function App() {
   return (
     <div>
       <BrowserRouter>
           <Routes>
+          <Route path='/' element={<LoginPage/>}></Route>
             <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
             </Route>
@@ -19,3 +20,4 @@ function App() {
 }
 
 export default App;
+
