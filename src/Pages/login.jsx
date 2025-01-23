@@ -2,6 +2,7 @@ import React from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { FormGroup, FormControl, InputGroup, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../CSS/riyansee.css";
@@ -15,14 +16,22 @@ const LoginSchema = Yup.object().shape({
     .required("Password is required"),
 });
 
+
+
 const LoginForm = () => {
+  const navigate = useNavigate();
   return (
     <div className="login-page">
       {/* Left Section */}
       <div className="left-section">
         <div className="cartoon-container">
-          <img src={require("../Photos/logincartoon.png")} alt="Cartoon" />
+          <img
+            src={require("../Photos/logincartoon.png")}
+            alt="Cartoon"
+            className="cartoon-walk"
+          />
         </div>
+        <div className="cartoon-border"></div>
       </div>
 
       {/* Right Section */}
@@ -42,9 +51,7 @@ const LoginForm = () => {
                 {/* Email Field */}
                 <FormGroup className="mb-3">
                   <InputGroup>
-                    <InputGroup.Text>
-                      <i className="bi bi-envelope-fill"></i>
-                    </InputGroup.Text>
+                    
                     <Field
                       name="email"
                       type="email"
@@ -52,6 +59,9 @@ const LoginForm = () => {
                       as={FormControl}
                       isInvalid={touched.email && errors.email}
                     />
+                    <InputGroup.Text>
+                      <i className="bi bi-envelope-fill"></i>
+                    </InputGroup.Text>
                   </InputGroup>
                   {touched.email && errors.email && (
                     <div className="invalid-feedback">{errors.email}</div>
@@ -61,9 +71,7 @@ const LoginForm = () => {
                 {/* Password Field */}
                 <FormGroup className="mb-3">
                   <InputGroup>
-                    <InputGroup.Text>
-                      <i className="bi bi-lock-fill"></i>
-                    </InputGroup.Text>
+                    
                     <Field
                       name="password"
                       type="password"
@@ -71,6 +79,9 @@ const LoginForm = () => {
                       as={FormControl}
                       isInvalid={touched.password && errors.password}
                     />
+                    <InputGroup.Text>
+                      <i className="bi bi-lock-fill"></i>
+                    </InputGroup.Text>
                   </InputGroup>
                   {touched.password && errors.password && (
                     <div className="invalid-feedback">{errors.password}</div>
@@ -78,8 +89,8 @@ const LoginForm = () => {
                 </FormGroup>
 
                 {/* Forgot Password */}
-                <div className="d-flex justify-content-between">
-                  <a href="#" className="forgot-password">
+                <div className="text-end">
+                  <a href="#" className="forgot-password" onClick={() => navigate("/forgot-password")}>
                     Forgot Password?
                   </a>
                 </div>
