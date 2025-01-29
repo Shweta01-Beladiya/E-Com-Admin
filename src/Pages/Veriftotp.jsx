@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { FormGroup, Button } from "react-bootstrap";
@@ -6,13 +6,29 @@ import { useNavigate } from "react-router-dom";
 import "../CSS/riyansee.css";
 
 const OTPSchema = Yup.object().shape({
-  otp: Yup.string()
-    .length(4, "OTP must be exactly 4 digits")
-    .required("OTP is required"),
+  otp1: Yup.string()
+    .length(1, "Required")
+    .required("Required"),
+  otp2: Yup.string()
+    .length(1, "Required")
+    .required("Required"),
+  otp3: Yup.string()
+    .length(1, "Required")
+    .required("Required"),
+  otp4: Yup.string()
+    .length(1, "Required")
+    .required("Required"),
 });
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
+  const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+
+  const handleKeyUp = (e, index) => {
+    if (e.target.value.length === 1 && index < 3) {
+      inputRefs[index + 1].current.focus();
+    }
+  };
 
   return (
     <div className="login-page">
@@ -32,36 +48,43 @@ const VerifyOTP = () => {
       <div className="right-section">
         <div className="login-form">
           <h2>Verify OTP</h2>
-          <p>Enter the OTP sent to your email.</p>
+          <p>Code has been succesfully sent to example@gmail.com</p>
           <Formik
-            initialValues={{ otp: "" }}
+            initialValues={{ otp1: "", otp2: "", otp3: "", otp4: "" }}
             validationSchema={OTPSchema}
             onSubmit={(values) => {
-              console.log("OTP Submitted", values);
-              navigate("/reset-password"); // Navigate to Reset Password page
+              const otp = values.otp1 + values.otp2 + values.otp3 + values.otp4;
+              console.log("OTP Submitted", otp);
+              navigate("/reset-password");
             }}
           >
             {({ errors, touched }) => (
               <Form>
-                {/* OTP Field */}
-                <FormGroup className="mb-3">
-                  <Field
-                    name="otp"
-                    type="text"
-                    placeholder="Enter OTP"
-                    className={`form-control ${
-                      touched.otp && errors.otp ? "is-invalid" : ""
-                    }`}
-                  />
-                  {touched.otp && errors.otp && (
-                    <div className="invalid-feedback">{errors.otp}</div>
-                  )}
-                </FormGroup>
+                <div className="d-flex justify-content-between mb-3">
+                  {[1, 2, 3, 4].map((num, index) => (
+                    <FormGroup key={num} className="mx-1">
+                      <Field
+                        name={`otp${num}`}
+                        type="text"
+                        maxLength="1"
+                        className={`form-control text-center otp-input ${
+                          touched[`otp${num}`] && errors[`otp${num}`] ? "is-invalid" : ""
+                        }`}
+                        style={{ width: "60px", height: "60px", fontSize: "24px" }}
+                        onKeyUp={(e) => handleKeyUp(e, index)}
+                        innerRef={inputRefs[index]}
+                      />
+                    </FormGroup>
+                  ))}
+                </div>
 
                 {/* Submit Button */}
                 <Button type="submit" className="btn-login w-100 mt-3">
                   Verify OTP
                 </Button>
+                <p className="mt-3 text-center">
+                  Didn't receive code? <span style={{ cursor: "pointer", color: "#007bff" }}>Resend</span>
+                </p>
               </Form>
             )}
           </Formik>
