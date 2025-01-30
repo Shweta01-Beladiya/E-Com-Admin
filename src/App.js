@@ -7,19 +7,22 @@ import LoginPage from './Pages/login';
 import Forgotpassword from './Pages/Forgotpassword';
 import VerifyOTP from './Pages/Veriftotp';
 import ResetPassword from './Pages/Resetpassword';
+import UserTable from './Pages/User';
 function App() {
   return (
     <div>
       <BrowserRouter>
-          <Routes>
-          <Route path='/' element={<LoginPage/>}></Route>
-          <Route path='/verify-otp' element={<VerifyOTP/>}></Route>
-          <Route path='/forgot-password' element={<Forgotpassword/>}></Route>
-          <Route path='/reset-password' element={<ResetPassword/>}></Route>
-            <Route path="/dashboard" element={<Layout />}>
+        <Routes>
+          <Route path='/' element={<LoginPage />}></Route>
+          <Route path='/verify-otp' element={<VerifyOTP />}></Route>
+          <Route path='/forgot-password' element={<Forgotpassword />}></Route>
+          <Route path='/reset-password' element={<ResetPassword />}></Route>
+          <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
-            </Route>
-          </Routes>
+            <Route path="users" element={<UserTable/>}/>
+          </Route>
+        
+        </Routes>
       </BrowserRouter>
     </div>
   );
