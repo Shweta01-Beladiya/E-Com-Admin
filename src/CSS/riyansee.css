@@ -96,7 +96,54 @@
 .btn-login:hover {
   background-color: #2c2c2c;
 }
+.otp-input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  background: #fff;
+}
 
+.otp-input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.otp-input.is-invalid {
+  border-color: #dc3545;
+  padding-right: 0.75rem !important;
+}
+
+.otp-input.is-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
+}
+
+.password-field-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+}
+
+/* Adjust padding of password fields to prevent overlap with toggle button */
+.password-field-container .form-control {
+  padding-right: 40px;
+}
 /* Responsive Design */
 @media screen and (max-width: 1440px){
   .cartoon-container img{
@@ -146,3 +193,5 @@
     padding: 20px;
   }
 }
+
+
