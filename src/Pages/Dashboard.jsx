@@ -113,12 +113,12 @@ const Dashboard = () => {
                 <p className='mb-2 mv_revenue_heading'>Revenue</p>
                 <p className='mb-4 mv_revenue_dollar'>$34360.33</p>
                 <p className='mb-0 mv_revenue_percan'>
-                  <img src={require('../../images/arrow_top_right.png')} alt="" />10%
+                  <img src={require('../mv_img/arrow_top_right.png')} alt="" />10%
                 </p>
               </div>
               <div className="mv_revenue_logo">
                 <p className='mb-0'>
-                  <img src={require('../../images/revenue.png')} alt="" />
+                  <img src={require('../mv_img/revenue.png')} alt="" />
                 </p>
               </div>
             </div>
@@ -129,12 +129,12 @@ const Dashboard = () => {
                 <p className='mb-2 mv_revenue_heading'>Daily Order</p>
                 <p className='mb-4 mv_revenue_dollar'>2.2K</p>
                 <p className='mb-0 mv_daily_order_percan'>
-                  <img src={require('../../images/arrow_down_left.png')} alt="" />23%
+                  <img src={require('../mv_img/arrow_down_left.png')} alt="" />23%
                 </p>
               </div>
               <div className="mv_revenue_logo">
                 <p className='mb-0'>
-                  <img src={require('../../images/daily_order.png')} alt="" />
+                  <img src={require('../mv_img/daily_order.png')} alt="" />
                 </p>
               </div>
             </div>
@@ -145,12 +145,12 @@ const Dashboard = () => {
                 <p className='mb-2 mv_revenue_heading'>Daily Sales</p>
                 <p className='mb-4 mv_revenue_dollar'>$34360.33</p>
                 <p className='mb-0 mv_daily_sale'>
-                  <img src={require('../../images/arrow_top_right.png')} alt="" />10%
+                  <img src={require('../mv_img/arrow_top_right.png')} alt="" />10%
                 </p>
               </div>
               <div className="mv_revenue_logo">
                 <p className='mb-0'>
-                  <img src={require('../../images/daily_sales.png')} alt="" />
+                  <img src={require('../mv_img/daily_sales.png')} alt="" />
                 </p>
               </div>
             </div>
@@ -161,12 +161,12 @@ const Dashboard = () => {
                 <p className='mb-2 mv_revenue_heading'>Products</p>
                 <p className='mb-4 mv_revenue_dollar'>226</p>
                 <p className='mb-0 mv_product_percan'>
-                  <img src={require('../../images/arrow_top_right_green.png')} alt="" />10%
+                  <img src={require('../mv_img/arrow_top_right_green.png')} alt="" />10%
                 </p>
               </div>
               <div className="mv_revenue_logo">
                 <p className='mb-0'>
-                  <img src={require('../../images/product_revenue.png')} alt="" />
+                  <img src={require('../mv_img/product_revenue.png')} alt="" />
                 </p>
               </div>
             </div>
@@ -209,7 +209,7 @@ const Dashboard = () => {
                         {checkboxes.isIDChecked && <td>{item.id}</td>}
                         {checkboxes.isNameChecked && (
                           <td>
-                            <img src={require('../../images/vegetable.png')} alt="" />
+                            <img src={require('../mv_img/vegetable.png')} alt="" />
                             {item.name}
                           </td>
                         )}
