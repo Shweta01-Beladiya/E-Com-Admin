@@ -11,46 +11,34 @@
   flex: 0.4; /* Smaller portion for left section */
   background-color: #FFEDE1;
   display: flex;
-  align-items: flex-end; /* Align cartoon to bottom */
+  align-items: flex-end; 
   justify-content: center;
   position: relative;
 }
 
-.cartoon-container {
+/* .cartoon-container {
   position: relative;
-  width: 100%;
 }
-
-.cartoon-container img {
-  position: absolute;
-  bottom: 100px; /* Ensure cartoon touches the border */
-  left: 0;
-  width: auto;
-  height: 450px; /* Adjust size as needed */
-}
-
 .cartoon-border {
   position: absolute;
   bottom: 10%;
   left: 0;
-  width: 100vw; /* Full screen width */
-  height: 3px; /* Border thickness */
+  width: 100vw; 
+  height: 3px; 
   background-color: #FFCEAE;
   z-index: 1;
-}
+} */
 
-/* Walking animation */
-@keyframes walk {
-  0% {
-    left: -150px; /* Start off-screen */
-  }
-  100% {
-    left: 80%; /* Walk off the other side of the screen */
-  }
+#mouth{
+  animation: mymouth 3s infinite;
 }
-
-.cartoon-walk {
-  animation: walk 10s linear infinite; /* Adjust timing as needed */
+@keyframes mymouth {
+  from{
+    rotate: 20deg;
+  }
+  to{
+    rotate: 0deg;
+  }
 }
 
 /* Right Section */
@@ -145,32 +133,7 @@
   padding-right: 40px;
 }
 /* Responsive Design */
-@media screen and (max-width: 1440px){
-  .cartoon-container img{
-    bottom: 60px;
-  }
-  @keyframes walk {
-    0% {
-      left: -150px; /* Start off-screen */
-    }
-    100% {
-      left: 60%; /* Walk off the other side of the screen */
-    }
-  }
-}
-@media screen and (max-width: 1024px){
-  .cartoon-container img{
-    height: 300px;
-  }
-  @keyframes walk {
-    0% {
-      left: -150px; /* Start off-screen */
-    }
-    100% {
-      left: 30%; /* Walk off the other side of the screen */
-    }
-  }
-}
+
 @media screen and (max-width: 768px) {
   .login-page {
     flex-direction: column;
