@@ -1,5 +1,6 @@
 // Header.jsx
 import React from 'react';
+import './header.css';
 import { styled } from '@mui/material/styles';
 import {
   AppBar as MuiAppBar,
@@ -11,6 +12,7 @@ import { FiMenu } from 'react-icons/fi';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Modal from 'react-bootstrap/Modal';
 
 const drawerWidth = 280;
 
@@ -43,6 +45,10 @@ const Header = ({ open, handleDrawerOpen }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  // Modal
+  const [modalShow, setModalShow] = React.useState(false);
+
   return (
     <AppBar position="fixed" open={open}>
       <Toolbar className='bg-white text-black'>
@@ -95,10 +101,27 @@ const Header = ({ open, handleDrawerOpen }) => {
               </div>
             </MenuItem>
             <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={() => setModalShow(true)}>Logout</MenuItem>
           </Menu>
         </div>
       </Toolbar>
+
+      {/* Logout Modal */}
+      <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal.Body className='text-center mv_logout'>
+          <h5 className='mb-2'>Logout?</h5>
+          <p>Are you sure you want to<br /> Logout?</p>
+          <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
+            <div className="mv_logout_cancel">
+              <button onClick={() => setModalShow(false)}>Cancel</button>
+            </div>
+            <div className="mv_logout_button">
+              <button>Logout</button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+
     </AppBar>
   );
 };
