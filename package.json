@@ -8,6 +8,8 @@
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
     "@mui/styled-engine-sc": "^6.4.0",
+    "@shadcn/ui": "^0.0.4",
+    "apexcharts": "^4.4.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "cra-template": "1.2.0",

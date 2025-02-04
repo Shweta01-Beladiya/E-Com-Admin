@@ -80,6 +80,7 @@
 .mv_product_heading{
     padding: 20px;
     background-color: #fff;
+    border-bottom: 0.91px solid #D8D8D8 !important;
 }
 .mv_product p{
     font-size: 20px;
@@ -110,24 +111,18 @@
     background-color: #fff;
     box-shadow: -2.19px 4.38px 63.51px 0px #7777771A;
 }
-.mv_product_table_padd{
-    padding: 0px 30px;
-}
 .mv_product_table{
     width: 100%;
 }
 .mv_product_table thead tr th{
-    padding: 10px 30px;
+    padding: 20px 30px;
     font-size: 20px;
     font-weight: 600;
     line-height: 24.2px;
-    color: #16325B;
+    color: #2B221E;
 }
 .mv_product_table thead tr th:last-child{
     margin-right: 45px !important;
-}
-.mv_product_table thead tr{
-    border-bottom: 0.8px solid #D2D2D2;
 }
 .mv_product_table tbody tr td{
     padding: 10px 30px;
@@ -135,12 +130,10 @@
     font-weight: 500;
     line-height: 21.78px;
     text-wrap: nowrap !important;
+    color: #000000 !important;
 }
 .mv_product_table tbody tr td:last-child{
     margin-right: 20px !important;
-}
-.mv_product_table tbody tr{
-    border-bottom: 0.8px solid #D2D2D2;
 }
 .mv_product_table tbody tr:last-child{
     border-bottom: none !important;
@@ -148,6 +141,8 @@
 .mv_product_table tbody tr td img{
     border-radius: 50%;
     margin-right: 5px;
+    height: 42px;
+    width: 42px;
 }
 .mv_revenue_percentage{
     font-size: 14px;
@@ -160,6 +155,200 @@
 }
 .mv_earning_revenue_profile_item{
     margin-right: 40px;
+}
+
+/* new */
+.mv_total_save_logo img{
+    width: 66px;
+    height: 66px;
+    margin-right: 10px;
+}
+.mv_ts_text{
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16.94px;
+    margin-bottom: 5px !important;
+    color: #828282;
+}
+.mv_tsm_text{
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 29.05px;
+    color: #000000;
+}
+.mv_text_plus_per{
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24.39px;
+    margin-bottom: 0px !important;
+    color: #0D894F;
+}
+.mv_text_mainus_per{
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24.39px;
+    color: #FF0000;
+}
+/* Order Summary */
+.mv_review_height{
+    height: 500px !important;
+    background-color: #fff;
+}
+.mv_order_summary{
+    background-color: #fff;
+    box-shadow: -2.19px 4.38px 63.51px 0px #7777771A;
+}
+.mv_main_order_summary{
+    padding: 15px !important;
+    border-bottom: 0.91px solid #D8D8D8 !important;
+}
+.mv_heading_order_sum{
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 24.2px;
+    color: #2B221E;
+}
+.mv_oreder_month{
+    border: 0.91px solid #2B221E80 !important;
+    border-radius: 2px !important;
+    color: #6A6A6A !important;
+    font-size: 13.58px !important;
+    font-weight: 500;
+    line-height: 16.43px;
+    }
+.mv_oreder_month:focus{
+    box-shadow: none !important;
+}
+.mv_oprtion_month{
+    font-size: 13.58px !important;
+    font-weight: 500;
+    line-height: 16.43px;
+    color: #6A6A6A;
+}
+.mv_sub_order_summary{
+    background-color: #fff;
+    padding: 20px;
+}
+.mv_on_deli_con{
+    border: 1.13px solid #948F8E !important;
+    backdrop-filter: blur(18.488929748535156px) !important;
+    padding: 20px;
+    border-radius: 2px;
+}
+.mv_on_deli_per{
+    font-size: 20.37px;
+    font-weight: 600;
+    line-height: 24.65px;
+    color: #000000;
+}
+.mv_on_deli_text{
+    font-size: 15.84px;
+    font-weight: 400;
+    line-height: 19.17px;
+    color: #6A6A6A;
+}
+.apexcharts-legend {
+    top: 75px !important;
+}
+.mv_review_view_all{
+    font-size: 13.58px;
+    font-weight: 400;
+    line-height: 16.43px;
+    color: #6A6A6A;
+}
+.mv_review_user_img img{
+    border-radius: 50%;
+    margin-right: 15px;
+    width: 52px;
+    height: 52px;
+}
+.mv_review_user_name{
+    font-size: 16.97px;
+    font-weight: 500;
+    line-height: 20.54px;
+    color: #000000;
+}
+.mv_review_date{
+    font-size: 14.71px;
+    font-weight: 400;
+    line-height: 17.8px;
+    color: #6A6A6A;
+}
+.mv_main_padd{
+    background-color: #fff;
+}
+.mv_main_review{
+    padding: 20px;
+}
+.mv_star_yellow{
+    color: #FDC040;
+    height: 18.8px;
+    width: 18.8px;
+    margin-right: 4px;
+}
+.mv_star_gray{
+    color: #C3C3C3;
+    height: 18.8px;
+    width: 18.8px;
+}
+.mv_review_text{
+    font-size: 13.58px;
+    font-weight: 500;
+    line-height: 16.43px;
+    color: #6A6A6A;
+    padding: 0px 20px 20px 20px;
+    border-bottom: 0.85px solid #DADADA;
+}
+/* Top Product */
+.mv_rating_img{
+    background-color: #F6F6F6;
+    display: inline-block !important;
+    padding: 5px 10px;
+}
+/* Sales by Location */
+.mv_sales_by_location_table{
+    width: 100%;
+}
+.mv_sales_by_location_table thead tr{
+    border-bottom: 0.85px solid #DADADA;
+}
+.mv_sales_by_location_table thead tr th{
+    padding: 15px 20px;
+}
+.mv_sales_by_location_table thead tr th:last-child{
+    float: right !important;
+}
+.mv_table_month{
+    width: 100px !important;
+}
+.mv_sales_by_location_table tbody tr td{
+    font-size: 13.58px;
+    font-weight: 500;
+    line-height: 22.63px;
+    letter-spacing: 0.005em;
+    color: #000000;
+    padding: 8px 20px;
+}
+.mv_sales_by_location_table tbody tr td:last-child{
+    float: right !important;
+}
+.mv_plus_sales_per{
+    background-color: #E7F4EE;
+    color: #0D894F;
+    padding: 5px 10px;
+    border-radius: 40%;
+    margin-left: 10px;
+    width: 60px !important;
+    text-align: center;
+}
+.mv_mainus_sales_per{
+    background-color: #E7F4EE;
+    color: #FF0000;
+    padding: 5px 10px;
+    border-radius: 40%;
+    margin-left: 10px;
+    width: 60px !important;
+    text-align: center;
 }
 
 
@@ -192,6 +381,10 @@
 @media (max-width: 1024px){
     .mv_revenue{
         padding: 10px;
+    }
+    /* product list table */
+    .mv_product_table_content{
+        margin-bottom: 20px;
     }
 }
 
