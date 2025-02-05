@@ -10,9 +10,11 @@ import ResetPassword from './Pages/Resetpassword';
 import UserTable from './Pages/User';
 import Login from './Pages/Login';
 
-import MainCategoryManagement from './Pages/Maincategory';
+import Maincategory from'./Pages/Maincategory';
+import Category from './Pages/Category';
 
 import Viewprofile from './Pages/Viewprofile';
+import Subcategory from './Pages/Subcategory';
 
 function App() {
   return (
@@ -28,7 +30,9 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="users" element={<UserTable/>}/>
 
-            <Route path='maincategory' element={<MainCategoryManagement/>}></Route>
+            <Route path='maincategory' element={<Maincategory/>}></Route>
+            <Route path='category' element={<Category/>}></Route>
+            <Route path='subcategory' element={<Subcategory/>}></Route>
 
             <Route path='view_profile' element={<Viewprofile />}></Route>
 
