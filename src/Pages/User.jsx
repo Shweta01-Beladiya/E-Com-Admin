@@ -1,19 +1,20 @@
-
 import React, { useState } from 'react';
-import { 
-  Container, 
-  Table, 
-  Form, 
-  InputGroup, 
-  Button, 
-  Row, 
-  Col, 
+import {
+  Container,
+  Table,
+  Form,
+  InputGroup,
+  Button,
+  Row,
+  Col,
   Pagination,
-  Offcanvas
+  Offcanvas,
+  Modal
 } from 'react-bootstrap';
 import { FaSearch, FaTrash } from 'react-icons/fa';
 import { FaFilter } from "react-icons/fa";
 import '../CSS/riya.css';
+import { X } from 'lucide-react';
 
 const UserTable = () => {
   // Sample data
@@ -48,17 +49,32 @@ const UserTable = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [showFilter, setShowFilter] = useState(false);
   const [selectedGenders, setSelectedGenders] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
 
   // Filter functionality
   const filteredData = data.filter(item => {
     const matchesSearch = Object.values(item).some(value =>
       value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
-    
+
     const matchesGender = selectedGenders.length === 0 || selectedGenders.includes(item.gender);
-    
+
     return matchesSearch && matchesGender;
   });
+
+  // No Results Found Component
+  const NoResultsFound = () => (
+    <div className="text-center ">
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+        {/* <X className="w-8 h-8 text-gray-400" /> */}
+        <img src={require('../Photos/notfind.png')}></img>
+      </div>
+      <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
+      <p className="text-gray-500">Whoops... No matching data found</p>
+    </div>
+  );
 
   // Sorting functionality
   const sortData = (key) => {
@@ -90,8 +106,15 @@ const UserTable = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   // Handle delete
-  const handleDelete = (id) => {
-    setData(data.filter(item => item.id !== id));
+  const handleDelete = (id, name) => {
+    setUserToDelete({ id, name });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    setData(data.filter(item => item.id !== userToDelete.id));
+    setShowDeleteModal(false);
+    setUserToDelete(null);
   };
 
   // Handle filter actions
@@ -137,13 +160,14 @@ const UserTable = () => {
     filterGroup: {
       marginBottom: '20px'
     }
+
   };
 
   return (
-    
-    <Container fluid className="py-5" style={{backgroundColor: '#F7F7F7',padding:'0 40px'}} >
-      <h4 className='mb-0'>User</h4>
-      <p className='text-muted'>Dashboard <span>/ User</span></p>
+
+    <Container fluid className="py-3" style={{ backgroundColor: '#F7F7F7' }}>
+      <h4 className="mb-0">User</h4>
+      <p className="text-muted">Dashboard <span>/ User</span></p>
       <div style={styles.card}>
         {/* Search and Filter Section */}
         <Row className="mb-4 align-items-center">
@@ -160,86 +184,91 @@ const UserTable = () => {
             </InputGroup>
           </Col>
           <Col xs={12} md={6} lg={8} className="text-end mt-3 mt-md-0">
-            <Button 
+            <Button
               variant="outline-secondary"
               onClick={() => setShowFilter(true)}
             >
-                <FaFilter className='me-2' />
+              <FaFilter className="me-2" />
               Filter {selectedGenders.length > 0 && `(${selectedGenders.length})`}
             </Button>
           </Col>
         </Row>
 
-        {/* Table Section */}
-        <div className="table-responsive">
-          <Table hover borderless>
-            <thead>
-              <tr>
-                {['ID', 'Name', 'Mobile No.', 'DOB', 'Gender', 'Email', 'Action'].map((header, index) => (
-                  <th 
-                    key={index}
-                    style={styles.tableHeader}
-                    onClick={() => sortData(header.toLowerCase())}
-                  >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td>{item.name}</td>
-                  <td>{item.mobile}</td>
-                  <td>{item.dob}</td>
-                  <td>{item.gender}</td>
-                  <td>{item.email}</td>
-                  <td>
-                    <button
-                      style={styles.deleteButton}
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
+        {/* Conditional rendering based on filtered results */}
+        {filteredData.length > 0 ? (
+          <>
+            {/* Table Section */}
+            <div className="table-responsive">
+              <Table hover borderless>
+                <thead>
+                  <tr>
+                    {['ID', 'Name', 'Mobile No.', 'DOB', 'Gender', 'Email', 'Action'].map((header, index) => (
+                      <th
+                        key={index}
+                        style={styles.tableHeader}
+                        onClick={() => sortData(header.toLowerCase())}
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td>{item.name}</td>
+                      <td>{item.mobile}</td>
+                      <td>{item.dob}</td>
+                      <td>{item.gender}</td>
+                      <td>{item.email}</td>
+                      <td>
+                        <button
+                          style={styles.deleteButton}
+                          onClick={() => handleDelete(item.id, item.name)}
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
 
-        {/* Pagination Section */}
-        <div className="d-flex justify-content-end mt-4">
-          <Pagination>
-            <Pagination.Prev
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            />
-            
-            {[...Array(totalPages)].map((_, index) => (
-              <Pagination.Item
-                key={index + 1}
-                active={currentPage === index + 1}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </Pagination.Item>
-            ))}
-            
-            <Pagination.Next
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            />
-          </Pagination>
-        </div>
+            {/* Pagination Section */}
+            <div className="d-flex justify-content-end mt-4">
+              <Pagination>
+                <Pagination.Prev
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                />
+                {[...Array(totalPages)].map((_, index) => (
+                  <Pagination.Item
+                    key={index + 1}
+                    active={currentPage === index + 1}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </Pagination.Item>
+                ))}
+                <Pagination.Next
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            </div>
+          </>
+        ) : (
+          <NoResultsFound />
+        )}
 
         {/* Filter Offcanvas */}
-        <Offcanvas 
-          show={showFilter} 
-          onHide={() => setShowFilter(false)} 
+        <Offcanvas
+          show={showFilter}
+          onHide={() => setShowFilter(false)}
           placement="end"
-          style={{zIndex: 9999}}
+          style={{ zIndex: 9999 }}
         >
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Filter</Offcanvas.Title>
@@ -259,16 +288,16 @@ const UserTable = () => {
                 />
               ))}
             </Form.Group>
-            
+
             <div className="d-flex justify-content-space-between gap-2">
-              <Button 
-                variant="outline-secondary" 
+              <Button
+                variant="outline-secondary"
                 onClick={handleClearFilter}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={handleApplyFilter}
               >
                 Apply
@@ -276,6 +305,23 @@ const UserTable = () => {
             </div>
           </Offcanvas.Body>
         </Offcanvas>
+
+        {/* Delete Confirmation Modal */}
+        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+
+          <Modal.Body className='p-5'>
+            <h5 className='font-weight-bold text-center'>Delete</h5>
+            <p className='text-center text-muted'> Are you sure you want to delete {userToDelete?.name}?</p>
+            <div className='d-flex justify-content-center gap-3'>
+              <Button onClick={() => setShowDeleteModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
+                Cancel
+              </Button>
+              <Button onClick={confirmDelete} className='r_btn text-white' style={{ backgroundColor: "black" }}>
+                Delete
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
     </Container>
   );

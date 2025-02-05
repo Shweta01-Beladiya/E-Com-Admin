@@ -35,7 +35,7 @@ const Layout = () => {
         handleDrawerClose={handleDrawerClose} 
         theme={theme} 
       />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3}} style={{backgroundColor:'#F7F7F7'}}>
         <DrawerHeader />
         <Outlet />
       </Box>

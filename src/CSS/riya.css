@@ -3,6 +3,19 @@
     padding: 0;
     box-sizing: border-box;
 }
-.css-zxdg2z{
-    padding: 0 !important;
+.page-link{
+    color: black !important;
 }
+.active>.page-link{
+    color: white !important;
+    background-color: black!important;
+    border: none;
+}
+.r_btn{
+    border: 1px solid black !important;
+    padding: 7px 30px;
+    border-radius: 0 !important; 
+}
+/* .css-zxdg2z{
+     padding: 0 !important;
+} */
