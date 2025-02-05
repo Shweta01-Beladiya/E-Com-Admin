@@ -296,19 +296,9 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <Form.Select className='mv_oreder_month' aria-label="Default select example">
-                    <option className='mv_oprtion_month'>Month</option>
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
+                    <option value='Month'>Month</option>
+                    <option value="Week">Week</option>
+                    <option value="Year">Year</option>
                   </Form.Select>
                 </div>
               </div>
@@ -407,7 +397,7 @@ const Dashboard = () => {
                       <tr key={index}>
                         {checkboxes.isNameChecked && (
                           <td>
-                            <img src={require('../mv_img/product.png')} alt="" />
+                            <img className='mv_product_img' src={require('../mv_img/lehenga.png')} alt="" />
                             {item.name}
                           </td>
                         )}
@@ -438,19 +428,9 @@ const Dashboard = () => {
                     <th>Sales by Location</th>
                     <th>
                       <Form.Select className='mv_oreder_month mv_table_month' aria-label="Default select example">
-                      <option className='mv_oprtion_month'>Month</option>
-                      <option value="January">January</option>
-                      <option value="February">February</option>
-                      <option value="March">March</option>
-                      <option value="April">April</option>
-                      <option value="May">May</option>
-                      <option value="June">June</option>
-                      <option value="July">July</option>
-                      <option value="August">August</option>
-                      <option value="September">September</option>
-                      <option value="October">October</option>
-                      <option value="November">November</option>
-                      <option value="December">December</option>
+                        <option value='Month'>Month</option>
+                        <option value="Week">Week</option>
+                        <option value="Year">Year</option>
                       </Form.Select>
                     </th>
                   </tr>

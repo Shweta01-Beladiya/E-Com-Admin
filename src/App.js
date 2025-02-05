@@ -14,6 +14,8 @@ import MainCategoryManagement from './Pages/Maincategory';
 
 import Viewprofile from './Pages/Viewprofile';
 
+import Product from "./Pages/product";
+
 function App() {
   return (
     <div>
@@ -31,6 +33,8 @@ function App() {
             <Route path='maincategory' element={<MainCategoryManagement/>}></Route>
 
             <Route path='view_profile' element={<Viewprofile />}></Route>
+
+            <Route path="product" element={<Product />}></Route>
 
           </Route>
         </Routes>
