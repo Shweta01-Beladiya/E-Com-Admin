@@ -9,7 +9,11 @@ import VerifyOTP from './Pages/Veriftotp';
 import ResetPassword from './Pages/Resetpassword';
 import UserTable from './Pages/User';
 import Login from './Pages/Login';
+
 import MainCategoryManagement from './Pages/Maincategory';
+
+import Viewprofile from './Pages/Viewprofile';
+
 function App() {
   return (
     <div>
@@ -23,9 +27,12 @@ function App() {
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="users" element={<UserTable/>}/>
+
             <Route path='maincategory' element={<MainCategoryManagement/>}></Route>
+
+            <Route path='view_profile' element={<Viewprofile />}></Route>
+
           </Route>
-        
         </Routes>
       </BrowserRouter>
     </div>

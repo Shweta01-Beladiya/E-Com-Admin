@@ -1,8 +1,17 @@
+#mv_container_fluid{
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+
+/******************** Deshboard *******************/
 .mv_main_heading p{
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 600;
-    line-height: 29.05px;
-    color: #002846;
+    line-height: 31.47px;
+    color: #2B221E;
 }
 .mv_revenue_item{
     margin-bottom: 1rem;
@@ -448,3 +457,359 @@
         margin-top: 0px;
     }
 }
+/* ********************************************** */
+
+
+
+
+/***************** View Profile ********************/
+.mv_main_bg_color{
+    background-color: #fff !important;
+    box-shadow: 0px 4px 28px 0px #6F6F6F14 !important;
+    height: 760px !important;
+}
+.mv_user_bgimg{
+    background-image: url(../mv_img/profile_user_bgimg.png) !important;
+    height: 115px !important;
+    width: 100% !important;
+    background-position: center !important;
+    background-size: 100% !important;
+    background-repeat: no-repeat !important;
+}
+.mv_user_bgimg img{
+    width: 120px;
+    height: 120px;
+    margin-top: 60px !important;
+}
+.mv_main_profile_name_email{
+    margin-top: 60px !important;
+    border-bottom: 0.91px solid #DADADA !important;
+    margin: 20px;
+}
+.mv_profile_name{
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 24.2px;
+    text-align: center;
+    color: #2B221E;
+    margin-bottom: 0px !important;
+}
+.mv_profile_email{
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16.94px;
+    text-align: center;
+    color: #6A6A6A;
+}
+.mv_main_personal_info{
+    padding: 20px;
+}
+.mv_personal_info{
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19.36px;
+    color: #2B221E;
+}
+.mv_full_name{
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.94px;
+    color: #000000;
+    display: flex;
+    justify-content: space-between;
+}
+.mv_user_name{
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16.94px;
+    color: #6A6A6A;
+}
+
+/* navs & tabs */
+.nav-tabs{
+    border: none !important;
+    border-bottom: 0.91px solid #DADADA !important;
+    padding: 30px 0px 0px 0px !important;
+    margin: 0px 30px 10px 30px !important;
+    background-color: #fff;
+}
+.nav-link{
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19.36px;
+    padding: 15px 20px !important;
+    color: #6A6A6A !important;
+}
+.nav-tabs .nav-link{
+    border-radius: 0px !important;
+}
+.nav-tabs .nav-link.active{
+    border: none !important;
+    font-weight: 600;
+    border-bottom: 1px solid #2B221E !important;
+    background: linear-gradient(360deg, rgba(43, 34, 30, 0.2) 0%, rgba(55, 49, 46, 0.1) 100%) !important;
+    color: #2B221E !important;
+}
+.nav-tabs .nav-link:hover{
+    border: none !important;
+}
+.nav-tabs .nav-link:focus{
+    outline: none !important;
+}
+
+/* Edit Profile */
+.mv_profile_image_heading{
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19.36px;
+    color: #2B221E;
+}
+.mv_main_profile_change{
+    box-shadow: -2px 4px 58px 0px #2C2C2C1A;
+    height: 760px !important;
+}
+.mv_profile_img img{
+    width: 120;
+    height: 120;
+}
+.mv_main_profile_img{
+    position: relative !important;
+}
+.mv_main_pro_img_camera{
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 75px;
+    left: 80px;
+}
+.mv_pro_img_camera{
+    height: 23px;
+    width: 23px;
+}
+.mv_profile{
+    background-color: #fff;
+    padding: 30px 30px 10px 30px;
+}
+.mv_edit_profile button{
+    width: 180px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 21.78px;
+    padding: 7px 0px;
+    border-radius: 4px;
+    background-color: #fff !important;
+    margin: 0px 14px;
+    color: #2B221E;
+    border: 1px solid #2B221E80 !important;
+}
+.mv_edit_profile button:last-child{
+    width: 180px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 21.78px;
+    padding: 7px 0px;
+    border-radius: 4px;
+    background-color: #2B221E !important;
+    margin: 0px 14px;
+    color: #fff;
+}
+.mv_profile_type{
+    padding: 30px;
+}
+.mv_label_input{
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16.94px;
+    color: #2B221E;
+}
+.mv_input_content input{
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    border: 1px solid #95908F;
+    border-radius: 4px;
+}
+.mv_input_content input:focus{
+    box-shadow: none;
+    border: 1px solid #002846;
+}
+.mv_input_content select{
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    border: 1px solid #95908F;
+    border-radius: 4px;
+}
+.mv_input_content select:focus{
+    box-shadow: none;
+    border: 1px solid #002846;
+}
+.mv_form_select:disabled{
+    background-color: transparent !important;
+}
+.mv_update_profile button{
+    width: 400px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 21.78px;
+    padding: 7px 30px;
+    background-color: #002846 !important;
+    border-radius: 4px;
+    color: #fff;
+}
+
+/* Chnge Password */
+.mv_main_change_pass{
+    padding: 30px;
+}
+.mv_old_pass{
+    position: relative;
+}
+.mv_old_pass input{
+    border: 0.75px solid #95908F !important;
+    border-radius: 4px !important;
+    margin-bottom: 25px !important;
+}
+.mv_old_pass input:focus{
+    outline: none !important;
+}
+.mv_change_pass_icon{
+    color: #727272;
+    position: absolute;
+    top: 38%;
+    right: 15px;
+    font-size: 20px;
+}
+.mv_label_old_pass{
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16.94px;
+    color: #2B221E;
+}
+
+
+
+
+@media (max-width: 1199px){
+    /* View Profile */
+    .mv_user_bgimg img {
+        width: 80px;
+        height: 80px;
+        margin-top: 60px !important;
+    }
+    .mv_main_profile_name_email{
+        margin-top: 20px !important;
+    }
+    .mv_full_name{
+        justify-content: flex-start !important;
+    }
+    .mv_heading_full_name{
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 1024px){
+    /* Edit Profile */
+    .mv_edit_profile button {
+        width: 140px;
+    }
+    .mv_edit_profile button:last-child {
+        width: 140px;
+    }
+}
+
+@media (max-width: 991px){
+    .mv_update_profile button{
+        width: 250px;
+    }
+    /* View Profile */
+    .mv_user_bgimg img {
+        width: 120px;
+        height: 120px;
+        margin-top: 60px !important;
+    }
+    .mv_main_profile_name_email{
+        margin-top: 60px !important;
+    }
+    .mv_full_name{
+        justify-content: space-between !important;
+    }
+    .mv_heading_full_name{
+        margin-bottom: 5px;
+    }
+    .mv_main_bg_color{
+        height: auto !important;
+    }
+    .mv_main_profile_change{
+        height: auto !important;
+    }
+}
+
+@media (max-width: 768px){
+    /* Edit Profile */
+    .mv_edit_profile button {
+        width: 110px;
+        margin: 0px 10px;
+        font-size: 13px;
+    }
+    .mv_edit_profile button:last-child {
+        width: 110px;
+        margin: 0px 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 575px){
+    /* navs & tabs */
+    .nav-tabs {
+        padding: 20px 0px 0px 0px !important;
+        margin: 0px 20px 10px 20px !important;
+    }
+    .mv_profile {
+        padding: 20px 20px 10px 20px;
+    }
+    .mv_profile_type {
+        padding: 20px;
+    }
+    /* Change Password */
+    .mv_main_change_pass {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 425px){
+    .mv_profile{
+        padding:20px;
+    }
+    .mv_profile_type{
+        padding:20px;
+    }
+    .mv_profile_img img{
+        width: 80px;
+        height: 80px;
+    }
+    .mv_update_profile button{
+        width: 180px;
+    }
+    /* View Profile */
+    .mv_user_bgimg img {
+        margin-top: 40px !important;
+    }
+    /* Edit Profile */
+    .mv_edit_profile button {
+        width: 85px;
+        margin: 0px 5px;
+        font-size: 11px;
+    }
+    .mv_edit_profile button:last-child {
+        width: 85px;
+        margin: 0px 5px;
+        font-size: 11px;
+    }
+}
+/* ************************************************ */

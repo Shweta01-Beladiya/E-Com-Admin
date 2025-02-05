@@ -1,0 +1,96 @@
+/******* Logout Model *******/
+.mv_logout{
+    padding: 30px 80px;
+    background-color: #fff;
+    border-radius: 4px !important;
+}
+.mv_logout h5 {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 26.63px;
+    color: #2B221E;
+}
+.mv_logout p{
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 24.2px;
+    color: #6A6A6A;
+    margin-bottom: 40px;
+}
+.mv_logout_cancel{
+    margin-right: 20px;
+}
+.mv_logout_cancel button{
+    border: 1px solid #2B221E;
+    background-color: #fff;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 21.78px;
+    padding: 6px 40px;
+}
+.mv_logout_button button{
+    border: none;
+    background-color: #2B221E;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 21.78px;
+    padding: 6px 40px;
+    width: 136px !important;
+    border: 1px solid #2B221E;
+}
+.modal-dialog {
+    margin: auto !important;
+    max-width: 480px !important;
+}
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: auto !important;
+        max-width: 350px !important;
+    }
+    .mv_logout {
+        padding: 20px 40px;
+    }
+    .mv_logout h5 {
+        font-size: 20px;
+    }
+    .mv_logout p {
+        font-size: 16px;
+        line-height: 22px;
+        margin-bottom: 30px;
+    }
+    .mv_logout_cancel {
+        margin-right: 10px;
+    }
+    .mv_logout_cancel button,
+    .mv_logout_button button {
+        padding: 6px 30px;
+        font-size: 16px;
+        width: 110px !important;
+    }
+}
+@media (max-width: 425px){
+    .mv_logout {
+        padding: 15px 20px;
+    }
+    .mv_logout h5 {
+        font-size: 18px;
+    }
+    .mv_logout p {
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+    .mv_logout_cancel button,
+    .mv_logout_button button{
+        font-size: 14px;
+    }
+}
+@media (max-width: 375px){
+    .modal-dialog {
+        margin: auto !important;
+        max-width: 300px !important;
+    }
+}
+/* ************************ */
