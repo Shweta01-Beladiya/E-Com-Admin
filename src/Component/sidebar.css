@@ -1,0 +1,4 @@
+/* Sidebar */
+.css-dca0j9-MuiDrawer-docked .MuiDrawer-paper {
+    z-index: 10 !important;
+}

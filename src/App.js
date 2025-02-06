@@ -16,6 +16,8 @@ import Category from './Pages/Category';
 import Viewprofile from './Pages/Viewprofile';
 import Subcategory from './Pages/Subcategory';
 
+import Product from "./Pages/product";
+
 function App() {
   return (
     <div>
@@ -35,6 +37,8 @@ function App() {
             <Route path='subcategory' element={<Subcategory/>}></Route>
 
             <Route path='view_profile' element={<Viewprofile />}></Route>
+
+            <Route path="product" element={<Product />}></Route>
 
           </Route>
         </Routes>

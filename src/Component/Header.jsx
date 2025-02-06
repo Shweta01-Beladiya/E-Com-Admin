@@ -101,7 +101,7 @@ const Header = ({ open, handleDrawerOpen }) => {
               </div>
             </MenuItem>
             <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={() => setModalShow(true)}>Logout</MenuItem>
+            <MenuItem onClick={() => { handleClose(); setModalShow(true); }}>Logout</MenuItem>
           </Menu>
         </div>
       </Toolbar>
