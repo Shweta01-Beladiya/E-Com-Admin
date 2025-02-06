@@ -1,4 +1,7 @@
 /******* Logout Model *******/
+.css-7mxpdy-MuiPaper-root-MuiAppBar-root{
+    z-index: 11 !important;
+}
 .mv_logout{
     padding: 30px 80px;
     background-color: #fff;

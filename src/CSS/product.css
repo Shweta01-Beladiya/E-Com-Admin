@@ -1,0 +1,297 @@
+/******************* Product ************************/
+.mv_price_range{
+    position: relative;
+}
+.mv_horisilder{
+    margin: 20px 0;
+    height: 6px;
+}
+.mv_track{
+    background: #b5b5b5;
+    height: 6px;
+}
+.mv_track_active{
+    background: #002846;
+}
+.mv_thumb{
+    height: 20px;
+    width: 20px;
+    background-color: #002846;
+    cursor: pointer;
+    border-radius: 50%;
+    position: relative;
+    top: -8px;
+}
+.mv_price_label{
+    position: absolute;
+    top: 15px;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #000;
+}
+.mv_price_min,
+.mv_price_max{
+    z-index: 1;
+}
+/* .mv_other_category {
+    margin-top: 25px;
+} */
+.mv_dashboard_heading{
+    color: #6A6A6A !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 19.36px !important;
+}
+.mv_category_heading{
+    color: #2B221E !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 19.36px !important;
+    margin-left: 4px;
+}
+.mv_column_button button{
+    width: 120px;
+    background-color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 19.36px;
+    border: 1px solid #95908F;
+    border-radius: 4px;
+    padding: 5px 15px !important;
+    margin-right: 15px;
+    color: #2B221E;
+}
+.mv_column_button button:hover{
+    color: #002846 !important;
+    background-color: #fff !important;
+    border: 1px solid #95908F !important;
+}
+.mv_column_button .show{
+    color: #002846 !important;
+    background-color: #fff !important;
+}
+.mv_column_button button:active{
+    color: #002846 !important;
+    background-color: #fff !important;
+}
+.mv_column_button button img{
+    margin-right: 5px;
+    height: 18px;
+    width: 18px;
+}
+.mv_add_category button{
+    width: 120px;
+    background-color: #2B221E;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 19.36px;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 15px;
+}
+.mv_add_category button a{
+    color: #fff;
+    text-decoration: none !important;
+}
+/* .mv_category_table{
+    background-color: #fff;
+    box-shadow: -2.19px 4.38px 63.51px 0px #7777771A;
+} */
+
+.mv_pencil_icon{
+    border-radius: 4px;
+    border: 0.5px solid #002846;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.mv_pencil_icon:last-child{
+    margin-right: 0px;
+}
+.mv_pencil_icon img{
+    margin-right: 0px !important;
+    padding: 8px 8px;
+    height: 34px !important;
+}
+
+.form-check-input:focus{
+    box-shadow: none !important;
+}
+.form-switch .form-check-input{
+    --bs-form-switch-bg: url(../mv_img/form_switch_white.svg);
+    background-color: #6A6A6A;
+}
+.form-switch .form-check-input:focus{
+    --bs-form-switch-bg: url(../mv_img/form_switch_white.svg);
+    /* background-color: #002846; */
+}
+.form-check-input:checked {
+    background-color: #2B221E !important;
+    border-color: #2B221E !important;
+}
+
+.mv_dropdown_column{
+    margin-top: 0px !important;
+    transform: translate(0px, 33px) !important;
+}
+.mv_dropdown_item{
+    min-width: 8rem !important;
+}
+.mv_drop_down_menu_category{
+    padding: 2px 4px 2px 8px !important;
+}
+.mv_column_heading{
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 21.78px;
+    margin-right: 5px;
+}
+.mv_drop_down_menu_category:hover{
+    background-color: #D2D2D2;
+}
+.mv_other_category p{
+    border: 1px solid #2B221E;
+    border-radius: 4px;
+    padding: 5px 12px;
+    margin-right: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #333333;
+}
+.mv_active{
+    background-color: #2B221E;
+    color: #fff !important;
+}
+.mv_other_category p:hover{
+    background-color: #2B221E;
+    color: #fff;
+}
+.mv_other_category p:last-child{
+    margin-right: 0px;
+}
+.mv_browse_button{
+    display: inline-block;
+    background-color: #002846;
+    border-radius: 3px;
+    padding: 10px 12px 5px 12px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 15.73px;
+    color: #fff;
+}
+
+
+.mv_delivered_padd{
+    padding: 5px 10px;
+    color: #0D894F;
+    background-color: #EDFBE3;
+    width: 120px;
+    text-align: center;
+}
+.mv_pending_padd{
+    padding: 5px 10px;
+    color: #DF8600;
+    background-color: #EDFBE3;
+    width: 120px;
+    text-align: center;
+}
+.mv_cancelled_padd{
+    padding: 5px 10px;
+    color: #FF0000;
+    background-color: #EDFBE3;
+    width: 120px;
+    text-align: center;
+}
+.mv_product_radius_img{
+    border-radius: 0% !important;
+}
+.mv_table_search{
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+}
+
+
+
+
+@media (max-width: 1400px) {
+    .mv_product_table_padd {
+        overflow-x: scroll !important;
+    }
+}
+@media(max-width: 1024px){
+    .mv_column_button button{
+        margin-right: 15px !important;
+        /* margin-bottom: 10px; */
+        text-align: end;
+    }
+}
+@media(max-width: 425px){
+    .mv_dashboard_heading{
+        font-size: 14px !important;
+    }
+    .mv_category_heading{
+        font-size: 14px !important;
+    }
+    .mv_column_button button{
+        font-size: 14px;
+    }
+    .mv_add_category button{
+        font-size: 14px;
+    }
+}
+@media(max-width: 375px){
+    .mv_dashboard_heading{
+        font-size: 13px !important;
+    }
+    .mv_category_heading{
+        font-size: 13px !important;
+    }
+    .mv_column_button button{
+        font-size: 13px;
+    }
+    .mv_add_category button{
+        font-size: 13px;
+    }
+    .mv_add_product button{
+        padding: 7px 15px !important;   
+    }
+}
+/* ************************************************ */
+
+
+
+
+
+/********************* Unit ***********************/
+.mv_edit_profile_header {
+    padding: 1rem 1rem !important;
+    text-align: center !important;
+}
+.mv_edit_profile_header  button:focus{
+    box-shadow: none !important;
+}
+.mv_edit_profile_title {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    line-height: 26.63px !important;
+    text-align: center !important;
+}
+.mv_edit_profile_model_padd {
+    padding: 1rem 25px !important;
+}
+.mv_edit_profile_model_padd  form{
+    padding: 0px !important;
+}
+.mv_edit_profile_label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16.94px;
+    color: #6A6A6A;
+}
+/* ************************************************ */

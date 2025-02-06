@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Modal from 'react-bootstrap/Modal';
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 280;
 
@@ -92,7 +93,9 @@ const Header = ({ open, handleDrawerOpen }) => {
             <MenuItem onClick={handleClose}>
               <div className='flex'>
                 <div>
-                  <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-2' />
+                  <Link to='/dashboard/view_profile'>
+                    <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-2' />
+                  </Link>
                 </div>
                 <div>
                   <p><b>John Patel</b></p>
