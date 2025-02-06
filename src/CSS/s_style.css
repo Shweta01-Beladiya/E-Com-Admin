@@ -1,12 +1,64 @@
-/* .css-7mxpdy-MuiPaper-root-MuiAppBar-root{
-        background-color:white !important;
-    --AppBar-background:white !important;
-    color: black !important;
-} */
- .css-1lwhjos-MuiPaper-root-MuiDrawer-paper{
-    background-color: #2B221E !important;
-    color: white !important;
- }
- .css-1n6jaw4-MuiListItemText-root::after{
-    content: "'•'",
- }
+.css-1lwhjos-MuiPaper-root-MuiDrawer-paper {
+   background-color: #2B221E !important;
+   color: white !important;
+}
+
+.css-1n6jaw4-MuiListItemText-root::after {
+   content: "'•'",
+}
+
+.illustration-container svg {
+   position: absolute;
+   bottom: 10%;
+   left: 21%;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+   border-color: #2B221E !important;
+}
+
+.MuiInputLabel-root.Mui-focused {
+   color: #2B221E !important;
+}
+
+
+@media (min-width:1990px) {
+   .illustration-container svg {
+      left: 26%;
+   }
+}
+
+@media (max-width:1440px) {
+   .illustration-container svg {
+      left: 11%;
+   }
+}
+
+@media (max-width:1024px) {
+   .illustration-container svg {
+      left: -8%;
+   }
+}
+
+@media (max-width:768px) {
+   .s_animation_top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+   }
+   .s_animation_bottom{
+      position: relative;
+      /* background-color: rgba(, 0.7); */
+   }
+   .s_animation_bottom::after{
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background-color: rgba(0,0,0,0.2);
+   }
+}

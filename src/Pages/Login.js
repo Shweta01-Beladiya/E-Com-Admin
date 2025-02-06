@@ -1,17 +1,23 @@
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { FormGroup, Button } from 'react-bootstrap';
-import { AiOutlineMail, AiOutlineEye } from 'react-icons/ai';
+import Animation from './Animaton';
+import { Button, TextField, InputAdornment, Box, Typography } from '@mui/material';
+import { FaEye } from 'react-icons/fa';
+import { BsTelephoneFill } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+
+  const navigate = useNavigate();
+
   const initialValues = {
-    email: '',
+    mobileNo: '',
     password: '',
   };
 
   const validationSchema = Yup.object({
-    email: Yup.string().email('Invalid email format').required('Email is required'),
+    mobileNo: Yup.number().positive("A mobile number can't start with a minus").min(10).required('Mobile Number is Required'),
     password: Yup.string().required('Password is required'),
   });
 
@@ -19,68 +25,102 @@ const Login = () => {
     console.log('Form values:', values);
   };
 
+  const handleNavigate = () => {
+    navigate('/forgot-password');
+  }
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="p-4 border rounded shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
-        <h3 className="text-center">Login</h3>
-        <p className="text-center text-muted">Login to your existing account!</p>
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ touched, errors }) => (
-            <Form>
-              <FormGroup className="mb-3 position-relative">
-                <div className="input-group">
-                  <Field
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    className={`form-control ${touched.email && errors.email ? 'is-invalid' : ''}`}
-                  />
-                  <span className="input-group-text bg-white border-0">
-                    <AiOutlineMail />
-                  </span>
-                </div>
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-danger small mt-1"
-                />
-              </FormGroup>
+    <>
+      <div className='container-fluid'>
+        <div className="row md:relative">
+          <div className="col-lg-5 col-12 s_animation_bottom" style={{ backgroundColor: '#fcf3ed' }}>
+            <Animation />
+          </div>
+          <div className='col-lg-7 col-12 p-0 s_animation_top' >
+            <div className="d-flex justify-content-center align-items-center vh-100 md:bg-light">
+              <Box maxWidth={400} width="100%" p={4} style={{backgroundColor:'rgba(255, 255, 255, 0.9)'}}>
+                <Typography variant="h4" align="center">Login</Typography>
+                <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
+                  Login to your existing account!
+                </Typography>
 
-              <FormGroup className="mb-3 position-relative">
-                <div className="input-group">
-                  <Field
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
-                  />
-                  <span className="input-group-text bg-white border-0">
-                    <AiOutlineEye />
-                  </span>
-                </div>
-                <ErrorMessage
-                  name="password"
-                  component="div"
-                  className="text-danger small mt-1"
-                />
-              </FormGroup>
+                <Formik
+                  initialValues={initialValues}
+                  validationSchema={validationSchema}
+                  onSubmit={handleSubmit}
+                >
+                  {({ touched, errors, handleChange, handleBlur, values }) => (
+                    <Form>
+                      {/* Email Field */}
+                      <Field
+                        as={TextField}
+                        fullWidth
+                        name="mobileNo"
+                        label="Mobile No"
+                        variant="outlined"
+                        margin="normal"
+                        error={touched.mobileNo && Boolean(errors.mobileNo)}
+                        helperText={touched.mobileNo && errors.mobileNo}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.mobileNo}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <BsTelephoneFill />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
 
-              <div className="d-flex justify-content-end">
-                <a href="/forgot-password" className="text-danger small">Forgot Password?</a>
-              </div>
+                      {/* Password Field */}
+                      <Field
+                        as={TextField}
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        margin="normal"
+                        error={touched.password && Boolean(errors.password)}
+                        helperText={touched.password && errors.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.password}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <FaEye />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
 
-              <Button type="submit" className="btn btn-dark w-100 mt-3">
-                Login
-              </Button>
-            </Form>
-          )}
-        </Formik>
+                      <Box display="flex" justifyContent="flex-end" mt={1} onClick={handleNavigate}>
+                        <Typography
+                          style={{ textDecoration: 'none', cursor: 'pointer', color: '#FF2D2D', fontSize: 14, fontWeight: 'bold' }}
+                        >
+                          Forgot Password?
+                        </Typography>
+                      </Box>
+
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        fullWidth
+                        sx={{ mt: 3 }}
+                        style={{ backgroundColor: '#2B221E', color: '#fff',padding:'10px 0' }}
+                      >
+                        Login
+                      </Button>
+                    </Form>
+                  )}
+                </Formik>
+              </Box>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+    </>
   );
 };
 

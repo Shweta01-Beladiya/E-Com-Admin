@@ -14,7 +14,6 @@ import {
 import { FaSearch, FaTrash } from 'react-icons/fa';
 import { FaFilter } from "react-icons/fa";
 import '../CSS/riya.css';
-import { X } from 'lucide-react';
 
 const UserTable = () => {
   // Sample data

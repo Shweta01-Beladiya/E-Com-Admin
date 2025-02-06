@@ -3,7 +3,8 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { FormGroup, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; // Import icons for visibility toggle
+import { IoEye, IoEyeOff } from "react-icons/io5";
+
 import "../CSS/riyansee.css";
 
 const ResetPasswordSchema = Yup.object().shape({
@@ -66,9 +67,9 @@ const ResetPassword = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff size={20} color="#666" />
+                        <IoEyeOff color="#666" />
                       ) : (
-                        <Eye size={20} color="#666" />
+                        <IoEye color="#666" />
                       )}
                     </button>
                   </div>
@@ -96,9 +97,9 @@ const ResetPassword = () => {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
-                        <EyeOff size={20} color="#666" />
+                        <IoEyeOff  color="#666" />
                       ) : (
-                        <Eye size={20} color="#666" />
+                        <IoEye color="#666" />
                       )}
                     </button>
                   </div>
