@@ -60,7 +60,7 @@ const Viewprofile = () => {
 
     return (
         <>
-            <div id='mv_container_fluid'>
+            <div>
                 <div className="mv_main_heading d-flex align-items-center">
                     <p className='mb-4'>View Profile</p>
                 </div>
