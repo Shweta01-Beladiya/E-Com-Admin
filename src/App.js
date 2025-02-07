@@ -25,7 +25,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* <Route path='/' element={<LoginPage />}></Route> */}
-          <Route path='/login' element={<Login/>}></Route>
+          <Route path='/' element={<Login/>}></Route>
           <Route path='/verify-otp' element={<VerifyOTP />}></Route>
           <Route path='/forgot-password' element={<Forgotpassword />}></Route>
           <Route path='/reset-password' element={<ResetPassword />}></Route>

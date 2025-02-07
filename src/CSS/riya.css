@@ -20,10 +20,6 @@ thead th{
      background-color: #FFF9F6 !important;
       cursor: pointer !important;
 }
-.form-check-input:checked {
-    background-color: black;
-    border-color: black;
-}
 .modal-header{
     border-bottom: none;
     padding: 5px !important;
@@ -39,8 +35,21 @@ thead th{
     margin-bottom: 2rem;
 }
 
+.form-switch .form-check-input{
+    background-color: #919191 !important;
+    border-color: #919191 !important;
+}
 
-
+.form-check-input:checked {
+    background-color: black !important;
+    border-color: black !important;
+}
+.page-item{
+    margin: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* .css-zxdg2z{
      padding: 0 !important;

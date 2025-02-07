@@ -267,7 +267,7 @@ const UserTable = () => {
           placement="end"
           style={{ zIndex: 9999 }}
         >
-          <Offcanvas.Header closeButton>
+          <Offcanvas.Header closeButton className="border-bottom">
             <Offcanvas.Title>Filter</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
