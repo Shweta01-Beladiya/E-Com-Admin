@@ -74,10 +74,10 @@ const Drawer = styled(MuiDrawer, {
 
 const menuItems = [
   { text: 'Dashboard', icon: <AiFillHome size={20} />, path: '/dashboard' },
-  { text: 'User', icon: <FaUser size={20} />, path: '/' },
-  { text: 'Main Category', icon: <BiSolidCategory size={20} />, path: '/' },
-  { text: 'Category', icon: <FaListUl size={20} />, path: '/' },
-  { text: 'Sub Category', icon: <IoGrid size={20} />, path: '/' },
+  { text: 'User', icon: <FaUser size={20} />, path: '/dashboard/users' },
+  { text: 'Main Category', icon: <BiSolidCategory size={20} />, path: '/dashboard/maincategory' },
+  { text: 'Category', icon: <FaListUl size={20} />, path: '/dashboard/category' },
+  { text: 'Sub Category', icon: <IoGrid size={20} />, path: '/dashboard/subcategory' },
   { text: 'Products', icon: <PiPackageBold size={20} />, path: '/' },
   { text: 'Unit', icon: <IoBagCheck size={20} />, path: '/' },
   { text: 'Size', icon: <CgArrowsShrinkH size={20} />, path: '/' },
