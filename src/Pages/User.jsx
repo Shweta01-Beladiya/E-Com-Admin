@@ -15,6 +15,7 @@ import { FaSearch, FaTrash } from 'react-icons/fa';
 import { FaFilter } from "react-icons/fa";
 import '../CSS/riya.css';
 
+
 const UserTable = () => {
   // Sample data
   const initialData = [
@@ -118,11 +119,7 @@ const UserTable = () => {
 
   // Handle filter actions
   const handleGenderChange = (gender) => {
-    if (selectedGenders.includes(gender)) {
-      setSelectedGenders(selectedGenders.filter(g => g !== gender));
-    } else {
-      setSelectedGenders([...selectedGenders, gender]);
-    }
+    setSelectedGenders([gender]); // Allow only one selection
   };
 
   const handleApplyFilter = () => {
@@ -164,7 +161,7 @@ const UserTable = () => {
 
   return (
 
-    <Container fluid className="py-3" style={{ backgroundColor: '#F7F7F7' }}>
+    <Container fluid className="py-3" style={{ backgroundColor: '#F7F7F7', height: '100vh' }}>
       <h4 className="mb-0">User</h4>
       <p className="text-muted">Dashboard <span>/ User</span></p>
       <div style={styles.card}>
@@ -186,6 +183,7 @@ const UserTable = () => {
             <Button
               variant="outline-secondary"
               onClick={() => setShowFilter(true)}
+              color='black'
             >
               <FaFilter className="me-2" />
               Filter {selectedGenders.length > 0 && `(${selectedGenders.length})`}
@@ -275,17 +273,15 @@ const UserTable = () => {
           <Offcanvas.Body>
             <Form.Group style={styles.filterGroup}>
               <Form.Label>Gender</Form.Label>
-              {['Male', 'Female', 'Other'].map((gender) => (
-                <Form.Check
-                  key={gender}
-                  type="checkbox"
-                  id={`gender-${gender}`}
-                  label={gender}
-                  checked={selectedGenders.includes(gender)}
-                  onChange={() => handleGenderChange(gender)}
-                  className="mb-2"
-                />
-              ))}
+              <Form.Select
+                value={selectedGenders.length > 0 ? selectedGenders[0] : ""}
+                onChange={(e) => handleGenderChange(e.target.value)}
+              >
+                <option value="">Select Gender</option>
+                {['Male', 'Female', 'Other'].map((gender) => (
+                  <option key={gender} value={gender}>{gender}</option>
+                ))}
+              </Form.Select>
             </Form.Group>
 
             <div className="d-flex justify-content-space-between gap-2">
@@ -309,8 +305,8 @@ const UserTable = () => {
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
 
           <Modal.Body className='p-5'>
-            <h5 className='font-weight-bold text-center'>Delete</h5>
-            <p className='text-center text-muted'> Are you sure you want to delete {userToDelete?.name}?</p>
+            <h5 className='font-weight-bold text-center mb-3'>Delete</h5>
+            <p className='text-center text-muted mb-4'> Are you sure you want to delete {userToDelete?.name}?</p>
             <div className='d-flex justify-content-center gap-3'>
               <Button onClick={() => setShowDeleteModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
                 Cancel
