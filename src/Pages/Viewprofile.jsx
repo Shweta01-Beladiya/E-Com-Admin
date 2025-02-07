@@ -11,6 +11,7 @@ const Viewprofile = () => {
     let [name, setname] = useState('');
     let [contact, setcontact] = useState('');
     let [gender, setgender] = useState('');
+    const [profileImage, setProfileImage] = useState(require('../mv_img/profile_img.png'));
 
     let handle_onload = () => {
         let data = JSON.parse(localStorage.getItem('user'));
@@ -71,6 +72,14 @@ const Viewprofile = () => {
     const handleImageClick = () => {
         fileInputRef.current.click();
     };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const imageURL = URL.createObjectURL(file); // Create a temporary URL for the uploaded image
+          setProfileImage(imageURL); // Update the state with the new image
+        }
+      };
 
     return (
         <>
@@ -166,7 +175,7 @@ const Viewprofile = () => {
                                             <p className='mv_profile_image_heading'>Profile Image</p>
                                             <div className='mv_main_profile_img'>
                                                 <div className="mv_profile_img">
-                                                    <img src={require('../mv_img/profile_img.png')} alt="" />
+                                                    <img src={profileImage} alt="" />
                                                 </div>
                                                 <div className='mv_main_pro_img_camera' onClick={handleImageClick}>
                                                     <img className='mv_pro_img_camera' src={require('../mv_img/profile_img_camera.png')} alt="" />
@@ -175,7 +184,7 @@ const Viewprofile = () => {
                                                     type="file"
                                                     ref={fileInputRef}
                                                     style={{ display: 'none' }}
-                                                    onChange={(e) => console.log(e.target.files[0])}
+                                                    onChange={handleImageChange}
                                                 />
                                             </div>
                                         </div>

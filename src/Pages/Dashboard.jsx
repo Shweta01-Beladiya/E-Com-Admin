@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../CSS/vaidik.css';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import ReactApexChart from "react-apexcharts";
+import Chart from "react-apexcharts";
 import { FaStar } from "react-icons/fa";
 
 const Dashboard = () => {
@@ -11,47 +11,82 @@ const Dashboard = () => {
   var orderSummary = [
     {
       label: "On Delivery",
-      percentage: 30, 
-      color: "bg-green-400" 
+      percentage: 30,
+      color: "bg-green-400"
     },
     {
-      label: "Pending", 
-      percentage: 25, 
-      color: "bg-pink-400" 
+      label: "Pending",
+      percentage: 25,
+      color: "bg-pink-400"
     },
     {
-      label: "Delivered", 
-      percentage: 20, 
-      color: "bg-blue-400" 
+      label: "Delivered",
+      percentage: 20,
+      color: "bg-blue-400"
     },
     {
-      label: "Cancelled", 
-      percentage: 15, 
-      color: "bg-gray-400" 
+      label: "Cancelled",
+      percentage: 15,
+      color: "bg-gray-400"
     },
   ];
 
   // Chart
-  const [state, setState] = React.useState({
-          
-    series: [20, 30, 15, 25],
+  const state = {
+    series: [30, 25, 20, 15], // Values matching your image
     options: {
       chart: {
-        type: 'donut',
+        type: "donut",
       },
-      responsive: [{
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
+      labels: ["On Delivery", "Pending", "Delivered", "Cancelled"],
+      legend: {
+        show: false, // Hide default legend, we create custom
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: (val) => `${val.toFixed(0)}%`,
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 250,
+            },
           },
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }]
+        },
+      ],
+      plotOptions: {
+        pie: {
+          customScale: 1,
+          donut: {
+            size: '60%',
+          },
+        },
+      },
+      fill: {
+        type: 'gradient', // Apply gradient fill to the donut slices
+        gradient: {
+          type: 'linear',
+          shadeIntensity: 1,
+          gradientToColors: ["#4CAF50", "#0288D1", "#F50057", "#6200EA"], // Add your target colors for the gradient
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 100], // Start and end points of the gradient
+        },
+      },
     },
-  });
+  };
+
+  const gradients = [
+    "linear-gradient(135deg, #8BC34A, #4CAF50)",
+    "linear-gradient(135deg, #03A9F4, #0288D1)",
+    "linear-gradient(135deg, #E91E63, #F50057)",
+    "linear-gradient(135deg, #9C27B0, #6200EA)",
+  ];
+  const labels = ["On Delivery", "Pending", "Delivered", "Cancelled"];
+  const values = [30, 25, 20, 15];
 
   // Review
   var review = [
@@ -171,31 +206,45 @@ const Dashboard = () => {
 
   // Sales by Location
   var salesData = [
-    { 
-      city: "Surat", 
-      sales: "$17,678", 
-      change: "+12%", 
+    {
+      city: "Surat",
+      sales: "$17,678",
+      change: "+12%",
     },
-    { 
-      city: "Ahmedabad", 
-      sales: "$5,500", 
+    {
+      city: "Ahmedabad",
+      sales: "$5,500",
       change: "-5%",
     },
-    { city: "Mumbai", 
-      sales: "$2,500", 
-      change: "0%", 
+    {
+      city: "Mumbai",
+      sales: "$2,500",
+      change: "0%",
     },
-    { city: "Singapore", 
-      sales: "$7,456", 
-      change: "+19%", 
+    {
+      city: "Singapore",
+      sales: "$7,456",
+      change: "+19%",
     },
-    { city: "Pune", 
-      sales: "$24,189", 
+    {
+      city: "Pune",
+      sales: "$24,189",
       change: "-25%",
     },
-    { city: "Delhi", 
-      sales: "$15,700", 
-      change: "+11%", 
+    {
+      city: "Delhi",
+      sales: "$15,700",
+      change: "+11%",
+    },
+    {
+      city: "Delhi",
+      sales: "$15,700",
+      change: "+11%",
+    },
+    {
+      city: "Delhi",
+      sales: "$15,700",
+      change: "+11%",
     },
   ];
 
@@ -211,15 +260,15 @@ const Dashboard = () => {
           <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
             <div className="mv_revenue d-flex justify-content-between align-items-center">
               <div className="mv_revenue_text">
-                  <div className='d-flex align-items-center'>
-                    <div className='mv_total_save_logo'>  
-                      <img src={require('../mv_img/total_save.png')} alt="" />
-                    </div>
-                    <div>
-                      <p className='mv_ts_text'>Total Sales</p>
-                      <p className='mb-0 mv_tsm_text'>1,00,000</p>
-                    </div>
+                <div className='d-flex align-items-center'>
+                  <div className='mv_total_save_logo'>
+                    <img src={require('../mv_img/total_save.png')} alt="" />
                   </div>
+                  <div>
+                    <p className='mv_ts_text'>Total Sales</p>
+                    <p className='mb-0 mv_tsm_text'>1,00,000</p>
+                  </div>
+                </div>
               </div>
               <div>
                 <p className='mv_text_plus_per'>+ 22%</p>
@@ -228,17 +277,17 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-          <div className="mv_revenue d-flex justify-content-between align-items-center">
+            <div className="mv_revenue d-flex justify-content-between align-items-center">
               <div className="mv_revenue_text">
-                  <div className='d-flex align-items-center'>
-                    <div className='mv_total_save_logo'>  
-                      <img src={require('../mv_img/total_income.png')} alt="" />
-                    </div>
-                    <div>
-                      <p className='mv_ts_text'>Total Income</p>
-                      <p className='mb-0 mv_tsm_text'>12,00,000</p>
-                    </div>
+                <div className='d-flex align-items-center'>
+                  <div className='mv_total_save_logo'>
+                    <img src={require('../mv_img/total_income.png')} alt="" />
                   </div>
+                  <div>
+                    <p className='mv_ts_text'>Total Income</p>
+                    <p className='mb-0 mv_tsm_text'>12,00,000</p>
+                  </div>
+                </div>
               </div>
               <div>
                 <p className='mv_text_mainus_per'>- 25%</p>
@@ -247,17 +296,17 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-          <div className="mv_revenue d-flex justify-content-between align-items-center">
+            <div className="mv_revenue d-flex justify-content-between align-items-center">
               <div className="mv_revenue_text">
-                  <div className='d-flex align-items-center'>
-                    <div className='mv_total_save_logo'>  
-                      <img src={require('../mv_img/total_orders.png')} alt="" />
-                    </div>
-                    <div>
-                      <p className='mv_ts_text'>Total Orders</p>
-                      <p className='mb-0 mv_tsm_text'>10,000</p>
-                    </div>
+                <div className='d-flex align-items-center'>
+                  <div className='mv_total_save_logo'>
+                    <img src={require('../mv_img/total_orders.png')} alt="" />
                   </div>
+                  <div>
+                    <p className='mv_ts_text'>Total Orders</p>
+                    <p className='mb-0 mv_tsm_text'>10,000</p>
+                  </div>
+                </div>
               </div>
               <div>
                 <p className='mv_text_plus_per'>+49%</p>
@@ -266,17 +315,17 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-          <div className="mv_revenue d-flex justify-content-between align-items-center">
+            <div className="mv_revenue d-flex justify-content-between align-items-center">
               <div className="mv_revenue_text">
-                  <div className='d-flex align-items-center'>
-                    <div className='mv_total_save_logo'>  
-                      <img src={require('../mv_img/total_customer.png')} alt="" />
-                    </div>
-                    <div>
-                      <p className='mv_ts_text'>Total Customer</p>
-                      <p className='mb-0 mv_tsm_text'>8,521</p>
-                    </div>
+                <div className='d-flex align-items-center'>
+                  <div className='mv_total_save_logo'>
+                    <img src={require('../mv_img/total_customer.png')} alt="" />
                   </div>
+                  <div>
+                    <p className='mv_ts_text'>Total Customer</p>
+                    <p className='mb-0 mv_tsm_text'>8,521</p>
+                  </div>
+                </div>
               </div>
               <div>
                 <p className='mv_text_plus_per'>+ 22%</p>
@@ -292,7 +341,7 @@ const Dashboard = () => {
             <div className='mv_order_summary'>
               <div className='mv_main_order_summary d-flex justify-content-between align-items-center'>
                 <div>
-                    <p className='mb-0 mv_heading_order_sum'>Order Summary</p>
+                  <p className='mb-0 mv_heading_order_sum'>Order Summary</p>
                 </div>
                 <div>
                   <Form.Select className='mv_oreder_month' aria-label="Default select example">
@@ -313,11 +362,36 @@ const Dashboard = () => {
                     </div>
                   ))}
                 </div>
-                <div className='mt-4'>
+                <div className='mv_chart_container mt-4'>
                   <div id="chart">
-                      <ReactApexChart options={state.options} series={state.series} type="donut" width={380} />
+                    <Chart
+                      options={{
+                        ...state.options,
+                        colors: gradients, // Apply gradients to chart slices
+                      }}
+                      series={state.series}
+                      type="donut"
+                      width={310}
+                    />
                   </div>
-                  <div id="html-dist"></div>
+                  <div className="mv_chart_custom_legend">
+                    {labels.map((label, index) => (
+                      <div key={index} className="mv_chart_legend_item">
+                        <span className="mv_chart_dot" style={{ background: gradients[index] }}></span> {/* Linear Gradient for Legend */}
+                        <span className="mv_chart_label">{label}</span>
+                        <div className="mv_chart_progress_bar">
+                          <div
+                            className="mv_chart_progress_fill"
+                            style={{
+                              width: `${values[index]}%`,
+                              background: gradients[index], // Apply linear gradient to progress bar
+                            }}
+                          ></div>
+                        </div>
+                        <span className="mv_chart_value">{values[index]}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -330,7 +404,7 @@ const Dashboard = () => {
                     <p className='mb-0 mv_heading_order_sum'>Review</p>
                   </div>
                   <div>
-                    <p className='mb-0 mv_review_view_all'>View all</p>  
+                    <p className='mb-0 mv_review_view_all'>View all</p>
                   </div>
                 </div>
               </div>
@@ -338,7 +412,7 @@ const Dashboard = () => {
                 {review.map((item) => (
                   <div key={item.id}>
                     <div className='mv_main_review d-flex justify-content-between'>
-                        <div className='d-flex'>
+                      <div className='d-flex'>
                         <div className='mv_review_user_img'>
                           <img src={item.imgSrc} alt={item.name} />
                         </div>
@@ -365,7 +439,7 @@ const Dashboard = () => {
 
         {/* Top Product */}
         <div className="row mt-4">
-          <div className="col-lg-9">
+          <div className="col-xl-9">
             <div className="mv_product_table_content">
               <div className="mv_product_heading d-flex justify-content-between align-items-center">
                 <div className="mv_product">
@@ -381,8 +455,8 @@ const Dashboard = () => {
                   </InputGroup>
                 </div> */}
               </div>
-              <div className="mv_product_table_padd">
-                <table className='mv_product_table justify-content-between'>
+              <div className="">
+                <table className='mv_product_table mv_top_table_product justify-content-between'>
                   <thead>
                     <tr>
                       {checkboxes.isNameChecked && <th className=''>Product</th>}
@@ -404,10 +478,10 @@ const Dashboard = () => {
                         {checkboxes.isPriceChecked && <td>{item.price}</td>}
                         {checkboxes.isCategoryChecked && <td>{item.category}</td>}
                         {checkboxes.isSubCategoryChecked && <td>{item.subcategory}</td>}
-                        {checkboxes.isRatingChecked && 
+                        {checkboxes.isRatingChecked &&
                           <td>
                             <div className='mv_rating_img'>
-                              <FaStar className='mv_star_yellow'/>
+                              <FaStar className='mv_star_yellow' />
                               {item.rating}
                             </div>
                           </td>
@@ -419,7 +493,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="col-lg-3">
+          <div className="col-xl-3">
             {/* Sales by Location */}
             <div className="mv_product_table_content">
               <table className='mv_sales_by_location_table'>
@@ -436,29 +510,29 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                {salesData.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.city}</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <div>
-                          <p className="mb-0">{item.sales}</p>
+                  {salesData.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.city}</td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <div>
+                            <p className="mb-0">{item.sales}</p>
+                          </div>
+                          <div>
+                            <p className={item.change.startsWith('+') ? "mv_plus_sales_per mb-0" : "mv_mainus_sales_per mb-0"}>
+                              {item.change}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className={item.isPositive ? "mv_plus_sales_per mb-0" : "mv_mainus_sales_per mb-0"}>
-                            {item.change}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-        
+
       </div>
     </>
   )

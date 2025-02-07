@@ -17,6 +17,7 @@ import Viewprofile from './Pages/Viewprofile';
 import Subcategory from './Pages/Subcategory';
 
 import Product from "./Pages/product";
+import Unit from './Pages/unit';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path='view_profile' element={<Viewprofile />}></Route>
 
             <Route path="product" element={<Product />}></Route>
+            <Route path='unit' element={<Unit />}></Route>
 
           </Route>
         </Routes>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../CSS/vaidik.css';
+import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -24,8 +24,8 @@ const Product = (props) => {
             price: "$120",
             rating: "4.5",
             stock:"In Stock",
-          },
-          {
+        },
+        {
             id: 2,
             category: "Women",
             subcategory: "Indian Wear",
@@ -34,8 +34,8 @@ const Product = (props) => {
             price: "$120",
             rating: "4.5",
             stock:"Low Stock",
-          },
-          {
+        },
+        {
             id: 3,
             category: "Women",
             subcategory: "Indian Wear",
@@ -44,17 +44,77 @@ const Product = (props) => {
             price: "$120",
             rating: "4.5",
             stock:"Out of Stock",
-          },
-          {
+        },
+        {   
             id: 4,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "saree.png",
+            name: "Premium Saree",
+            price: "$120",
+            rating: "4.5",
+            stock:"In Stock",
+        },
+        {
+            id: 5,
             category: "Women",
             subcategory: "Indian Wear",
             productimg: "lehenga.png",
             name: "Premium Lehenga",
             price: "$120",
             rating: "4.5",
+            stock:"Low Stock",
+        },
+        {
+            id: 6,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "saree.png",
+            name: "Premium Saree",
+            price: "$120",
+            rating: "4.5",
+            stock:"Out of Stock",
+        },
+        {   
+            id: 7,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "saree.png",
+            name: "Premium Saree",
+            price: "$120",
+            rating: "4.5",
             stock:"In Stock",
-          },
+        },
+        {
+            id: 8,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "lehenga.png",
+            name: "Premium Lehenga",
+            price: "$120",
+            rating: "4.5",
+            stock:"Low Stock",
+        },
+        {
+            id: 9,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "saree.png",
+            name: "Premium Saree",
+            price: "$120",
+            rating: "4.5",
+            stock:"Out of Stock",
+        },
+        {
+            id: 10,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "saree.png",
+            name: "Premium Saree",
+            price: "$120",
+            rating: "4.5",
+            stock:"Out of Stock",
+        },
     ];
 
     localStorage.setItem('data3', JSON.stringify(data1))
@@ -252,7 +312,7 @@ const Product = (props) => {
     return (
         <>
             <div id='mv_container_fluid'>
-                <div className="mv_main_heading mb-5 d-flex align-items-center justify-content-between">
+                <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
                         <p className='mb-1'>Product</p>
                         <div className='d-flex align-items-center'>
@@ -260,11 +320,10 @@ const Product = (props) => {
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>Product</p>
                         </div>
                     </div>
-                    
                 </div>
                 <div className="row mt-4">
                     <div className="col-12">
-                        <div className="mv_product_table_content mv_category_table">
+                        <div className="mv_product_table_content">
                             <div className='mv_table_search'>
                                 <div className="mv_product_search">
                                     <InputGroup>
@@ -358,8 +417,8 @@ const Product = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd mv_category_table_padd">
-                                <table className='mv_product_table  justify-content-between'>
+                            <div className="mv_product_table_padd">
+                                <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
                                         {checkboxes.isIDChecked && <th className=''>ID</th>}
