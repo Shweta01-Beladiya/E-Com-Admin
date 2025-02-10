@@ -45,6 +45,11 @@
     margin: auto !important;
     max-width: 480px !important;
 }
+@media (max-width: 768px){
+    .css-zxdg2z{
+        padding: 24px 0px 0px 0px !important;
+    }
+}
 @media (max-width: 576px) {
     .modal-dialog {
         margin: auto !important;
