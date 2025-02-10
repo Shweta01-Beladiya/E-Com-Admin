@@ -1,122 +1,115 @@
 import React, { useState } from 'react';
-import { Table, Button, Offcanvas, Modal, Form, Pagination } from 'react-bootstrap';
-import { FiFilter } from 'react-icons/fi';
-import '../CSS/riya.css';
+import { Button, Modal, Form, Table, Pagination, Offcanvas } from 'react-bootstrap';
+import { FaFilter } from "react-icons/fa6";
+import "../CSS/riya.css";
 
-const CategoryManagement = () => {
-    // Main categories for dropdown
+
+const SubCategoryManagement = () => {
     const mainCategories = [
-        "Electronics",
-        "Fashion",
-        "Home & Living",
-        "Books",
-        "Sports"
+        "Woman",
+        "Men",
+        "Kids",
+        "Beauty & Health",
+        "Mobile & Electronics",
+        "Sports",
+        "Luggage",
+        "Home & Kitchen"
     ];
 
-    // State management
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 2, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 3, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        { id: 4, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 5, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 6, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        { id: 7, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 8, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 9, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        { id: 10, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 11, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 12, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        // Add more sample data as needed
+    const categories = [
+        "Indian Wear",
+        "Western Wear",
+        "Watches",
+        "Footwear",
+        "Sports & Active Wear",
+        "Lingerie & Sleepwear",
+        "Beauty & Personal Care",
+        "Belts, Scarves & More",
+        "Maternity",
+        "Sunglasses & Frames",
+        "Jewellary",
+        "Bags",
+        "Topwear",
+        "Indian & Festive Wear",
+        "Bottomwear",
+        "Footwear",
+        "Innerwear & Sleepwear",
+        "Personal Care & Grooming",
+        "Boy",
+        "Girl",
+        "Toys & Games",
+        "Kids Accessories",
+        "Personal Care",
+        "Winterwear",
+        "Mackup",
+        "Skin Care",
+        "Health & Personal Care",
+        "Fragrances",
+        "Baby Care",
+        "Men's Grooming",
+        "Makeup Set",
+        "Company",
+        "Mobile, TV & More",
+        "Wearable Device",
+        "Games",
+        "Accessories",
+        "Shoes",
+        "Sport Accessories & Gear",
+        "Trolley Bag",
+        "Duffle Bags",
+        "Backpacks",
+        "Cookwear & Kitchenwear",
+        "Table wear & Dinner wear",
+        "Home Decor",
+        "Smart Home",
+    ]
+    const [subCategories, setSubCategories] = useState([
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
+        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
     ]);
-
     const [showFilter, setShowFilter] = useState(false);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showAddEditModal, setShowAddEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+    const [currentSubCategory, setCurrentSubCategory] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filters, setFilters] = useState({ category: '', mainCategory: '', status: '' });
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
-    const [filters, setFilters] = useState({
-        mainCategory: '',
-        status: ''
-    });
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [deletingCategory, setDeletingCategory] = useState(null);
-    const [newCategory, setNewCategory] = useState({
-        name: '',
-        mainCategory: '',
-        status: 'Active'
-    });
-    const [searchTerm, setSearchTerm] = useState('');
+    const itemsPerPage = 10;
 
-    // Search handler
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1); // Reset to first page when searching
-    };
-
-    // Modified filter logic to include search
-    const filteredCategories = categories.filter((cat) => {
-        const matchesSearch =
-            cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            cat.mainCategory.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesFilters =
-            (!filters.mainCategory || cat.mainCategory === filters.mainCategory) &&
-            (!filters.status || cat.status === filters.status);
-
-        return matchesSearch && matchesFilters;
-    });
-
-    // Previous handlers remain the same
-    const handleFilterChange = (e) => {
-        setFilters({
-            ...filters,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const applyFilters = () => {
-        setCurrentPage(1);
-        setShowFilter(false);
-    };
-
-    const clearFilters = () => {
-        setFilters({
-            mainCategory: '',
-            status: ''
-        });
-        setCurrentPage(1);
-        setShowFilter(false);
-    };
-
-    // Previous CRUD operations remain the same
-    const handleAddCategory = () => {
-        setCategories([...categories, { ...newCategory, id: categories.length + 1 }]);
-        setNewCategory({ name: '', mainCategory: '', status: 'Active' });
-        setShowAddModal(false);
-    };
-
-    const handleEditCategory = () => {
-        setCategories(
-            categories.map((cat) =>
-                cat.id === editingCategory.id ? editingCategory : cat
-            )
+    const filteredSubCategories = subCategories.filter((sub) => {
+        return (
+            sub.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+            (!filters.category || sub.category === filters.category) &&
+            (!filters.mainCategory || sub.mainCategory === filters.mainCategory) &&
+            (!filters.status || sub.status === filters.status)
         );
-        setShowEditModal(false);
-    };
-
-    const handleDeleteCategory = () => {
-        setCategories(categories.filter((cat) => cat.id !== deletingCategory.id));
-        setShowDeleteModal(false);
-    };
+    });
 
     // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+    const currentItems = filteredSubCategories.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredSubCategories.length / itemsPerPage);
 
     const handlePreviousPage = () => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -155,274 +148,243 @@ const CategoryManagement = () => {
         />
     );
 
-    const handleStatusToggle = (id) => {
-        setCategories(categories.map((cat) =>
-            cat.id === id ? { ...cat, status: cat.status === 'Active' ? 'Inactive' : 'Active' } : cat
-        ));
+    const handleAddEditSave = (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const subCategory = {
+            id: currentSubCategory ? currentSubCategory.id : Date.now(),
+            name: formData.get('name'),
+            category: formData.get('category'),
+            mainCategory: formData.get('mainCategory'),
+            status: formData.get('status'),
+        };
+
+        if (currentSubCategory) {
+            setSubCategories((prev) =>
+                prev.map((sub) => (sub.id === currentSubCategory.id ? subCategory : sub))
+            );
+        } else {
+            setSubCategories((prev) => [...prev, subCategory]);
+        }
+        setShowAddEditModal(false);
+    };
+
+    const handleDelete = () => {
+        setSubCategories((prev) => prev.filter((sub) => sub.id !== currentSubCategory.id));
+        setShowDeleteModal(false);
     };
 
     return (
         <div className="container-fluid">
-            {/* Header with title and buttons */}
-            <h4 className="mb-0">Category</h4>
-            <p className="text-muted">Dashboard <span>/ Category</span></p>
-
-
-            {/* Main Table */}
-            <div className="bg-white rounded shadow-sm" style={{ padding: '20px' }}>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <input
-                            type="search"
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={handleSearch}
-                            className="form-control"
-                            style={{ minWidth: '200px' }}
-                        />
-                    </div>
-                    <div className="d-flex gap-2">
-                        <Button
-                            variant="outline-secondary"
-                            onClick={() => setShowFilter(true)}
-                            className="d-flex align-items-center"
-                            style={{ padding: '5px 30px', borderRadius: '0' }}
-                        >
-                            <FiFilter className="me-2" /> Filter
-                        </Button>
-                        <Button variant="dark" onClick={() => setShowAddModal(true)} style={{ padding: '5px 30px', borderRadius: '0' }}>
-                            + Add
-                        </Button>
-                    </div>
+            <h4 className="mb-0">Sub Category</h4>
+            <p className="text-muted">Dashboard <span>/ Sub Category</span></p>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="form-control d-inline-block w-auto me-2"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
-
-                {/* Table component */}
-                <Table responsive hover borderless className="mb-0">
-                    <thead className="bg-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Category Name</th>
-                            <th>Main Category</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentItems.map((category) => (
-                            <tr key={category.id}>
-                                <td>{category.id}</td>
-                                <td>{category.name}</td>
-                                <td>{category.mainCategory}</td>
-                                <td>
-                                    <Form.Check
-                                        type="switch"
-                                        id={`status-switch-${category.id}`}
-
-                                        checked={category.status === 'Active'}
-                                        onChange={() => handleStatusToggle(category.id)}
-                                    />
-                                </td>
-                                <td>
-                                    <Button
-                                        variant="link"
-                                        className="p-0 me-2 text-primary"
-                                        onClick={() => {
-                                            setEditingCategory(category);
-                                            setShowEditModal(true);
-                                        }}
-                                    >
-                                        <img src={require('../Photos/edit.png')} style={{ border: '1px solid #919191', padding: '2px' }}></img>
-                                        {/* <FiEdit size={18} /> */}
-                                    </Button>
-                                    <Button
-                                        variant="link"
-                                        className="p-0 text-danger"
-                                        onClick={() => {
-                                            setDeletingCategory(category);
-                                            setShowDeleteModal(true);
-                                        }}
-                                    >
-                                        <img src={require('../Photos/delet.png')} style={{ border: '1px solid #919191', padding: '2px' }}></img>
-                                        {/* <FiTrash2 size={18} /> */}
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-                {/* Enhanced Pagination */}
-                <div className="d-flex justify-content-end mt-3">
-                    <Pagination className="mb-0">
-                        {paginationItems}
-                    </Pagination>
+                <div className="d-flex gap-2">
+                    <Button variant="outline-secondary" className="d-flex align-items-center" onClick={() => setShowFilter(true)} style={{ padding: '5px 30px', borderRadius: '0', color: 'black' }}>
+                        <FaFilter className='me-2' /> Filter
+                    </Button>
+                    <Button variant="dark" onClick={() => {
+                        setCurrentSubCategory(null);
+                        setShowAddEditModal(true);
+                    }} className="d-flex align-items-center" style={{ padding: '5px 30px', borderRadius: '0' }}>
+                        + Add
+                    </Button>
                 </div>
             </div>
 
+            <Table hover responsive borderless>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Main Category</th>
+                        <th>Category</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {currentItems.map((sub) => (
+                        <tr key={sub.id}>
+                            <td>{sub.id}</td>
+                            <td>{sub.mainCategory}</td>
+                            <td>{sub.category}</td>
+                            <td>{sub.name}</td>
+                            <td>{sub.status}</td>
+                            <td>
+                                <Button
+                                    variant="link"
+                                    className="me-2 p-0"
+                                    onClick={() => {
+                                        setCurrentSubCategory(sub);
+                                        setShowAddEditModal(true);
+                                    }}
+                                >
+                                    {/* <FaEdit /> */}
+                                    <img src={require('../Photos/edit.png')} style={{ border: '1px solid #919191', padding: '2px' }}></img>
+                                </Button>
+                                <Button
+                                    variant="link"
+                                    onClick={() => {
+                                        setCurrentSubCategory(sub);
+                                        setShowDeleteModal(true);
+                                    }}
+                                    className='p-0'
+                                >
+                                    {/* <FaTrash /> */}
+                                    <img src={require('../Photos/delet.png')} style={{ border: '1px solid #919191', padding: '2px' }}></img>
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
 
+            {/* Enhanced Pagination */}
+            <div className="d-flex justify-content-end mt-3">
+                <Pagination className="mb-0">
+                    {paginationItems}
+                </Pagination>
+            </div>
 
-            {/* Filter Offcanvas */}
-            <Offcanvas show={showFilter} onHide={() => setShowFilter(false)} placement="end" style={{ zIndex: 9999 }}>
-                <Offcanvas.Header closeButton className="border-bottom">
-                    <Offcanvas.Title>Filter</Offcanvas.Title>
+            <Offcanvas show={showFilter} onHide={() => setShowFilter(false)} placement="end">
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Filter Sub Categories</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <Form>
+                    <Form onSubmit={(e) => {
+                        e.preventDefault();
+                        setShowFilter(false);
+                    }}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control
+                                as="select"
+                                value={filters.category}
+                                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                            >
+                                <option value="">Select Category</option>
+                                <option value="Category 1">Category 1</option>
+                                <option value="Category 2">Category 2</option>
+                            </Form.Control>
+                        </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Main Category</Form.Label>
-                            <Form.Select
-                                name="mainCategory"
+                            <Form.Control
+                                as="select"
                                 value={filters.mainCategory}
-                                onChange={handleFilterChange}
+                                onChange={(e) => setFilters({ ...filters, mainCategory: e.target.value })}
                             >
-                                <option value="">Select</option>
-                                {mainCategories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </Form.Select>
+                                <option value="">Select Main Category</option>
+                                <option value="Main Category 1">Main Category 1</option>
+                                <option value="Main Category 2">Main Category 2</option>
+                            </Form.Control>
                         </Form.Group>
-                        <Form.Group className="mb-4">
+                        <Form.Group className="mb-3">
                             <Form.Label>Status</Form.Label>
-                            <Form.Select
-                                name="status"
+                            <Form.Control
+                                as="select"
                                 value={filters.status}
-                                onChange={handleFilterChange}
+                                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                             >
-                                <option value="">Select</option>
+                                <option value="">Select Status</option>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
-                            </Form.Select>
+                            </Form.Control>
                         </Form.Group>
-                        <div className="d-flex justify-content-space-between gap-2">
-                            <Button variant="outline-secondary" onClick={applyFilters}>
-                                Cancel
+                        <div className="d-flex justify-content-end">
+                            <Button variant="secondary" className="me-2" onClick={() => setFilters({ category: '', mainCategory: '', status: '' })}>
+                                Clear
                             </Button>
-                            <Button variant="primary" onClick={clearFilters}>
-                                Applay
+                            <Button variant="primary" type="submit">
+                                Apply
                             </Button>
                         </div>
                     </Form>
                 </Offcanvas.Body>
             </Offcanvas>
 
-            {/* Add Category Modal */}
-            <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
+            <Modal show={showAddEditModal} onHide={() => setShowAddEditModal(false)} centered>
                 <Modal.Header closeButton>
-                   
                 </Modal.Header>
                 <Modal.Body>
-                    <h6 className='text-center fw-bold'>Add Category</h6>
-                    <Form>
+                    <h6 className='text-center fw-bold'>Add Sub Category</h6>
+                    <Form onSubmit={handleAddEditSave}>
+
+
+                        {/* Select for Main Categories */}
                         <Form.Group className="mb-3">
                             <Form.Label>Main Category</Form.Label>
-                            <Form.Select
-                                value={newCategory.mainCategory}
-                                onChange={(e) =>
-                                    setNewCategory({ ...newCategory, mainCategory: e.target.value })
-                                }
+                            <Form.Control
+                                as="select"
+                                name="mainCategory"
+                                required
                             >
-                                <option value="">Select Main Category</option>
-                                {mainCategories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
-                                    </option>
+                                <option value="">Select</option>
+                                {mainCategories.map((mainCategory, index) => (
+                                    <option key={index} value={mainCategory}>{mainCategory}</option>
                                 ))}
-                            </Form.Select>
+                            </Form.Control>
                         </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Category Name</Form.Label>
+                        {/* Select for Categories */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="category"
+                                required
+                            >
+                                <option value="">Select </option>
+                                {categories.map((category, index) => (
+                                    <option key={index} value={category}>{category}</option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Sub Category</Form.Label>
                             <Form.Control
                                 type="text"
-                                value={newCategory.name}
-                                onChange={(e) =>
-                                    setNewCategory({ ...newCategory, name: e.target.value })
-                                }
-                                placeholder="Enter category name"
+                                name="name"
+                                placeholder='Enter Sub Category'
+                                defaultValue={currentSubCategory?.name || ''}
+                                required
                             />
                         </Form.Group>
                         <div className="d-flex justify-content-center gap-2">
-                        <Button variant="secondary" onClick={() => setShowAddModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleAddCategory} className='r_btn text-white' style={{ backgroundColor: "black" }}>
-                        Add
-                    </Button>
+                            <Button variant="secondary" onClick={() => setShowAddEditModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
+                                Cancel
+                            </Button>
+                            <Button variant="primary" type="submit" className='r_btn text-white' style={{ backgroundColor: "black" }}>
+                                Save
+                            </Button>
                         </div>
                     </Form>
                 </Modal.Body>
             </Modal>
 
-            {/* Edit Category Modal */}
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-                <Modal.Header closeButton >
-                </Modal.Header>
-                <Modal.Body>
-                <h6 className='text-center fw-bold'>Edit Category</h6>
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Main Category</Form.Label>
-                            <Form.Select
-                                value={editingCategory?.mainCategory || ''}
-                                onChange={(e) =>
-                                    setEditingCategory({
-                                        ...editingCategory,
-                                        mainCategory: e.target.value
-                                    })
-                                }
-                            >
-                                <option value="">Select Main Category</option>
-                                {mainCategories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Category Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={editingCategory?.name || ''}
-                                onChange={(e) =>
-                                    setEditingCategory({
-                                        ...editingCategory,
-                                        name: e.target.value
-                                    })
-                                }
-                                placeholder="Enter category name"
-                            />
-                        </Form.Group>
-                        <div className="d-flex justify-content-center gap-2">
-                        <Button variant="secondary" onClick={() => setShowEditModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleEditCategory} className='r_btn text-white' style={{ backgroundColor: "black" }}>
-                       Update
-                    </Button>
-                        </div>
-                    </Form>
-                </Modal.Body>
-               
-            </Modal>
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
 
-            {/* Delete Confirmation Modal */}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-                <Modal.Body className='p-5'>
-                <h6 className='text-center fw-bold mb-3'>Delete</h6>
-                   <p className='mb-4 text-center'> Are you sure you want to delete "{deletingCategory?.name}"?</p>
-                    <div className="d-flex justify-content-center gap-2">
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
+                <Modal.Body>Are you sure you want to delete this sub-category?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel
                     </Button>
-                    <Button variant="danger" onClick={handleDeleteCategory} className='r_btn text-white' style={{ backgroundColor: "black" }}>
+                    <Button variant="danger" onClick={handleDelete}>
                         Delete
                     </Button>
-                    </div>
-                </Modal.Body>
-                </Modal>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
 
-export default CategoryManagement;
+export default SubCategoryManagement;

@@ -3,7 +3,12 @@
     padding: 0;
     box-sizing: border-box;
 }
-.page-link{
+img{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+/* .page-link{
     color: black !important;
 }
 .active>.page-link{
@@ -26,10 +31,10 @@ thead th{
 }
 .modal-content{
     border-radius: 0;
-    /* padding: 40px; */
+
 } 
 .modal-body form{
-    padding: 20px;
+    padding: 20px !important;
 }
 .r_bottom{
     margin-bottom: 2rem;
@@ -49,8 +54,4 @@ thead th{
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* .css-zxdg2z{
-     padding: 0 !important;
 } */
