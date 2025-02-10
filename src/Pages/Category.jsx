@@ -295,12 +295,13 @@ const CategoryManagement = () => {
                             </Form.Select>
                         </Form.Group>
                         <div className="d-flex justify-content-space-between gap-2">
-                            <Button variant="outline-secondary" onClick={applyFilters}>
-                                Cancel
+                             <Button variant="primary" onClick={clearFilters}>
+                                Cnncel
                             </Button>
-                            <Button variant="primary" onClick={clearFilters}>
+                            <Button variant="outline-secondary" onClick={applyFilters}>
                                 Applay
                             </Button>
+                           
                         </div>
                     </Form>
                 </Offcanvas.Body>
