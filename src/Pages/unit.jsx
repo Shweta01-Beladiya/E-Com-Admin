@@ -289,7 +289,7 @@ const Unit = (props) => {
                                     </tbody>
                                 </table>
                                 {totalPages > 1 && (
-                                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4'>
+                                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
                                         <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
                                             <MdOutlineKeyboardArrowLeft />
                                         </p>
@@ -403,8 +403,8 @@ const Unit = (props) => {
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     placeholder="Enter short name"
-                                    name='name1'
-                                    value={values.name1}
+                                    name='name2'
+                                    value={values.name2}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                 />
@@ -413,7 +413,7 @@ const Unit = (props) => {
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={() => setModalShow2(false)}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">Update</button>

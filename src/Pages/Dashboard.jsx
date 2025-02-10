@@ -4,8 +4,50 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Chart from "react-apexcharts";
 import { FaStar } from "react-icons/fa";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { TrendingUp, Wallet, ShoppingCart, Users } from 'lucide-react';
 
 const Dashboard = () => {
+
+  // Cahat Box
+  const revenueData = [
+    { 
+      title: "Total Sales", 
+      amount: "1,00,000", 
+      change: "+22%", 
+      img: "total_save.png",
+      color: "#8b5cf6",
+      data: [30, 40, 100, 10, 120, 140]
+    },
+    { 
+      title: "Total Income", 
+      amount: "12,00,000", 
+      change: "-25%", 
+      img: "total_income.png",
+      color: "#10b981",
+      data: [20, 40, 80, 100, 110, 100, 80, 40, 20, 10]
+    },
+    { 
+      title: "Total Orders", 
+      amount: "10,000", 
+      change: "+49%", 
+      img: "total_orders.png",
+      color: "#8b5cf6",
+      data: [30, 40, 100, 10, 120, 140]
+    },
+    { 
+      title: "Total Customer", 
+      amount: "8,521", 
+      change: "+22%", 
+      img: "total_customer.png",
+      color: "#f59e0b",
+      data: [30, 40, 100, 10, 120, 140]
+    },
+  ];
+
+  const getChartData = (data) => {
+    return data.map((value, index) => ({ value }));
+  };
 
   // Order Summary
   var orderSummary = [
@@ -257,82 +299,33 @@ const Dashboard = () => {
 
         <div className="row">
           {/* Revenue Cards */}
-          <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-            <div className="mv_revenue d-flex justify-content-between align-items-center">
-              <div className="mv_revenue_text">
-                <div className='d-flex align-items-center'>
-                  <div className='mv_total_save_logo'>
-                    <img src={require('../mv_img/total_save.png')} alt="" />
+          {revenueData.map((item, index) => (
+            <div key={index} className="col-xxl-3 col-xl-6 col-md-6 col-sm-12 mv_revenue_item">
+              <div className="mv_revenue d-flex justify-content-between align-items-center">
+                <div className="mv_revenue_text d-flex align-items-center">
+                  <div className="mv_total_save_logo">
+                    <img src={require(`../mv_img/${item.img}`)} alt={item.title} />
                   </div>
                   <div>
-                    <p className='mv_ts_text'>Total Sales</p>
-                    <p className='mb-0 mv_tsm_text'>1,00,000</p>
+                    <p className="mv_ts_text">{item.title}</p>
+                    <p className="mb-0 mv_tsm_text">{item.amount}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className={item.change.startsWith("+") ? "mv_text_plus_per" : "mv_text_mainus_per"}>
+                    {item.change}
+                  </p>
+                  <div className="h-12 w-24" style={{ height: "50px", width: "100px" }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={getChartData(item.data)}>
+                        <Line type="monotone" dataKey="value" stroke={item.color} strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
               </div>
-              <div>
-                <p className='mv_text_plus_per'>+ 22%</p>
-                <p></p>
-              </div>
             </div>
-          </div>
-          <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-            <div className="mv_revenue d-flex justify-content-between align-items-center">
-              <div className="mv_revenue_text">
-                <div className='d-flex align-items-center'>
-                  <div className='mv_total_save_logo'>
-                    <img src={require('../mv_img/total_income.png')} alt="" />
-                  </div>
-                  <div>
-                    <p className='mv_ts_text'>Total Income</p>
-                    <p className='mb-0 mv_tsm_text'>12,00,000</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className='mv_text_mainus_per'>- 25%</p>
-                <p></p>
-              </div>
-            </div>
-          </div>
-          <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-            <div className="mv_revenue d-flex justify-content-between align-items-center">
-              <div className="mv_revenue_text">
-                <div className='d-flex align-items-center'>
-                  <div className='mv_total_save_logo'>
-                    <img src={require('../mv_img/total_orders.png')} alt="" />
-                  </div>
-                  <div>
-                    <p className='mv_ts_text'>Total Orders</p>
-                    <p className='mb-0 mv_tsm_text'>10,000</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className='mv_text_plus_per'>+49%</p>
-                <p></p>
-              </div>
-            </div>
-          </div>
-          <div className="col-xxl-3 col-xl-6 col-md-6 col-6 mv_revenue_item">
-            <div className="mv_revenue d-flex justify-content-between align-items-center">
-              <div className="mv_revenue_text">
-                <div className='d-flex align-items-center'>
-                  <div className='mv_total_save_logo'>
-                    <img src={require('../mv_img/total_customer.png')} alt="" />
-                  </div>
-                  <div>
-                    <p className='mv_ts_text'>Total Customer</p>
-                    <p className='mb-0 mv_tsm_text'>8,521</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className='mv_text_plus_per'>+ 22%</p>
-                <p></p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Order Summary */}
@@ -455,8 +448,8 @@ const Dashboard = () => {
                   </InputGroup>
                 </div> */}
               </div>
-              <div className="">
-                <table className='mv_product_table mv_top_table_product justify-content-between'>
+              <div className="mv_product_table_padd">
+                <table className='mv_product_table mv_top_table_product'>
                   <thead>
                     <tr>
                       {checkboxes.isNameChecked && <th className=''>Product</th>}
