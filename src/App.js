@@ -15,6 +15,8 @@ import Category from './Pages/Category';
 
 import Viewprofile from './Pages/Viewprofile';
 import Subcategory from './Pages/Subcategory';
+import Riyansee from './Pages/riyansee';
+
 
 import Product from "./Pages/product";
 import Unit from './Pages/unit';
@@ -36,11 +38,13 @@ function App() {
             <Route path='maincategory' element={<Maincategory/>}></Route>
             <Route path='category' element={<Category/>}></Route>
             <Route path='subcategory' element={<Subcategory/>}></Route>
+            
 
             <Route path='view_profile' element={<Viewprofile />}></Route>
 
             <Route path="product" element={<Product />}></Route>
             <Route path='unit' element={<Unit />}></Route>
+            <Route path="riyansee" element={<Riyansee/>}></Route>
 
           </Route>
         </Routes>
