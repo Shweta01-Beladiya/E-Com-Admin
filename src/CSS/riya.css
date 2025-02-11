@@ -84,6 +84,7 @@ tr th{
     padding: 10px 15px;
     background-color: black !important;
     color: white !important;
+    border-color: transparent !important;
   }
   /* Delete Offcanvas */
   .r_cancel{

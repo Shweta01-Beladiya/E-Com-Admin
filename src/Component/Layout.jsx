@@ -1,7 +1,7 @@
 // Layout.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled,useTheme } from '@mui/material/styles';
-import { Box, CssBaseline } from '@mui/material';
+import { Box, CssBaseline, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -16,7 +16,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const Layout = () => {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+
+  const isLargeScreen = useMediaQuery('(min-width:769px)');
+  const [open, setOpen] = React.useState(isLargeScreen);
+
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -25,6 +28,10 @@ const Layout = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    setOpen(isLargeScreen);
+  },[isLargeScreen]);
 
   return (
     <Box sx={{ display: 'flex' }}>

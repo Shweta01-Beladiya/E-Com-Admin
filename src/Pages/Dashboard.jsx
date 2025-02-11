@@ -5,7 +5,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Chart from "react-apexcharts";
 import { FaStar } from "react-icons/fa";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Wallet, ShoppingCart, Users } from 'lucide-react';
+// import { TrendingUp, Wallet, ShoppingCart, Users } from 'lucide-react';
 
 const Dashboard = () => {
 
