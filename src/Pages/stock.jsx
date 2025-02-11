@@ -460,8 +460,8 @@ const Stock = (props) => {
             {/* Delete Product Model */}
             <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
-                    <h5 className='mb-2'>Delete?</h5>
-                    <p>Are you sure you want to delete<br /> Product?</p>
+                    <h5 className='mb-2'>Delete</h5>
+                    <p>Are you sure you want to <br /> delete? </p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>

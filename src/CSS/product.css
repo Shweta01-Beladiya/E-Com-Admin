@@ -20,12 +20,12 @@
     height: 6px;
 }
 .mv_track_active{
-    background: #002846;
+    background: #2B221E;
 }
 .mv_thumb{
     height: 20px;
     width: 20px;
-    background-color: #002846;
+    background-color: #2B221E;
     cursor: pointer;
     border-radius: 50%;
     position: relative;
@@ -34,7 +34,6 @@
 .mv_price_label{
     position: absolute;
     top: 15px;
-    transform: translateX(-50%);
     border-radius: 4px;
     font-weight: 500;
     font-size: 14px;
@@ -43,6 +42,9 @@
 .mv_price_min,
 .mv_price_max{
     z-index: 1;
+}
+.mv_price_max{
+    transform: translateX(-80%);
 }
 /* .mv_other_category {
     margin-top: 25px;
@@ -311,6 +313,34 @@
 
 
 
-/******************** Size ************************/
+/******************** Coupen ************************/
+.mv_offcanvas_filter_category {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 19.36px;
+    color: #2B221E;
+}
+/* ************************************************ */
 
+
+
+
+/******************** Coupen ************************/
+.mv_filter_start_date{
+    width: 100px !important;
+    color: #6A6A6A !important;
+}
+.mv_add_product_date_scheduled {
+    position: relative;
+}
+.mv_add_product_date {
+    position: absolute;
+    background-color: #fff;
+    top: 6px;
+    left: 10px;
+    padding: 5px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+}
 /* ************************************************ */

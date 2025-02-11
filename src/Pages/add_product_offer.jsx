@@ -3,28 +3,43 @@ import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { useLocation } from 'react-router-dom';
 
-const Addstock = () => {
+const Addproductoffer = () => {
     // State variables
     let [isedit, setisedit] = useState(false);
+    let [name, setname] = useState('');
     let [mainCategory, setMainCategory] = useState("");
     let [category, setCategory] = useState("");
     let [subCategory, setSubCategory] = useState("");
     let [product, setProduct] = useState("");
-    let [stockStatus, setStockStatus] = useState("");
-    let [quantity, setQuantity] = useState("");
+    let [offerName, setOfferName] = useState("");
+    let [code, setCode] = useState("");
+    let [discountPrice, setDiscountPrice] = useState("");
+    let [price, setPrice] = useState("");
+    let [startDate, setStartDate] = useState("");
+    let [endDate, setEndDate] = useState("");
+    let [minPurchase, setMinPurchase] = useState("");
+    let [maxPurchase, setMaxPurchase] = useState("");
+    let [description, setDescription] = useState("");
 
-    const [profileImage, setProfileImage] = useState(require('../mv_img/profile_img.png'));
 
     let handle_onload = () => {
         let data = JSON.parse(localStorage.getItem('user'));
         console.log(data);
         if (data) {
+            setname(data.name || "");
             setMainCategory(data.mainCategory || "");
             setCategory(data.category || "");
             setSubCategory(data.subCategory || "");
             setProduct(data.product || "");
-            setStockStatus(data.stockStatus || "");
-            setQuantity(data.quantity || "");
+            setOfferName(data.offerName || "");
+            setCode(data.code || "");
+            setDiscountPrice(data.discountPrice || "");
+            setPrice(data.price || "");
+            setStartDate(data.startDate || "");
+            setEndDate(data.endDate || "");
+            setMinPurchase(data.minPurchase || "");
+            setMaxPurchase(data.maxPurchase || "");
+            setDescription(data.description || "");
         } else {
             return;
         }
@@ -40,36 +55,59 @@ const Addstock = () => {
 
     let handlesubmit = (event) => {
         event.preventDefault();
-
+    
         const formData = {
+            name,
             mainCategory,
             category,
             subCategory,
             product,
-            stockStatus,
-            quantity,
+            offerName,
+            code,
+            discountPrice,
+            price,
+            startDate,
+            endDate,
+            minPurchase,
+            maxPurchase,
+            description,
         };
-
-        console.log('Form Submitted:', formData);
-        localStorage.setItem('user', JSON.stringify(formData));
+    
+        console.log("Form Submitted:", formData);
+        localStorage.setItem("user", JSON.stringify(formData));
         setisedit(false);
     };
 
-    // Edit Stock
+    // Edit Product Offer
     const location = useLocation();
-    const editStock = location.state?.editStock;
-    console.log(editStock)
+    const editProductoffer = location.state?.editProductoffer;
+    console.log(editProductoffer)
+
+    // Date function
+    let [date, setDate] = useState('Select Date');
+    let [date1, setDate1] = useState('Select Date');
+
+    const handleDateChange = (e, dateType) => {
+        const [year, month, day] = e.target.value.split("-");
+        const formattedDate = `${day}-${month}-${year}`;
+        
+        if (dateType === 'start') {
+            setDate(formattedDate);
+        } else if (dateType === 'end') {
+            setDate1(formattedDate);
+        }
+    };
 
     return (
         <>
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editStock ? 'Edit Stock' : 'Add Stock'}</p>
+                        <p className='mb-1'>{editProductoffer ? 'Edit Product Offer' : 'Add Product Offer'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editStock ? 'Edit Stock' : 'Add Stock'}
+                                {editProductoffer ? 'Edit Product Offer' : 'Add Product Offer'}
                             </p>
                         </div>
                     </div>
@@ -161,28 +199,112 @@ const Addstock = () => {
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
-                                                <label className='mv_label_input'>Stock Status</label>
-                                                <Form.Select
-                                                    value={stockStatus}
-                                                    onChange={(e) => setStockStatus(e.target.value)}
-                                                    aria-label="Default select example"
-                                                    className='mv_form_select mb-3'>
-                                                    <option value="">Select</option>
-                                                    <option value="In Stock">In Stock</option>
-                                                    <option value="Out of Stock">Out of Stock</option>
-                                                    <option value="Low Stock">Low Stock</option>
-                                                </Form.Select>
+                                                <label className='mv_label_input'>Offer Name</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={offerName}
+                                                        onChange={(e) => setOfferName(e.target.value)}
+                                                        placeholder="Enter Offer Name"
+                                                        aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
-                                                <label className='mv_label_input'>Quantity</label>
+                                                <label className='mv_label_input'>Code</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={quantity}
-                                                        onChange={(e) => setQuantity(e.target.value)}
-                                                        placeholder="Enter qty."
+                                                        value={code}
+                                                        onChange={(e) => setCode(e.target.value)}
+                                                        placeholder="Enter Code"
+                                                        aria-label="name1"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Discount Price</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={discountPrice}
+                                                        onChange={(e) => setDiscountPrice(e.target.value)}
+                                                        placeholder="Enter Discount Price"
                                                         aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Price</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={price}
+                                                        onChange={(e) => setPrice(e.target.value)}
+                                                        placeholder="Enter Price"
+                                                        aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <label className='mv_offcanvas_filter_category'>Start Date</label>
+                                            <div className="mv_input_content mv_add_product_date_scheduled">
+                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
+                                                <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <label className='mv_offcanvas_filter_category'>End Date</label>
+                                            <div className="mv_input_content mv_add_product_date_scheduled">
+                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
+                                                <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Minimum Purchase</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={minPurchase}
+                                                        onChange={(e) => setMinPurchase(e.target.value)}
+                                                        placeholder="Enter Minimum Purchase"
+                                                        aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Maximum Purchase</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={maxPurchase}
+                                                        onChange={(e) => setMaxPurchase(e.target.value)}
+                                                        placeholder="Enter Maximum Purchase"
+                                                        aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Description</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={description}
+                                                        onChange={(e) => setDescription(e.target.value)}
+                                                        placeholder="Enter Description"
+                                                        as="textarea" 
+                                                        aria-label="With textarea"
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
@@ -193,7 +315,7 @@ const Addstock = () => {
                                                 <button className='border-0 bg-transparent'>
                                                     Cnacel
                                                 </button>
-                                                {editStock === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                {editProductoffer === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
                                                     Update
                                                 </button> : 
                                                 <button className='border-0 bg-transparent' onClick={change_edit}>
@@ -213,4 +335,4 @@ const Addstock = () => {
     );
 };
 
-export default Addstock;
+export default Addproductoffer;

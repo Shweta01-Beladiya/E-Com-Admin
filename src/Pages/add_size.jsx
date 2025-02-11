@@ -6,10 +6,12 @@ import { useLocation } from 'react-router-dom';
 const Addsize = () => {
     // State variables
     let [isedit, setisedit] = useState(false);
-    let [email, setemail] = useState('');
-    let [name, setname] = useState('');
-    let [contact, setcontact] = useState('');
-    let [gender, setgender] = useState('');
+    let [mainCategory, setMainCategory] = useState("");
+    let [category, setCategory] = useState("");
+    let [subCategory, setSubCategory] = useState("");
+    let [sizeName, setSizeName] = useState("");
+    let [size, setSize] = useState("");
+    let [unit, setUnit] = useState("");
 
     const [profileImage, setProfileImage] = useState(require('../mv_img/profile_img.png'));
 
@@ -17,10 +19,12 @@ const Addsize = () => {
         let data = JSON.parse(localStorage.getItem('user'));
         console.log(data);
         if (data) {
-            setname(data.name);
-            setcontact(data.contact);
-            setemail(data.email);
-            setgender(data.gender);
+            setMainCategory(data.mainCategory || "");
+            setCategory(data.category || "");
+            setSubCategory(data.subCategory || "");
+            setSizeName(data.sizeName || "");
+            setSize(data.size || "");
+            setUnit(data.unit || "");
         } else {
             return;
         }
@@ -38,47 +42,17 @@ const Addsize = () => {
         event.preventDefault();
 
         const formData = {
-            name,
-            email,
-            contact,
-            gender,
+            mainCategory,
+            category,
+            subCategory,
+            sizeName,
+            size,
+            unit,
         };
 
         console.log('Form Submitted:', formData);
         localStorage.setItem('user', JSON.stringify(formData));
         setisedit(false);
-    };
-
-    // navs & tabs
-    const [activeTab, setActiveTab] = useState("edit-profile");
-
-    // change password
-    const [showPassword, setShowPassword] = useState({
-        old: false,
-        new: false,
-        confirm: false
-    });
-
-    const togglePasswordVisibility = (field) => {
-        setShowPassword((prevState) => ({
-            ...prevState,
-            [field]: !prevState[field]
-        }));
-    };
-
-    // Profile Image
-    const fileInputRef = useRef(null);
-
-    const handleImageClick = () => {
-        fileInputRef.current.click();
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const imageURL = URL.createObjectURL(file); // Create a temporary URL for the uploaded image
-          setProfileImage(imageURL); // Update the state with the new image
-        }
     };
 
     // Edit Size
@@ -111,8 +85,8 @@ const Addsize = () => {
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Main Category</label>
                                                 <Form.Select
-                                                    value={name}
-                                                    onChange={(e) => setname(e.target.value)}
+                                                    value={mainCategory}
+                                                    onChange={(e) => setMainCategory(e.target.value)}
                                                     aria-label="Default select example"
                                                     className='mv_form_select mb-3'>
                                                     <option>Select</option>
@@ -129,8 +103,8 @@ const Addsize = () => {
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
-                                                    value={name}
-                                                    onChange={(e) => setname(e.target.value)}
+                                                    value={category}
+                                                    onChange={(e) => setCategory(e.target.value)}
                                                     aria-label="Default select example"
                                                     className='mv_form_select mb-3'>
                                                     <option>Select</option>
@@ -149,8 +123,8 @@ const Addsize = () => {
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
-                                                    value={name}
-                                                    onChange={(e) => setname(e.target.value)}
+                                                    value={subCategory}
+                                                    onChange={(e) => setSubCategory(e.target.value)}
                                                     aria-label="Default select example"
                                                     className='mv_form_select mb-3'>
                                                     <option>Select</option>
@@ -170,8 +144,8 @@ const Addsize = () => {
                                                 <label className='mv_label_input'>Size Name</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={name}
-                                                        onChange={(e) => setname(e.target.value)}
+                                                        value={sizeName}
+                                                        onChange={(e) => setSizeName(e.target.value)}
                                                         placeholder="Enter size name"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
@@ -184,8 +158,8 @@ const Addsize = () => {
                                                 <label className='mv_label_input'>Size</label>
                                                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                                     <Form.Control
-                                                        value={name}
-                                                        onChange={(e) => setname(e.target.value)}
+                                                        value={size}
+                                                        onChange={(e) => setSize(e.target.value)}
                                                         type=""
                                                         placeholder="Enter size" />
                                                 </Form.Group>
@@ -195,8 +169,8 @@ const Addsize = () => {
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Unit</label>
                                                 <Form.Select
-                                                    value={name}
-                                                    onChange={(e) => setname(e.target.value)}
+                                                    value={unit}
+                                                    onChange={(e) => setUnit(e.target.value)}
                                                     aria-label="Default select example"
                                                     className='mv_form_select mb-3'>
                                                     <option value="">Select</option>

@@ -10,118 +10,139 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
+const Coupon = (props) => {
 
-const Size = (props) => {
-
-    // Edit Size
-    const [editsize,setEditsize] = useState(false);
+    // Edit Coupon
+    const [editstok,setEditcoupon] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleditsize = () => {
-        setEditsize(true);
+    const handleditcoupon = () => {
+        setEditcoupon(true);
         // navigate('addsize')
     }
 
     var data1 = [
         {   
             id: 1,
-            maincategory: "Women",
-            category: "Jewelry",
-            subcategory: "Necklace",
-            sizename: "Weight",
-            size: "56, 74, 70...",
-            unit: "gm",
+            code: "NEW100",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Fixed",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 2,
-            maincategory: "Men",
-            category: "Western Wear",
-            subcategory: "Blazer",
-            sizename: "Length",
-            size: "30, 32, 34..",
-            unit: "-",
+            code: "WINTER30",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Percentage",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: false,
         },
         {   
             id: 3,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            sizename: "Weight",
-            size: "50, 75, 100...",
-            unit: "gm",
+            code: "WINTER30",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Percentage",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 4,
-            maincategory: "Beauty & Health",
-            category: "Skin Care",
-            subcategory: "Facewash",
-            sizename: "Weight",
-            size: "100, 500,...",
-            unit: "gm",
+            code: "WINTER30",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Percentage",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 5,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            sizename: "Weight",
-            size: "50, 75, 100...",
-            unit: "gm",
+            code: "WINTER30",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Percentage",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 6,
-            maincategory: "Mobile & Electronics",
-            category: "Electronics",
-            subcategory: "Refrigerator",
-            sizename: "Weight",
-            size: "265, 280...",
-            unit: "ltr",
+            code: "WINTER30",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Percentage",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 7,
-            maincategory: "Beauty & Health",
-            category: "Fragrance",
-            subcategory: "Perfume",
-            sizename: "Weight",
-            size: "50, 100...",
-            unit: "ml",
+            code: "NEW100",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Fixed",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 8,
-            maincategory: "Home & Kitchen",
-            category: "Kitchen wear",
-            subcategory: "Pressure Cooker",
-            sizename: "Capacity",
-            size: "3, 5, 6, 7...",
-            unit: "ltr",
+            code: "NEW100",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Fixed",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 9,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            sizename: "Weight",
-            size: "50,70,100...",
-            unit: "gm",
+            code: "NEW100",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Fixed",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 10,
-            maincategory: "Mobile & Electronics",
-            category: "Mobile",
-            subcategory: "Smart Phone",
-            sizename: "Storage",
-            size: "32, 64, 128...",
-            unit: "GB",
+            code: "NEW100",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Fixed",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
         {   
             id: 11,
-            maincategory: "Women",
-            category: "Jewelry",
-            subcategory: "Necklace",
-            sizename: "Weight",
-            size: "56, 74, 70...",
-            unit: "gm",
+            code: "NEW100",
+            coupenname: "Lorem ipsum",
+            description: "Lorem ipsum idb..",
+            coupontype: "Fixed",
+            price: "2000",
+            startdate: "02/09/1994",
+            enddate: "02/09/1994",
+            status: true,
         },
     ];
 
@@ -129,24 +150,28 @@ const Size = (props) => {
 
     const [checkboxes, setCheckboxes] = useState({
         isIDChecked: true,
-        isMaincategoryChecked: true,
-        isCategoryChecked: true,
-        isSubcategoryChecked: true,
-        isSizenameChecked: true,
-        isSizeChecked: true,
-        isUnitChecked: true,
+        isCodeChecked: true,
+        isCouponnameChecked: true,
+        isDescriptionChecked: true,
+        isCoupontypeChecked: true,
+        isPriceChecked: true,
+        isStartdateChecked: true,
+        isEnddateChecked: true,
+        isStatusChecked: true,
         isActionChecked: true,
     });
 
     useEffect(() => {
         const savedCheckboxes = {
             isIDChecked: localStorage.getItem('isIDChecked') === 'true' || true,
-            isMaincategoryChecked: localStorage.getItem('isMaincategoryChecked') === 'true' || true,
-            isCategoryChecked: localStorage.getItem('isCategoryChecked') === 'true' || true,
-            isSubcategoryChecked: localStorage.getItem('isSubcategoryChecked') === 'true' || true,
-            isSizenameChecked: localStorage.getItem('isSizenameChecked') === 'true' || true,
-            isSizeChecked: localStorage.getItem('isSizeChecked') === 'true' || true,
-            isUnitChecked: localStorage.getItem('isUnitChecked') === 'true' || true,
+            isCodeChecked: localStorage.getItem('isCodeChecked') === 'true' || true,
+            isCouponnameChecked: localStorage.getItem('isCouponnameChecked') === 'true' || true,
+            isDescriptionChecked: localStorage.getItem('isDescriptionChecked') === 'true' || true,
+            isCoupontypeChecked: localStorage.getItem('isCoupontypeChecked') === 'true' || true,
+            isPriceChecked: localStorage.getItem('isPriceChecked') === 'true' || true,
+            isStartdateChecked: localStorage.getItem('isStartdateChecked') === 'true' || true,
+            isEnddateChecked: localStorage.getItem('isEnddateChecked') === 'true' || true,
+            isStatusChecked: localStorage.getItem('isStatusChecked') === 'true' || true,
             isActionChecked: localStorage.getItem('isActionChecked') === 'true' || true,
         };
 
@@ -262,15 +287,30 @@ const Size = (props) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    // Date function
+    let [date, setDate] = useState('Select Date');
+    let [date1, setDate1] = useState('Select Date');
+
+    const handleDateChange = (e, dateType) => {
+        const [year, month, day] = e.target.value.split("-");
+        const formattedDate = `${day}-${month}-${year}`;
+        
+        if (dateType === 'start') {
+            setDate(formattedDate);
+        } else if (dateType === 'end') {
+            setDate1(formattedDate);
+        }
+    };
+
     return (
         <>
             <div id='mv_container_fluid'>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>Size</p>
+                        <p className='mb-1'>Coupon</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
-                            <p className='mv_category_heading mv_subcategory_heading mb-0'>Size</p>
+                            <p className='mv_category_heading mv_subcategory_heading mb-0'>Coupon</p>
                         </div>
                     </div>
                 </div>
@@ -299,54 +339,26 @@ const Size = (props) => {
                                             </Offcanvas.Header>
                                             <Offcanvas.Body className=''>
                                                 <div>
-                                                    <div className="mv_input_content mt-3">
-                                                        <label className='mv_offcanvas_filter_category'>Main Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Women">Women</option>
-                                                            <option value="Men">Men</option>
-                                                            <option value="Baby & Kids">Baby & Kids</option>
-                                                            <option value="Beauty & Health">Beauty & Health</option>
-                                                            <option value="Home & Kitchen">Home & Kitchen</option>
-                                                            <option value="Mobile & Electronics">Mobile & Electronics</option>
-                                                        </Form.Select>
+                                                    <div>
+                                                        <label className='mv_offcanvas_filter_category'>Start Date</label>
+                                                        <div className="mv_input_content mv_add_product_date_scheduled">
+                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
+                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className='mv_offcanvas_filter_category'>End Date</label>
+                                                        <div className="mv_input_content mv_add_product_date_scheduled">
+                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
+                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                        </div>
                                                     </div>
                                                     <div className="mv_input_content">
-                                                        <label className='mv_offcanvas_filter_category'>Category</label>
+                                                        <label className='mv_offcanvas_filter_category'>Status</label>
                                                         <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Jewelry">Jewelry</option>
-                                                            <option value="Western Wear">Western Wear</option>
-                                                            <option value="Baby Care">Baby Care</option>
-                                                            <option value="Skin Care">Skin Care</option>
-                                                            <option value="Electronics">Electronics</option>
-                                                            <option value="Fragrance">Fragrance</option>
-                                                            <option value="Kitchen wear">Kitchen wear</option>
-                                                            <option value="Mobile">Mobile</option>
-                                                        </Form.Select>
-                                                    </div>
-                                                    <div className="mv_input_content">
-                                                        <label className='mv_offcanvas_filter_category'>Sub Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Necklace">Necklace</option>
-                                                            <option value="Blazer">Blazer</option>
-                                                            <option value="Baby Soap">Baby Soap</option>
-                                                            <option value="Facewash">Facewash</option>
-                                                            <option value="Refrigerator">Refrigerator</option>
-                                                            <option value="Perfume">Perfume</option>
-                                                            <option value="Pressure Cooker">Pressure Cooker</option>
-                                                            <option value="Smart Phone">Smart Phone</option>
-                                                        </Form.Select>
-                                                    </div>
-                                                    <div className="mv_input_content">
-                                                        <label className='mv_offcanvas_filter_category'>Size Name</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Weight">Weight</option>
-                                                            <option value="Length">Length</option>
-                                                            <option value="Capacity">Capacity</option>
-                                                            <option value="Storage">Storage</option>
+                                                            <option>Select Status</option>
+                                                            <option value="True">True</option>
+                                                            <option value="False">False</option>
                                                         </Form.Select>
                                                     </div>
                                                 </div>
@@ -365,7 +377,7 @@ const Size = (props) => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <button><Link to='/dashboard/addsize'>+ Add</Link></button>
+                                            <button><Link to='/dashboard/addcoupon'>+ Add</Link></button>
                                         </div>
                                     </div>
                                 </div>
@@ -375,12 +387,14 @@ const Size = (props) => {
                                     <thead>
                                         <tr>
                                         {checkboxes.isIDChecked && <th className=''>ID</th>}
-                                        {checkboxes.isMaincategoryChecked && <th className=''>Main Category</th>}
-                                        {checkboxes.isCategoryChecked && <th className=''>Category</th>}
-                                        {checkboxes.isSubcategoryChecked && <th className=''>Sub Category</th>}
-                                        {checkboxes.isSizenameChecked && <th className=''>Size Name</th>}
-                                        {checkboxes.isSizeChecked && <th className=''>Size</th>}
-                                        {checkboxes.isUnitChecked && <th className=''>Unit</th>}
+                                        {checkboxes.isCodeChecked && <th className=''>Code</th>}
+                                        {checkboxes.isCouponnameChecked && <th className=''>Coupon Name</th>}
+                                        {checkboxes.isDescriptionChecked && <th className=''>Description</th>}
+                                        {checkboxes.isCoupontypeChecked && <th className=''>Coupon Type</th>}
+                                        {checkboxes.isPriceChecked && <th className=''>Price</th>}
+                                        {checkboxes.isStartdateChecked && <th className=''>Start Date</th>}
+                                        {checkboxes.isEnddateChecked && <th className=''>End Date</th>}
+                                        {checkboxes.isStatusChecked && <th className=''>Status</th>}
                                         {checkboxes.isActionChecked && <th className='d-flex align-items-center justify-content-end'>Action</th>}
                                         </tr>
                                     </thead>
@@ -388,16 +402,28 @@ const Size = (props) => {
                                         {data.map((item, index) => (
                                         <tr key={index}>
                                             {checkboxes.isIDChecked && <td>{item.id}</td>}
-                                            {checkboxes.isMaincategoryChecked && <td>{item.maincategory}</td>}
-                                            {checkboxes.isCategoryChecked && <td>{item.category}</td>}
-                                            {checkboxes.isSubcategoryChecked && <td>{item.subcategory}</td>}
-                                            {checkboxes.isSizenameChecked && <td>{item.sizename}</td>}
-                                            {checkboxes.isSizeChecked && <td>{item.size}</td>}
-                                            {checkboxes.isUnitChecked && <td>{item.unit}</td>}
+                                            {checkboxes.isCodeChecked && <td>{item.code}</td>}
+                                            {checkboxes.isCouponnameChecked && <td>{item.coupenname}</td>}
+                                            {checkboxes.isDescriptionChecked && <td>{item.description}</td>}
+                                            {checkboxes.isCoupontypeChecked && <td>{item.coupontype}</td>}
+                                            {checkboxes.isPriceChecked && <td>${item.price}</td>}
+                                            {checkboxes.isStartdateChecked && <td>{item.startdate}</td>}
+                                            {checkboxes.isEnddateChecked && <td>{item.enddate}</td>}
+                                            {checkboxes.isStatusChecked && (
+                                                <td>
+                                                    <Form.Check
+                                                        type="switch"
+                                                        id={`custom-switch-${item.id}`}
+                                                        label=""
+                                                        checked={item.status}
+                                                        className=''
+                                                    />
+                                                </td>
+                                            )}
                                             {checkboxes.isActionChecked && (
                                                 <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon" onClick={handleditsize}>
-                                                        <Link to='/dashboard/addSize' state={{ editSize: true }}>
+                                                    <div className="mv_pencil_icon" onClick={handleditcoupon}>
+                                                        <Link to='/dashboard/addcoupon' state={{ editCoupon: true }}>
                                                             <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                         </Link>
                                                     </div>
@@ -436,7 +462,7 @@ const Size = (props) => {
             <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
-                    <p>Are you sure you want to <br /> weight?</p>
+                    <p>Are you sure you want to delete <br /> coupon?</p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>
@@ -451,4 +477,4 @@ const Size = (props) => {
     );
 };
 
-export default Size
+export default Coupon

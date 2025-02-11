@@ -8,7 +8,7 @@ import Forgotpassword from './Pages/Forgotpassword';
 import VerifyOTP from './Pages/Veriftotp';
 import ResetPassword from './Pages/Resetpassword';
 import UserTable from './Pages/User';
-import Login from './Pages/Login';
+// import Login from './Pages/Login';
 
 import Maincategory from'./Pages/Maincategory';
 import Category from './Pages/Category';
@@ -24,6 +24,10 @@ import Size from './Pages/size';
 import Addsize from './Pages/add_size';
 import Stock from './Pages/stock';
 import Addstock from './Pages/add_stock';
+import Coupon from './Pages/coupon';
+import Addcoupon from './Pages/add_coupon';
+import Productoffer from './Pages/product_offer';
+import Addproductoffer from './Pages/add_product_offer';
 
 function App() {
   return (
@@ -31,7 +35,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* <Route path='/' element={<LoginPage />}></Route> */}
-          <Route path='/' element={<Login/>}></Route>
+          {/* <Route path='/' element={<Login/>}></Route> */}
           <Route path='/verify-otp' element={<VerifyOTP />}></Route>
           <Route path='/forgot-password' element={<Forgotpassword />}></Route>
           <Route path='/reset-password' element={<ResetPassword />}></Route>
@@ -56,6 +60,11 @@ function App() {
             <Route path='addstock' element={<Addstock />}></Route>
 
             <Route path="riyansee" element={<Riyansee/>}></Route>
+
+            <Route path='coupon' element={<Coupon />}></Route>
+            <Route path='addcoupon' element={<Addcoupon />}></Route>
+            <Route path='Productoffer' element={<Productoffer />}></Route>
+            <Route path='addproductoffer' element={<Addproductoffer />}></Route>
 
           </Route>
         </Routes>
