@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
-import { Modal, Button, Form, Table, InputGroup } from "react-bootstrap";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { Modal, Button, Form, Table, InputGroup, Col, Row } from "react-bootstrap";
 import '../CSS/riya.css';
+import { FaSearch } from 'react-icons/fa';
 
 const App = () => {
   const [categories, setCategories] = useState([
@@ -52,92 +52,102 @@ const App = () => {
 
   return (
     <div>
-     <h4 className="mb-0">Main Category</h4>
-     <p className="text-muted">Dashboard <span>/ Main Category</span></p>
-    <div style={{backgroundColor:'white',padding:'20px'}}>
-    <div className="d-flex justify-content-between align-items-center mb-3">
-        <input
-          type="text"
-          className="form-control w-50"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <Button variant="dark" onClick={() => setShowAddModal(true)}>
-          + Add
-        </Button>
+      <h5 className="mb-0 fw-bold">Main Category</h5>
+      <div className='d-flex'>
+        <p class="text-muted">Dashboard /</p>
+        <p className='ms-1'>Main Category</p>
       </div>
-      <Table  hover responsive borderless>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredCategories.map((cat) => (
-            <tr key={cat.id}>
-              <td>{cat.id.toString().padStart(2, "0")}</td>
-              <td>{cat.name}</td>
-              <td>
-                <Form.Check
-                  type="switch"
-                  checked={cat.status}
-                  onChange={() =>
-                    setCategories(
-                      categories.map((c) =>
-                        c.id === cat.id ? { ...c, status: !c.status } : c
-                      )
-                    )
-                  }
-                />
-              </td>
-              <td>
-                <Button
-                  variant="success"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setCurrentCategory(cat);
-                    setShowEditModal(true);
-                  }}
-                >
-                  <FaEdit />
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => {
-                    setCurrentCategory(cat);
-                    setShowDeleteModal(true);
-                  }}
-                >
-                  <FaTrash />
-                </Button>
-              </td>
+      <div style={{ backgroundColor: 'white', padding: '20px' }}>
+        <Row className="mb-4 align-items-center">
+          <Col xs={12} md={6} lg={4}>
+            <InputGroup className="mb-3 search-input-group r_inputgroup">
+              <InputGroup.Text className="search-icon-container">
+                <FaSearch className="search-icon" />
+              </InputGroup.Text >
+              <Form.Control
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </InputGroup>
+          </Col>
+          <Col xs={12} md={6} lg={8} className="text-end mt-3 mt-md-0">
+            <Button className="r_add" onClick={() => setShowAddModal(true)}>
+              + Add
+            </Button>
+          </Col>
+        </Row>
+
+        <Table hover responsive borderless>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
-    </div>
+          </thead>
+          <tbody>
+            {filteredCategories.map((cat) => (
+              <tr key={cat.id}>
+                <td>{cat.id.toString().padStart(2, "0")}</td>
+                <td>{cat.name}</td>
+                <td>
+                  <Form.Check
+                    type="switch"
+                    checked={cat.status}
+                    onChange={() =>
+                      setCategories(
+                        categories.map((c) =>
+                          c.id === cat.id ? { ...c, status: !c.status } : c
+                        )
+                      )
+                    }
+                  />
+                </td>
+                <td>
+                  <Button
+                    className="r_deleticon me-2"
+                    onClick={() => {
+                      setCurrentCategory(cat);
+                      setShowEditModal(true);
+                    }}
+                  >
+                    <img src={require('../Photos/edit.png')} class="r_deletimg" ></img>
+                  </Button>
+                  <Button
+                    className="r_deleticon"
+                    onClick={() => {
+                      setCurrentCategory(cat);
+                      setShowDeleteModal(true);
+                    }}
+                  >
+                    <img src={require('../Photos/delet.png')} class="r_deletimg" ></img>
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
 
       {/* Add Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
-        <Modal.Header closeButton>
-         
+        <Modal.Header closeButton className="r_modalheader">
+
         </Modal.Header>
-        <Modal.Body>
-        <p className="text-center fw-bold">Add Main Category</p>
+        <Modal.Body className="r_modalbody">
+          <p className="text-center fw-bold">Add Main Category</p>
           <Form
+            className="r_form"
             onSubmit={(e) => {
               e.preventDefault();
               const newCategory = e.target.elements.categoryName.value;
               handleAdd(newCategory);
             }}
           >
-            <Form.Group className="r_bottom">
+            <Form.Group >
               <Form.Label>Main Category</Form.Label>
               <Form.Control
                 type="text"
@@ -146,15 +156,15 @@ const App = () => {
                 required
               />
             </Form.Group>
-            <div className='d-flex justify-content-center gap-3'>
-            <Button variant="secondary" onClick={() => setShowAddModal(false)}  className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-              Cancel
-            </Button>
-            <Button variant="dark" type="submit" className=" r_btn text-white"  style={{ backgroundColor: "black" }}>
-              Add
-            </Button>
+            <div className='d-flex justify-content-center gap-3 mt-4'>
+              <Button variant="secondary" onClick={() => setShowAddModal(false)} className="r_cancel">
+                Cancel
+              </Button>
+              <Button variant="dark" type="submit" className="r_delete">
+                Add
+              </Button>
             </div>
-            
+
           </Form>
         </Modal.Body>
       </Modal>
@@ -165,18 +175,19 @@ const App = () => {
         onHide={() => setShowEditModal(false)}
         centered
       >
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className="r_modalheader">
         </Modal.Header>
-        <Modal.Body>
-        <p className="text-center fw-bold">Edit Main Category</p>
+        <Modal.Body className="r_modalbody">
+          <p className="text-center fw-bold">Edit Main Category</p>
           <Form
+            className="r_form"
             onSubmit={(e) => {
               e.preventDefault();
               const updatedCategory = e.target.elements.categoryName.value;
               handleEdit(updatedCategory);
             }}
           >
-            <Form.Group className="r_bottom">
+            <Form.Group >
               <Form.Label>Main Category</Form.Label>
               <Form.Control
                 type="text"
@@ -185,43 +196,33 @@ const App = () => {
                 required
               />
             </Form.Group>
-            <div className='d-flex justify-content-center gap-3'>
-            <Button variant="secondary" onClick={() => setShowEditModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-              Cancel
-            </Button>
-            <Button variant="dark" type="submit" className="ms-2 r_btn text-white"  style={{ backgroundColor: "black" }}>
-              Update
-            </Button>
+            <div className='d-flex justify-content-center gap-3 mt-4'>
+              <Button onClick={() => setShowEditModal(false)} className="r_cancel">
+                Cancel
+              </Button>
+              <Button type="submit" className="r_delete">
+                Update
+              </Button>
             </div>
-           
+
           </Form>
         </Modal.Body>
       </Modal>
 
       {/* Delete Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-       
-        <Modal.Body className="text-center p-5" >
-       <div className="r_bottom">
-       <p className="text-center fw-bold">Delete</p>
-          Are you sure you want to delete{" "}
-          <strong>{currentCategory?.name}</strong>?
-
-       </div>
-
+        <Modal.Body className=" p-5" >
+          <h5 className='font-weight-bold text-center mb-3'>Delete</h5>
+          <p className='text-center text-muted mb-4'> Are you sure you want to delete {currentCategory?.name}?</p>
           <div className='d-flex justify-content-center gap-3 mt-4'>
-        <Button variant="secondary" onClick={() => setShowDeleteModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleDelete} className='r_btn text-white' style={{ backgroundColor: "black" }}>
-            Delete
-          </Button>
-        </div>
+            <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
+              Cancel
+            </Button>
+            <Button onClick={handleDelete} className="r_delete" >
+              Delete
+            </Button>
+          </div>
         </Modal.Body>
-       
-       
-          
-      
       </Modal>
     </div>
   );
