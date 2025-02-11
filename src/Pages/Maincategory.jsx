@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { Modal, Button, Form, Table } from "react-bootstrap";
+import { Modal, Button, Form, Table, InputGroup } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import '../CSS/riya.css';
 

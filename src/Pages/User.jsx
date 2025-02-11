@@ -11,7 +11,7 @@ import {
   Offcanvas,
   Modal
 } from 'react-bootstrap';
-import { FaSearch, FaTrash } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { FaFilter } from "react-icons/fa";
 import '../CSS/riya.css';
 
@@ -66,13 +66,18 @@ const UserTable = () => {
 
   // No Results Found Component
   const NoResultsFound = () => (
-    <div className="text-center ">
+    <div style={{transform: 'translateY(50%)'}}>
+      <div className="text-center">
       <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-        {/* <X className="w-8 h-8 text-gray-400" /> */}
         <img src={require('../Photos/notfind.png')}></img>
       </div>
-      <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
-      <p className="text-gray-500">Whoops... No matching data found</p>
+    <div>
+    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
+    </div>
+  <div>
+        <p className="text-gray-500">Whoops... No matching data found</p>
+  </div>
+    </div>
     </div>
   );
 
@@ -137,53 +142,45 @@ const UserTable = () => {
       borderRadius: '8px',
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       padding: '20px',
-      marginTop: '20px'
+      marginTop: '20px',
+      height: '750px'
     },
     tableHeader: {
       backgroundColor: '#FFF9F6',
       cursor: 'pointer'
     },
-    searchIcon: {
-      color: '#6c757d'
-    },
-    deleteButton: {
-      color: '#dc3545',
-      border: 'none',
-      background: 'none',
-      padding: '0',
-      cursor: 'pointer'
-    },
-    filterGroup: {
-      marginBottom: '20px'
-    }
-
   };
 
   return (
 
     <Container fluid className="py-3" style={{ backgroundColor: '#F7F7F7', height: '100vh' }}>
-      <h4 className="mb-0">User</h4>
-      <p className="text-muted">Dashboard <span>/ User</span></p>
+      <h5 className="mb-0 fw-bold">User</h5>
+      <div className='d-flex'>
+        <p class="text-muted">Dashboard /</p>
+        <p className='ms-1'>User</p>
+      </div>
       <div style={styles.card}>
         {/* Search and Filter Section */}
         <Row className="mb-4 align-items-center">
           <Col xs={12} md={6} lg={4}>
-            <InputGroup>
-              <InputGroup.Text>
-                <FaSearch style={styles.searchIcon} />
-              </InputGroup.Text>
+            <InputGroup className="mb-3 search-input-group">
+              <InputGroup.Text className="search-icon-container">
+                <FaSearch className="search-icon" />
+              </InputGroup.Text >
               <Form.Control
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
               />
             </InputGroup>
           </Col>
+
           <Col xs={12} md={6} lg={8} className="text-end mt-3 mt-md-0">
             <Button
-              variant="outline-secondary"
+              className="r_filterbtn"
               onClick={() => setShowFilter(true)}
-              color='black'
+
             >
               <FaFilter className="me-2" />
               Filter {selectedGenders.length > 0 && `(${selectedGenders.length})`}
@@ -221,10 +218,11 @@ const UserTable = () => {
                       <td>{item.email}</td>
                       <td>
                         <button
-                          style={styles.deleteButton}
+                          className="r_deleticon"
                           onClick={() => handleDelete(item.id, item.name)}
                         >
-                          <FaTrash />
+                          {/* <FaTrash /> */}
+                          <img src={require('../Photos/delet.png')} class="r_deletimg" ></img>
                         </button>
                       </td>
                     </tr>
@@ -268,50 +266,50 @@ const UserTable = () => {
           style={{ zIndex: 9999 }}
         >
           <Offcanvas.Header closeButton className="border-bottom">
-            <Offcanvas.Title>Filter</Offcanvas.Title>
+            <Offcanvas.Title className="r_filtertitle">Filter</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <Form.Group style={styles.filterGroup}>
+            <Form.Group >
               <Form.Label>Gender</Form.Label>
               <Form.Select
                 value={selectedGenders.length > 0 ? selectedGenders[0] : ""}
                 onChange={(e) => handleGenderChange(e.target.value)}
               >
-                <option value="">Select Gender</option>
+                <option value="">Select</option>
                 {['Male', 'Female', 'Other'].map((gender) => (
                   <option key={gender} value={gender}>{gender}</option>
                 ))}
               </Form.Select>
             </Form.Group>
-
-            <div className="d-flex justify-content-space-between gap-2">
+          </Offcanvas.Body>
+          <div className="p-3 mt-auto">
+            <div className="d-flex gap-5">
               <Button
-                variant="outline-secondary"
                 onClick={handleClearFilter}
+                className="flex-grow-1 r_outlinebtn"
               >
                 Cancel
               </Button>
               <Button
-                variant="primary"
                 onClick={handleApplyFilter}
+                className="flex-grow-1 r_bgbtn"
               >
                 Apply
               </Button>
             </div>
-          </Offcanvas.Body>
+          </div>
         </Offcanvas>
 
         {/* Delete Confirmation Modal */}
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-
           <Modal.Body className='p-5'>
             <h5 className='font-weight-bold text-center mb-3'>Delete</h5>
             <p className='text-center text-muted mb-4'> Are you sure you want to delete {userToDelete?.name}?</p>
             <div className='d-flex justify-content-center gap-3'>
-              <Button onClick={() => setShowDeleteModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
+              <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
                 Cancel
               </Button>
-              <Button onClick={confirmDelete} className='r_btn text-white' style={{ backgroundColor: "black" }}>
+              <Button onClick={confirmDelete} className=" r_delete">
                 Delete
               </Button>
             </div>
