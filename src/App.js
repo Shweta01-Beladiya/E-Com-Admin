@@ -20,6 +20,10 @@ import Riyansee from './Pages/riyansee';
 
 import Product from "./Pages/product";
 import Unit from './Pages/unit';
+import Size from './Pages/size';
+import Addsize from './Pages/add_size';
+import Stock from './Pages/stock';
+import Addstock from './Pages/add_stock';
 
 function App() {
   return (
@@ -44,6 +48,13 @@ function App() {
 
             <Route path="product" element={<Product />}></Route>
             <Route path='unit' element={<Unit />}></Route>
+
+            <Route path='size' element={<Size />}></Route>
+            <Route path='addsize' element={<Addsize />}></Route>
+
+            <Route path='stock' element={<Stock />}></Route>
+            <Route path='addstock' element={<Addstock />}></Route>
+
             <Route path="riyansee" element={<Riyansee/>}></Route>
 
           </Route>
