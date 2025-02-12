@@ -35,9 +35,12 @@ tr th{
   .search-input.form-control {
     border-left: 0;
   }
-  .input-group{
+  .r_inputgroup{
     width: 250px !important;
   }
+  /* .input-group{
+    width: 250px !important;
+  } */
   .r_filterbtn{
     border-radius: 5px !important;
     border: 1px solid #95908F !important;
@@ -46,16 +49,16 @@ tr th{
     background-color: transparent !important;
   }
   .r_deleticon{
-    border: 1px solid #95908F;
-   padding: 3px;
-   border-radius: 3px;
-   background-color: transparent;
+    border: 1px solid #95908F !important;
+   padding: 3px !important;
+   border-radius: 3px !important;
+   background-color: transparent !important;
   }
   .r_deletimg{
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    object-fit: cover !important;
   }
   .pagination li{
     margin: 0 5px;
@@ -71,22 +74,25 @@ tr th{
   }
   /* filter offcanvas */
   .r_filtertitle{
-    font-size: 20px;
-    font-weight:500;
+    font-size: 20px !important;
+    font-weight:500 !important;
+  }
+  .offcanvas-header{
+    border-bottom: 1px solid #DADADA!important;
   }
   .r_outlinebtn{
-    padding: 10px 15px;
+    padding: 10px 15px !important;
     border: 1px solid #95908F !important;
     background-color: transparent !important;
     color: black !important;
   }
   .r_bgbtn{
-    padding: 10px 15px;
+    padding: 10px 15px !important;
     background-color: black !important;
     color: white !important;
     border-color: transparent !important;
   }
-  /* Delete Offcanvas */
+  /* Delete Modal */
   .r_cancel{
     border: 1px solid #95908F !important;
     padding: 7px 20px;
@@ -97,8 +103,8 @@ tr th{
   .r_delete{
 
     border: 1px solid #95908F !important;
-    padding: 7px 20px;
-    width: 150px;
+    padding: 7px 20px !important;
+    width: 150px !important;
     background-color: black !important;
     color:white !important;
     
@@ -106,9 +112,20 @@ tr th{
   .r_add{
     background-color: black !important;
     color: white !important;
-    padding: 5px 20px;
+    padding: 5px 30px;
     border: none !important;
     font-size: 15px;
+  }
+  /* comman modal css */
+  .r_modalheader{
+    border-bottom: none !important;
+    padding: 5px !important;
+  }
+  .r_modalbody{
+    padding: 0px !important;  
+  }
+  .r_form{
+    padding: 30px !important;
   }
   @media screen and (max-width:425px){
     .input-group{

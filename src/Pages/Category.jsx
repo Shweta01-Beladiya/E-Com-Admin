@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { Table, Button, Offcanvas, Modal, Form, Pagination } from 'react-bootstrap';
+import {
+    Table, Button, Offcanvas, Modal, Form, Pagination, Row,
+    Col, InputGroup,
+} from 'react-bootstrap';
 import { FiFilter } from 'react-icons/fi';
+import { FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
 
 const CategoryManagement = () => {
@@ -164,45 +168,50 @@ const CategoryManagement = () => {
     return (
         <div className="container-fluid">
             {/* Header with title and buttons */}
-            <h4 className="mb-0">Category</h4>
-            <p className="text-muted">Dashboard <span>/ Category</span></p>
+            <h5 className="mb-0 fw-bold">Category</h5>
+            <div className='d-flex'>
+                <p class="text-muted">Dashboard /</p>
+                <p className='ms-1'>Category</p>
+            </div>
 
 
             {/* Main Table */}
             <div className="bg-white rounded shadow-sm" style={{ padding: '20px' }}>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <input
-                            type="search"
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={handleSearch}
-                            className="form-control"
-                            style={{ minWidth: '200px' }}
-                        />
-                    </div>
-                    <div className="d-flex gap-2">
-                        <Button
-                            variant="outline-secondary"
-                            onClick={() => setShowFilter(true)}
-                            className="d-flex align-items-center"
-                            style={{ padding: '5px 30px', borderRadius: '0' }}
-                        >
-                            <FiFilter className="me-2" /> Filter
-                        </Button>
-                        <Button variant="dark" onClick={() => setShowAddModal(true)} style={{ padding: '5px 30px', borderRadius: '0' }}>
-                            + Add
-                        </Button>
-                    </div>
-                </div>
-
+                <Row className="mb-4 align-items-center">
+                    <Col xs={12} md={6} lg={4}>
+                        <InputGroup className="mb-3 search-input-group r_inputgroup">
+                            <InputGroup.Text className="search-icon-container">
+                                <FaSearch className="search-icon" />
+                            </InputGroup.Text >
+                            <Form.Control
+                                placeholder="Search..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="search-input"
+                            />
+                        </InputGroup>
+                    </Col>
+                    <Col xs={12} md={6} lg={8}>
+                        <div className="d-flex justify-content-end gap-2">
+                            <Button
+                                className="r_filterbtn"
+                                onClick={() => setShowFilter(true)}
+                            >
+                                <FiFilter className="me-2" /> Filter
+                            </Button>
+                            <Button onClick={() => setShowAddModal(true)} className="r_add">
+                                + Add
+                            </Button>
+                        </div>
+                    </Col>
+                </Row>
                 {/* Table component */}
                 <Table responsive hover borderless className="mb-0">
                     <thead className="bg-light">
                         <tr>
                             <th>ID</th>
-                            <th>Category Name</th>
                             <th>Main Category</th>
+                            <th> Name</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -211,8 +220,9 @@ const CategoryManagement = () => {
                         {currentItems.map((category) => (
                             <tr key={category.id}>
                                 <td>{category.id}</td>
-                                <td>{category.name}</td>
                                 <td>{category.mainCategory}</td>
+                                <td>{category.name}</td>
+
                                 <td>
                                     <Form.Check
                                         type="switch"
@@ -224,25 +234,25 @@ const CategoryManagement = () => {
                                 </td>
                                 <td>
                                     <Button
-                                        variant="link"
-                                        className="p-0 me-2 text-primary"
+                                        className="r_deleticon me-2"
+                                      
+
                                         onClick={() => {
                                             setEditingCategory(category);
                                             setShowEditModal(true);
                                         }}
                                     >
-                                        <img src={require('../Photos/edit.png')} style={{ border: '1px solid #919191', padding: '2px' }}></img>
+                                        <img src={require('../Photos/edit.png')} class="r_deletimg"></img>
                                         {/* <FiEdit size={18} /> */}
                                     </Button>
                                     <Button
-                                        variant="link"
-                                        className="p-0 text-danger"
+                                        className="r_deleticon"
                                         onClick={() => {
                                             setDeletingCategory(category);
                                             setShowDeleteModal(true);
                                         }}
                                     >
-                                        <img src={require('../Photos/delet.png')} style={{ border: '1px solid #919191', padding: '2px' }}></img>
+                                        <img src={require('../Photos/delet.png')} class="r_deletimg"></img>
                                         {/* <FiTrash2 size={18} /> */}
                                     </Button>
                                 </td>
@@ -263,7 +273,7 @@ const CategoryManagement = () => {
             {/* Filter Offcanvas */}
             <Offcanvas show={showFilter} onHide={() => setShowFilter(false)} placement="end" style={{ zIndex: 9999 }}>
                 <Offcanvas.Header closeButton className="border-bottom">
-                    <Offcanvas.Title>Filter</Offcanvas.Title>
+                    <Offcanvas.Title className="r_filtertitle">Filter</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Form>
@@ -294,27 +304,29 @@ const CategoryManagement = () => {
                                 <option value="Inactive">Inactive</option>
                             </Form.Select>
                         </Form.Group>
-                        <div className="d-flex justify-content-space-between gap-2">
-                             <Button variant="primary" onClick={clearFilters}>
-                                Cnncel
-                            </Button>
-                            <Button variant="outline-secondary" onClick={applyFilters}>
-                                Applay
-                            </Button>
-                           
-                        </div>
                     </Form>
                 </Offcanvas.Body>
+                <div className="p-3 mt-auto">
+                    <div className="d-flex gap-5">
+                        <Button className="flex-grow-1 r_outlinebtn" onClick={clearFilters}>
+                            Cnncel
+                        </Button>
+                        <Button className="flex-grow-1 r_bgbtn" onClick={applyFilters}>
+                            Applay
+                        </Button>
+
+                    </div>
+                </div>
             </Offcanvas>
 
             {/* Add Category Modal */}
             <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
-                <Modal.Header closeButton>
-                   
+                <Modal.Header closeButton className="r_modalheader">
+
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="r_modalbody">
                     <h6 className='text-center fw-bold'>Add Category</h6>
-                    <Form>
+                    <Form className="r_form">
                         <Form.Group className="mb-3">
                             <Form.Label>Main Category</Form.Label>
                             <Form.Select
@@ -342,13 +354,13 @@ const CategoryManagement = () => {
                                 placeholder="Enter category name"
                             />
                         </Form.Group>
-                        <div className="d-flex justify-content-center gap-2">
-                        <Button variant="secondary" onClick={() => setShowAddModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleAddCategory} className='r_btn text-white' style={{ backgroundColor: "black" }}>
-                        Add
-                    </Button>
+                        <div className="d-flex justify-content-center gap-2 mt-4">
+                            <Button onClick={() => setShowAddModal(false)} className="r_cancel">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleAddCategory} className="r_delete">
+                                Add
+                            </Button>
                         </div>
                     </Form>
                 </Modal.Body>
@@ -356,11 +368,11 @@ const CategoryManagement = () => {
 
             {/* Edit Category Modal */}
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-                <Modal.Header closeButton >
+                <Modal.Header closeButton className="r_modalheader" >
                 </Modal.Header>
-                <Modal.Body>
-                <h6 className='text-center fw-bold'>Edit Category</h6>
-                    <Form>
+                <Modal.Body className="r_modalbody">
+                    <h6 className='text-center fw-bold'>Edit Category</h6>
+                    <Form className="r_form">
                         <Form.Group className="mb-3">
                             <Form.Label>Main Category</Form.Label>
                             <Form.Select
@@ -395,33 +407,32 @@ const CategoryManagement = () => {
                             />
                         </Form.Group>
                         <div className="d-flex justify-content-center gap-2">
-                        <Button variant="secondary" onClick={() => setShowEditModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleEditCategory} className='r_btn text-white' style={{ backgroundColor: "black" }}>
-                       Update
-                    </Button>
+                            <Button onClick={() => setShowEditModal(false)} className="r_cancel">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleEditCategory} className="r_delete">
+                                Update
+                            </Button>
                         </div>
                     </Form>
                 </Modal.Body>
-               
             </Modal>
 
             {/* Delete Confirmation Modal */}
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Body className='p-5'>
-                <h6 className='text-center fw-bold mb-3'>Delete</h6>
-                   <p className='mb-4 text-center'> Are you sure you want to delete "{deletingCategory?.name}"?</p>
+                    <h6 className='text-center fw-bold mb-3'>Delete</h6>
+                    <p className='mb-4 text-center text-muted'> Are you sure you want to delete {deletingCategory?.name}?</p>
                     <div className="d-flex justify-content-center gap-2">
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)} className='r_btn text-black' style={{ backgroundColor: "transparent" }}>
-                        Cancel
-                    </Button>
-                    <Button variant="danger" onClick={handleDeleteCategory} className='r_btn text-white' style={{ backgroundColor: "black" }}>
-                        Delete
-                    </Button>
+                        <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
+                            Cancel
+                        </Button>
+                        <Button variant="danger" onClick={handleDeleteCategory} className="r_delete" >
+                            Delete
+                        </Button>
                     </div>
                 </Modal.Body>
-                </Modal>
+            </Modal>
         </div>
     );
 };
