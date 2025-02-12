@@ -8,6 +8,7 @@ import Animation from "./Animaton";
 import { Box, Button, InputAdornment, TextField, Typography } from "@mui/material";
 import { BsTelephoneFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const initialValues = {
     mobileNo: '',
@@ -22,15 +23,21 @@ const validationSchema = Yup.object({
 
 const Forgotpassword = () => {
 
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+
     const navigate = useNavigate();
 
-    const handleSubmit = (values) => {
-        console.log('Form values:', values);
+    const handleSubmit = async (values) => {
+        try {
+            const response = await axios.post(`${BaseUrl}/api/forgotPassword`, values);
+            // console.log("response", response.data.status);
+            if (response.data.status === 200) {
+                navigate('/verify-otp', { state: { mobileNo: values.mobileNo, otp: response.data.otp } });
+            }
+        } catch (error) {
+            console.error('Forgot Password error:', error);
+        }
     };
-    
-    const handleSendOtp = () => {
-        navigate('/verify-otp');
-    }
 
     return (
         <div className='relative sb_line'>
@@ -42,9 +49,9 @@ const Forgotpassword = () => {
                     <div className='col-lg-7 col-12 p-0 s_animation_top' >
                         <div className="d-flex justify-content-center align-items-center vh-100 md:bg-light bg-transparent">
                             <Box maxWidth={400} width="100%" p={4} style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
-                                <Typography variant="h5" align="center" style={{ fontWeight: '700',color:'#2B221E' }} >Forgot password</Typography>
+                                <Typography variant="h5" align="center" style={{ fontWeight: '700', color: '#2B221E' }} >Forgot password</Typography>
                                 <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-                                    Enter your mail to forgot your password.
+                                    Enter your Mobile No to forgot your password.
                                 </Typography>
 
                                 <Formik
@@ -80,7 +87,7 @@ const Forgotpassword = () => {
                                                 fullWidth
                                                 sx={{ mt: 3 }}
                                                 style={{ backgroundColor: '#2B221E', color: '#fff', padding: '10px 0' }}
-                                                onClick={handleSendOtp}
+                                            // onClick={handleSendOtp}
                                             >
                                                 Send Otp
                                             </Button>

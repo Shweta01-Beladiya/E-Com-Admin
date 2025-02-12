@@ -1,5 +1,5 @@
 // Header.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import './header.css';
 import { styled } from '@mui/material/styles';
 import {
@@ -14,8 +14,9 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Modal from 'react-bootstrap/Modal';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaPowerOff, FaUser } from 'react-icons/fa';
+import axios from 'axios';
 
 const drawerWidth = 280;
 
@@ -38,22 +39,54 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 
-
 const Header = ({ open, handleDrawerOpen }) => {
+
+
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
+
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [modalShow, setModalShow] = React.useState(false);
+
   const isMenuOpen = Boolean(anchorEl);
+  const navigate = useNavigate();
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  // Modal
-  const [modalShow, setModalShow] = React.useState(false);
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    setModalShow(false);
+    setTimeout(() => {
+      navigate('/');
+    }, (200));
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${BaseUrl}/api/getUser`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log("Response", response.data);
+        console.log("Response", response.data.user);
+
+      } catch (error) {
+        console.error('Data Fetching Error:', error);
+      }
+    }
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <AppBar position="fixed" open={open} sx={{paddingRight:'0 !important'}}>
+    <AppBar position="fixed" open={open} sx={{ paddingRight: '0 !important' }}>
       <Toolbar className='bg-white text-black'>
         <IconButton
           color="inherit"
@@ -74,43 +107,43 @@ const Header = ({ open, handleDrawerOpen }) => {
        <img src={require('../s_img/loginUser.png')} alt=""  />
        </div> */}
         {/* <div> */}
-          <Button
-            id="basic-button"
-            aria-controls={isMenuOpen ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={isMenuOpen ? 'true' : undefined}
-            onClick={handleClick}
-            sx={{marginLeft:'auto'}}
-          >
-            <img src={require('../s_img/loginUser.png')} alt="" />
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={isMenuOpen}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-            className='p-3'
-          >
-            <MenuItem onClick={handleClose}>
-              <div className='d-flex'>
-                <div>
-                    <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-3' />
-                </div>
-                <div>
-                  <p className='mb-0'><b>John Patel</b></p>
-                  <p className='text-[#7D7D7D] mb-0'>example@gmail.com</p>
-                </div>
+        <Button
+          id="basic-button"
+          aria-controls={isMenuOpen ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={isMenuOpen ? 'true' : undefined}
+          onClick={handleClick}
+          sx={{ marginLeft: 'auto' }}
+        >
+          <img src={require('../s_img/loginUser.png')} alt="" />
+        </Button>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={isMenuOpen}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }}
+          className='p-3'
+        >
+          <MenuItem onClick={handleClose}>
+            <div className='d-flex'>
+              <div>
+                <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-3' />
               </div>
-            </MenuItem>
-              <Divider sx={{borderColor:'rgba(0, 0, 0, 0.8)'}} />
-              <Link to='/view_profile' className='text-decoration-none text-dark'>
-            <MenuItem onClick={handleClose}><FaUser  className='me-3'/> My Profile</MenuItem>
-            </Link>
-            <MenuItem onClick={() => { handleClose(); setModalShow(true); }}><FaPowerOff className='me-3' />Logout</MenuItem>
-          </Menu>
+              <div>
+                <p className='mb-0'><b>John Patel</b></p>
+                <p className='text-[#7D7D7D] mb-0'>example@gmail.com</p>
+              </div>
+            </div>
+          </MenuItem>
+          <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.8)' }} />
+          <Link to='/view_profile' className='text-decoration-none text-dark'>
+            <MenuItem onClick={handleClose}><FaUser className='me-3' /> My Profile</MenuItem>
+          </Link>
+          <MenuItem onClick={() => { handleClose(); setModalShow(true); }}><FaPowerOff className='me-3' />Logout</MenuItem>
+        </Menu>
         {/* </div> */}
       </Toolbar>
 
@@ -124,7 +157,7 @@ const Header = ({ open, handleDrawerOpen }) => {
               <button onClick={() => setModalShow(false)}>Cancel</button>
             </div>
             <div className="mv_logout_button">
-              <button>Logout</button>
+              <button onClick={handleLogout}>Logout</button>
             </div>
           </div>
         </Modal.Body>

@@ -25,6 +25,9 @@ import MainCategory from './Pages/Maincategory';
 import Category from './Pages/Category';
 import SubCategory from './Pages/Subcategory';
 import Viewprofile from './Pages/Viewprofile';
+import Help from './Pages/Help';
+import ContactUs from './Pages/ContactUs';
+import ViewContact from './Pages/ViewContact';
 
 function App() {
   return (
@@ -56,6 +59,9 @@ function App() {
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
             <Route path='/Productoffer' element={<Productoffer />}></Route>
             <Route path='/addproductoffer' element={<Addproductoffer />}></Route>
+            <Route path='/help' element={<Help />}></Route>
+            <Route path='/ContactUs' element={<ContactUs />}></Route>
+            <Route path='/ViewContact' element={<ViewContact />}></Route>
           </Route>
         </Routes>
       </BrowserRouter>
