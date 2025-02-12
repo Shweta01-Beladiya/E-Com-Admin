@@ -4,13 +4,11 @@ import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import * as Yup from 'yup'
-import { isFunction, useFormik } from 'formik';
 import { Link } from 'react-router-dom';
 
-
 const Unit = (props) => {
-    var data1 = [
+   
+    var data = [
         {   
             id: 1,
             name: "Gram",
@@ -79,134 +77,71 @@ const Unit = (props) => {
         },
     ];
 
-    localStorage.setItem('data3', JSON.stringify(data1))
-
-    const [checkboxes, setCheckboxes] = useState({
-        isIDChecked: true,
-        isNameChecked: true,
-        isShortnameChecked: true,
-        isStatusChecked: true,
-        isActionChecked: true,
-    });
-
-    useEffect(() => {
-        const savedCheckboxes = {
-            isIDChecked: localStorage.getItem('isIDChecked') === 'true' || true,
-            isNameChecked: localStorage.getItem('isNameChecked') === 'true' || true,
-            isShortnameChecked: localStorage.getItem('isShortnameChecked') === 'true' || true,
-            isStatusChecked: localStorage.getItem('isStatusChecked') === 'true' || true,
-            isActionChecked: localStorage.getItem('isActionChecked') === 'true' || true,
-        };
-
-        setCheckboxes(savedCheckboxes);
-    }, []);
-
-    const store_data = (value) => {
-        let data = JSON.parse(localStorage.getItem('data2')) || [];
-
-        let id = data.length
-
-        value.id = id + 1;
-
-        if (value.status == 'active') {
-            value.status = true
-        } else {
-            value.status = false
-        }
-
-
-        value.image = "pencil_icon.png";
-
-        data.push(value);
-
-        localStorage.setItem('data2', JSON.stringify(data));
-
-        local_data()
-
-    };
-
+    // ************************************** Pagination **************************************
     const itemsPerPage = 10;
-    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
+    const [filteredData, setFilteredData] = useState(data);
 
-    const local_data = async () => {
-        const dataFromStorage = await JSON.parse(localStorage.getItem('data3'));
-        if (dataFromStorage) {
-            const total = Math.ceil(dataFromStorage.length / itemsPerPage);
-            setTotalPages(total);
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-
-            setData(dataFromStorage.slice(startIndex, endIndex));
-        }
-    };
-
-    useEffect(() => {
-        local_data();
-    }, [currentPage]);
-
-
-    const [image, setImage] = useState(null);
-
-    const init = {
-        name: "",
-        name1: "",
-        name2: "",
-        status: ""
-    };
-
-    const validation = Yup.object({
-        name: Yup.string().min(2, "Enter At least 2 characters").max(15, "Too Long For Category").required("Category Must Be required"),
-    });
-
-    let { handleBlur, handleChange, handleSubmit, handleReset, touched, errors, values } = useFormik({
-        initialValues: init,
-        validationSchema: validation,
-        onSubmit: (value) => {
-            store_data(value)
-            handleReset();
-        }
-    });
-
-    const handleImageChange = (event) => {
-        const file = event.currentTarget.files[0];
-        setImage(file);
-    };
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return;
-        setCurrentPage(newPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
     };
 
     const getPaginationButtons = () => {
         const buttons = [];
-        const maxButtonsToShow = 3;
-        let startPage = Math.max(currentPage - 1, 1);
-        let endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
-
+        const maxButtonsToShow = 5;
+        
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+        
+        // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(endPage - maxButtonsToShow + 1, 1);
+            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
 
+        // Add first page if not included
+        if (startPage > 1) {
+            buttons.push(1);
+            if (startPage > 2) buttons.push('...');
+        }
+
+        // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
 
+        // Add last page if not included
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) buttons.push('...');
+            buttons.push(totalPages);
+        }
         return buttons;
     };
 
-    // Sort Functions
-    const [filteredData, setFilteredData] = useState(data1);
-
-    // Pagenation
-    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
+    const paginatedData = filteredData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+    // *******************************************************************************
+    
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
     const [modalShow2, setModalShow2] = React.useState(false);
+
+    const [values, setValues] = useState({
+        name: "",
+        name1: ""
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setValues({ ...values, [name]: value });
+    };
 
     return (
         <>
@@ -245,47 +180,43 @@ const Unit = (props) => {
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
-                                        {checkboxes.isIDChecked && <th className=''>ID</th>}
-                                        {checkboxes.isNameChecked && <th className=''>Name</th>}
-                                        {checkboxes.isShortnameChecked && <th className=''>Short Name</th>}
-                                        {checkboxes.isStatusChecked && <th className=''>Status</th>}
-                                        {checkboxes.isActionChecked && <th className='d-flex align-items-center justify-content-end'>Action</th>}
+                                            <th className=''>ID</th>
+                                            <th className=''>Name</th>
+                                            <th className=''>Short Name</th>
+                                            <th className=''>Status</th>
+                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.map((item, index) => (
+                                        {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            {checkboxes.isIDChecked && <td>{item.id}</td>}
-                                            {checkboxes.isNameChecked && <td>{item.name}</td>}
-                                            {checkboxes.isShortnameChecked && <td>{item.shortname}</td>}
-                                            {checkboxes.isStatusChecked && (
-                                                <td>
-                                                    <Form.Check
-                                                        type="switch"
-                                                        id={`custom-switch-${item.id}`}
-                                                        label=""
-                                                        checked={item.status}
-                                                        className=''
+                                            <td>{item.id}</td>
+                                            <td>{item.name}</td>
+                                            <td>{item.shortname}</td>
+                                            <td>
+                                                <Form.Check
+                                                    type="switch"
+                                                    id={`custom-switch-${item.id}`}
+                                                    label=""
+                                                    checked={item.status}
+                                                    className=''
                                                     />
-                                                </td>
-                                                )}
-                                            {checkboxes.isActionChecked && (
-                                                <td className='d-flex align-items-center justify-content-end'>
-                                                    {/* <div className="mv_pencil_icon">
-                                                        <Link>
-                                                            <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div> */}
-                                                    <div className="mv_pencil_icon" onClick={() => setModalShow2(true)}>
-                                                        <Link>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                                </td>
-                                            )}
+                                            </td>
+                                            <td className='d-flex align-items-center justify-content-end'>
+                                                {/* <div className="mv_pencil_icon">
+                                                    <Link>
+                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                    </Link>
+                                                </div> */}
+                                                <div className="mv_pencil_icon" onClick={() => setModalShow2(true)}>
+                                                    <Link>
+                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                    </Link>
+                                                </div>
+                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                </div>
+                                            </td>
                                         </tr>
                                         ))}
                                     </tbody>
@@ -330,7 +261,7 @@ const Unit = (props) => {
             </Modal>
 
             {/* Add Unit Model */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); handleReset(); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1} onHide={() => { setModalShow1(false); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -338,7 +269,7 @@ const Unit = (props) => {
                     Add Unit
                 </Modal.Title>
                 <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form onSubmit={handleSubmit}>
+                    <form>
                         <div className="mv_input_content">
                             <label className='mv_edit_profile_label'>Name</label>
                             <InputGroup className="mb-3">
@@ -347,10 +278,8 @@ const Unit = (props) => {
                                     name='name'
                                     value={values.name}
                                     onChange={handleChange}
-                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {touched.category && errors.category && <div className="error">{errors.category}</div>}
                         </div>
                         <div className="mv_input_content mb-5">
                             <label className='mv_edit_profile_label'>Short Name</label>
@@ -360,10 +289,8 @@ const Unit = (props) => {
                                     name='name1'
                                     value={values.name1}
                                     onChange={handleChange}
-                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {touched.category && errors.category && <div className="error">{errors.category}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
@@ -378,7 +305,7 @@ const Unit = (props) => {
             </Modal>
 
             {/* Edit  Model */}
-            <Modal show={modalShow2} onHide={() => { setModalShow2(false); handleReset(); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow2} onHide={() => { setModalShow2(false);  }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -386,7 +313,7 @@ const Unit = (props) => {
                     Edit Unit
                 </Modal.Title>
                 <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form onSubmit={handleSubmit}>
+                    <form>
                         <div className="mv_input_content">
                             <label className='mv_edit_profile_label'>Name</label>
                             <InputGroup className="mb-3">
@@ -395,23 +322,19 @@ const Unit = (props) => {
                                     name='name'
                                     value={values.name}
                                     onChange={handleChange}
-                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {touched.category && errors.category && <div className="error">{errors.category}</div>}
                         </div>
                         <div className="mv_input_content mb-5">
                             <label className='mv_edit_profile_label'>Short Name</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     placeholder="Enter short name"
-                                    name='name2'
-                                    value={values.name2}
+                                    name='name1'
+                                    value={values.name1}
                                     onChange={handleChange}
-                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {touched.category && errors.category && <div className="error">{errors.category}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">

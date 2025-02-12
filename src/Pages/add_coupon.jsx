@@ -12,24 +12,6 @@ const Addcoupon = () => {
     let [couponType, setCouponType] = useState("");
     let [price, setPrice] = useState("");
 
-    let handle_onload = () => {
-        let data = JSON.parse(localStorage.getItem('user'));
-        console.log(data);
-        if (data) {
-            setCode(data.code || "");
-            setCouponName(data.couponName || "");
-            setDescription(data.description || "");
-            setCouponType(data.couponType || "");
-            setPrice(data.price || "");
-        } else {
-            return;
-        }
-    }
-
-    useEffect(() => {
-        handle_onload();
-    }, []);
-
     let change_edit = () => {
         setisedit(!isedit);
     };
@@ -46,7 +28,6 @@ const Addcoupon = () => {
         };
 
         console.log('Form Submitted:', formData);
-        localStorage.setItem('user', JSON.stringify(formData));
         setisedit(false);
     };
 

@@ -4,8 +4,6 @@ import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import * as Yup from 'yup'
-import { isFunction, useFormik } from 'formik';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
@@ -23,7 +21,7 @@ const Productoffer = (props) => {
         // navigate('addsize')
     }
 
-    var data1 = [
+    var data = [
         {   
             id: 1,
             subcategory: "Saree",
@@ -147,107 +145,56 @@ const Productoffer = (props) => {
         },
     ];
 
-    localStorage.setItem('data3', JSON.stringify(data1))
-
-    const store_data = (value) => {
-        let data = JSON.parse(localStorage.getItem('data2')) || [];
-
-        let id = data.length
-
-        value.id = id + 1;
-
-        if (value.status == 'active') {
-            value.status = true
-        } else {
-            value.status = false
-        }
-
-
-        value.image = "pencil_icon.png";
-
-        data.push(value);
-
-        localStorage.setItem('data2', JSON.stringify(data));
-
-        local_data()
-
-    };
-
+    // ************************************** Pagination **************************************
     const itemsPerPage = 10;
-    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-
-    const local_data = async () => {
-        const dataFromStorage = await JSON.parse(localStorage.getItem('data3'));
-        if (dataFromStorage) {
-            const total = Math.ceil(dataFromStorage.length / itemsPerPage);
-            setTotalPages(total);
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-
-            setData(dataFromStorage.slice(startIndex, endIndex));
-        }
-    };
-
-    useEffect(() => {
-        local_data();
-    }, [currentPage]);
-
-
-    const [image, setImage] = useState(null);
-
-    const init = {
-        name: "",
-        status: ""
-    };
-
-    const validation = Yup.object({
-        name: Yup.string().min(2, "Enter At least 2 characters").max(15, "Too Long For Category").required("Category Must Be required"),
-    });
-
-    let { handleBlur, handleChange, handleSubmit, handleReset, touched, errors, values } = useFormik({
-        initialValues: init,
-        validationSchema: validation,
-        onSubmit: (value) => {
-            store_data(value)
-            handleReset();
-        }
-    });
-
-    const handleImageChange = (event) => {
-        const file = event.currentTarget.files[0];
-        setImage(file);
-    };
-
+    const [filteredData, setFilteredData] = useState(data);
+ 
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    console.log("totalpage",totalPages)
+ 
     const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return;
-        setCurrentPage(newPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+             setCurrentPage(newPage);
+        }
     };
-
+ 
     const getPaginationButtons = () => {
         const buttons = [];
-        const maxButtonsToShow = 3;
-        let startPage = Math.max(currentPage - 1, 1);
-        let endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
-
+        const maxButtonsToShow = 5;
+         
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+         
+        // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(endPage - maxButtonsToShow + 1, 1);
+            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
-
+ 
+        // Add first page if not included
+        if (startPage > 1) {
+            buttons.push(1);
+            if (startPage > 2) buttons.push('...');
+        }
+ 
+        // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
-
+ 
+        // Add last page if not included
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) buttons.push('...');
+            buttons.push(totalPages);
+        }
         return buttons;
     };
-
-    // Sort Functions
-    const [filteredData, setFilteredData] = useState(data1);
-
-    // Pagenation
-    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+ 
+    const paginatedData = filteredData.slice(
+         (currentPage - 1) * itemsPerPage,
+         currentPage * itemsPerPage
+    );
+    // *******************************************************************************
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
@@ -387,7 +334,7 @@ const Productoffer = (props) => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <button><Link to='/dashboard/addproductoffer'>+ Add</Link></button>
+                                            <Link to='/addproductoffer'><button>+ Add</button></Link>
                                         </div>
                                     </div>
                                 </div>
@@ -409,7 +356,7 @@ const Productoffer = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       {data.map((item, index) => (
+                                       {paginatedData.map((item, index) => (
                                             <tr key={index}>
                                             <td>{item.id}</td>
                                             <td>{item.subcategory}</td>
@@ -430,12 +377,12 @@ const Productoffer = (props) => {
                                             </td>
                                             <td className='d-flex align-items-center justify-content-end'>
                                                 <div className="mv_pencil_icon">
-                                                    <Link>
+                                                    <Link to='/viewproductoffer'>
                                                         <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
                                                 <div className="mv_pencil_icon" onClick={handleditproductoffer}>
-                                                    <Link to='/dashboard/addproductoffer' state={{ editProductoffer: true }}>
+                                                    <Link to='/addproductoffer' state={{ editProductoffer: true }}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
                                                 </div>

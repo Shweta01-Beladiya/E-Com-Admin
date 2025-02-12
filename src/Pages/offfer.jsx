@@ -7,137 +7,138 @@ import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import ReactSlider from 'react-slider';
 
-const Coupon = (props) => {
+const Offer = (props) => {
 
-    // Edit Coupon
-    const [editstok,setEditcoupon] = useState(false);
+    // Edit Product Offer
+    const [editstok,setEditOffer] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleditcoupon = () => {
-        setEditcoupon(true);
+    const handleditoffer = () => {
+        setEditOffer(true);
         // navigate('addsize')
     }
 
     var data = [
         {   
             id: 1,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
+            productimg: "saree.png",
+            offertype: "Exclusive",
+            offername: "Saree Sale in 20% dis..",
+            description: "Lorem ipsum",
+            buttontext: "Shop Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 2,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
+            productimg: "lehenga.png",
+            offertype: "Best Collection",
+            offername: "Best Choli Collection",
+            description: "Lorem ipsum",
+            buttontext: "Explore Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
-            status: false,
+            status: true,
         },
         {   
             id: 3,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
+            productimg: "saree.png",
+            offertype: "Exclusive",
+            offername: "Saree Sale in 20% dis..",
+            description: "Lorem ipsum",
+            buttontext: "Explore Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 4,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
+            productimg: "lehenga.png",
+            offertype: "Exclusive",
+            offername: "Best Choli Collection.",
+            description: "Lorem ipsum",
+            buttontext: "Shop Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 5,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
+            productimg: "saree.png",
+            offertype: "Best Collection",
+            offername: "Saree Sale in 20% dis..",
+            description: "Lorem ipsum",
+            buttontext: "Explore Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 6,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
+            productimg: "lehenga.png",
+            offertype: "Best Collection",
+            offername: "Best Choli Collection",
+            description: "Lorem ipsum",
+            buttontext: "Shop Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 7,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
+            productimg: "saree.png",
+            offertype: "Best Collection",
+            offername: "Saree Sale in 20% dis..",
+            description: "Lorem ipsum",
+            buttontext: "Explore Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 8,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
+            productimg: "lehenga.png",
+            offertype: "Exclusive",
+            offername: "Best Choli Collection",
+            description: "Lorem ipsum",
+            buttontext: "Explore Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 9,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
+            productimg: "saree.png",
+            offertype: "Exclusive",
+            offername: "Saree Sale in 20% dis..",
+            description: "Lorem ipsum",
+            buttontext: "Shop Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 10,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
+            productimg: "lehenga.png",
+            offertype: "Exclusive",
+            offername: "Best Choli Collection",
+            description: "Lorem ipsum",
+            buttontext: "Shop Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
         },
         {   
             id: 11,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
+            productimg: "saree.png",
+            offertype: "Exclusive",
+            offername: "Saree Sale in 20% dis..",
+            description: "Lorem ipsum",
+            buttontext: "Shop Now",
             startdate: "02/09/1994",
             enddate: "02/09/1994",
             status: true,
@@ -204,6 +205,12 @@ const Coupon = (props) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    // offcanvas price
+    const [priceRange, setPriceRange] = useState([0, 300]);
+    const handleSliderChange = (newRange) => {
+        setPriceRange(newRange);
+    };
+
     // Date function
     let [date, setDate] = useState('Select Date');
     let [date1, setDate1] = useState('Select Date');
@@ -224,10 +231,10 @@ const Coupon = (props) => {
             <div id='mv_container_fluid'>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>Coupon</p>
+                        <p className='mb-1'>Offer</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
-                            <p className='mv_category_heading mv_subcategory_heading mb-0'>Coupon</p>
+                            <p className='mv_category_heading mv_subcategory_heading mb-0'>Offer</p>
                         </div>
                     </div>
                 </div>
@@ -256,8 +263,26 @@ const Coupon = (props) => {
                                             </Offcanvas.Header>
                                             <Offcanvas.Body className=''>
                                                 <div>
+                                                    <div className="mv_input_content">
+                                                        <label className='mv_offcanvas_filter_category'>Offer Type</label>
+                                                        <InputGroup className="mb-3">
+                                                            <Form.Control
+                                                                placeholder="Enter Offer Type"
+                                                                name='name'
+                                                            />
+                                                        </InputGroup>
+                                                    </div>
+                                                    <div className="mv_input_content mb-3">
+                                                        <label className='mv_offcanvas_filter_category'>Offer Name</label>
+                                                        <InputGroup className="mb-3">
+                                                            <Form.Control
+                                                                placeholder="Enter Offer Name"
+                                                                name='name1'
+                                                            />
+                                                        </InputGroup>
+                                                    </div>
                                                     <div>
-                                                        <label className='mv_offcanvas_filter_category'>Start Date</label>
+                                                        <label className='mv_offcanvas_filter_category'>Main Category</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
@@ -278,6 +303,30 @@ const Coupon = (props) => {
                                                             <option value="False">False</option>
                                                         </Form.Select>
                                                     </div>
+                                                    <label className='mv_offcanvas_filter_category'>Price</label>
+                                                    <div className="mv_price_range">
+                                                        <ReactSlider
+                                                            className="mv_horisilder"
+                                                            thumbClassName="mv_thumb"
+                                                            trackClassName="mv_track"
+                                                            min={0}
+                                                            max={300}
+                                                            value={priceRange}
+                                                            onChange={handleSliderChange}
+                                                            minDistance={50}
+                                                            withTracks={true}
+                                                            pearling
+                                                            renderTrack={(props, state) => (
+                                                                <div {...props} className={`mv_track ${state.index === 1 ? 'mv_track_active' : ''}`}></div>
+                                                            )}
+                                                        />
+                                                        <div className="mv_price_label mv_price_min" style={{ left: `${(priceRange[0] / 300) * 100}%` }}>
+                                                            ${priceRange[0]}
+                                                        </div>
+                                                        <div className="mv_price_label mv_price_max" style={{ left: `${(priceRange[1] / 300) * 100}%` }}>
+                                                            ${priceRange[1]}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
@@ -294,7 +343,7 @@ const Coupon = (props) => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <Link to='/addcoupon'><button>+ Add</button></Link>
+                                            <Link to='/addoffer'><button>+ Add</button></Link>
                                         </div>
                                     </div>
                                 </div>
@@ -304,11 +353,11 @@ const Coupon = (props) => {
                                     <thead>
                                         <tr>
                                             <th className=''>ID</th>
-                                            <th className=''>Code</th>
-                                            <th className=''>Coupon Name</th>
+                                            <th className=''>Image</th>
+                                            <th className=''>Offer Type</th>
+                                            <th className=''>Offer Name</th>
                                             <th className=''>Description</th>
-                                            <th className=''>Coupon Type</th>
-                                            <th className=''>Price</th>
+                                            <th className=''>Button Text</th>
                                             <th className=''>Start Date</th>
                                             <th className=''>End Date</th>
                                             <th className=''>Status</th>
@@ -316,14 +365,16 @@ const Coupon = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {paginatedData.map((item, index) => (
+                                       {paginatedData.map((item, index) => (
                                         <tr key={index}>
                                             <td>{item.id}</td>
-                                            <td>{item.code}</td>
-                                            <td>{item.coupenname}</td>
+                                            <td>
+                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.productimg}`)}  alt="" />
+                                            </td>
+                                            <td>{item.offertype}</td>
+                                            <td>{item.offername}</td>
                                             <td>{item.description}</td>
-                                            <td>{item.coupontype}</td>
-                                            <td>${item.price}</td>
+                                            <td>{item.buttontext}</td>
                                             <td>{item.startdate}</td>
                                             <td>{item.enddate}</td>
                                             <td>
@@ -336,8 +387,13 @@ const Coupon = (props) => {
                                                 />
                                             </td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={handleditcoupon}>
-                                                    <Link to='/addcoupon' state={{ editCoupon: true }}>
+                                                <div className="mv_pencil_icon">
+                                                    <Link to='/viewoffer'>
+                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                    </Link>
+                                                </div>
+                                                <div className="mv_pencil_icon" onClick={handleditoffer}>
+                                                    <Link to='/addoffer' state={{ editOffer: true }}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
@@ -390,4 +446,4 @@ const Coupon = (props) => {
     );
 };
 
-export default Coupon
+export default Offer

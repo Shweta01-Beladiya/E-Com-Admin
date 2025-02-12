@@ -159,7 +159,7 @@ const Dashboard = () => {
   ];
 
   // Top Product
-  var data1 = [
+  var data = [
     {
       name: "Premium L...",
       price: "$120",
@@ -189,62 +189,6 @@ const Dashboard = () => {
       rating: "4.5",
     },
   ];
-
-  localStorage.setItem('data6', JSON.stringify(data1));
-
-  const [checkboxes, setCheckboxes] = useState({
-    isNameChecked: true,
-    isPriceChecked: true,
-    isCategoryChecked: true,
-    isSubCategoryChecked: true,
-    isRatingChecked: true,
-  });
-
-  useEffect(() => {
-    const savedCheckboxes = {
-      isNameChecked: localStorage.getItem('isNameChecked') === 'true' || true,
-      isPriceChecked: localStorage.getItem('isPriceChecked') === 'true' || true,
-      isCategoryChecked: localStorage.getItem('isCategoryChecked') === 'true' || true,
-      isSubCategoryChecked: localStorage.getItem('isSubCategoryChecked') === 'true' || true,
-      isRatingChecked: localStorage.getItem('isRatingChecked') === 'true' || true,
-    };
-
-    setCheckboxes(savedCheckboxes);
-  }, []);
-
-  const [data, setData] = useState([]);
-
-  const store_data = (value) => {
-    let data = JSON.parse(localStorage.getItem('data6')) || [];
-
-    let id = data.length
-
-    value.id = id + 1;
-
-    if (value.status == 'active') {
-      value.status = true
-    } else {
-      value.status = false
-    }
-
-    value.image = "pencil_icon.png";
-
-    data.push(value);
-
-    // localStorage.setItem('data6', JSON.stringify(data));
-
-    local_data()
-
-  };
-
-  const local_data = async () => {
-    const dataFromStorage = await JSON.parse(localStorage.getItem('data6'));
-    setData(dataFromStorage)
-  };
-
-  useEffect(() => {
-    local_data();
-  }, []);
 
   // Sales by Location
   var salesData = [
@@ -443,33 +387,29 @@ const Dashboard = () => {
                 <table className='mv_product_table mv_top_table_product'>
                   <thead>
                     <tr>
-                      {checkboxes.isNameChecked && <th className=''>Product</th>}
-                      {checkboxes.isPriceChecked && <th className=''>Price</th>}
-                      {checkboxes.isCategoryChecked && <th className=''>Category</th>}
-                      {checkboxes.isSubCategoryChecked && <th className=''>Sub Category</th>}
-                      {checkboxes.isRatingChecked && <th className=''>Rating</th>}
+                      <th className=''>Product</th>
+                      <th className=''>Price</th>
+                      <th className=''>Category</th>
+                      <th className=''>Sub Category</th>
+                      <th className=''>Rating</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.map((item, index) => (
                       <tr key={index}>
-                        {checkboxes.isNameChecked && (
-                          <td>
-                            <img className='mv_product_img' src={require('../mv_img/lehenga.png')} alt="" />
-                            {item.name}
-                          </td>
-                        )}
-                        {checkboxes.isPriceChecked && <td>{item.price}</td>}
-                        {checkboxes.isCategoryChecked && <td>{item.category}</td>}
-                        {checkboxes.isSubCategoryChecked && <td>{item.subcategory}</td>}
-                        {checkboxes.isRatingChecked &&
-                          <td>
-                            <div className='mv_rating_img'>
-                              <FaStar className='mv_star_yellow' />
-                              {item.rating}
-                            </div>
-                          </td>
-                        }
+                        <td>
+                          <img className='mv_product_img' src={require('../mv_img/lehenga.png')} alt="" />
+                          {item.name}
+                        </td>
+                        <td>{item.price}</td>
+                        <td>{item.category}</td>
+                        <td>{item.subcategory}</td>
+                        <td>
+                          <div className='mv_rating_img'>
+                            <FaStar className='mv_star_yellow' />
+                            {item.rating}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

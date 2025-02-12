@@ -4,12 +4,9 @@ import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import * as Yup from 'yup'
-import { isFunction, useFormik } from 'formik';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-
 
 const Size = (props) => {
 
@@ -23,7 +20,7 @@ const Size = (props) => {
         // navigate('addsize')
     }
 
-    var data1 = [
+    var data = [
         {   
             id: 1,
             maincategory: "Women",
@@ -125,133 +122,56 @@ const Size = (props) => {
         },
     ];
 
-    localStorage.setItem('data3', JSON.stringify(data1))
-
-    const [checkboxes, setCheckboxes] = useState({
-        isIDChecked: true,
-        isMaincategoryChecked: true,
-        isCategoryChecked: true,
-        isSubcategoryChecked: true,
-        isSizenameChecked: true,
-        isSizeChecked: true,
-        isUnitChecked: true,
-        isActionChecked: true,
-    });
-
-    useEffect(() => {
-        const savedCheckboxes = {
-            isIDChecked: localStorage.getItem('isIDChecked') === 'true' || true,
-            isMaincategoryChecked: localStorage.getItem('isMaincategoryChecked') === 'true' || true,
-            isCategoryChecked: localStorage.getItem('isCategoryChecked') === 'true' || true,
-            isSubcategoryChecked: localStorage.getItem('isSubcategoryChecked') === 'true' || true,
-            isSizenameChecked: localStorage.getItem('isSizenameChecked') === 'true' || true,
-            isSizeChecked: localStorage.getItem('isSizeChecked') === 'true' || true,
-            isUnitChecked: localStorage.getItem('isUnitChecked') === 'true' || true,
-            isActionChecked: localStorage.getItem('isActionChecked') === 'true' || true,
-        };
-
-        setCheckboxes(savedCheckboxes);
-    }, []);
-
-    const store_data = (value) => {
-        let data = JSON.parse(localStorage.getItem('data2')) || [];
-
-        let id = data.length
-
-        value.id = id + 1;
-
-        if (value.status == 'active') {
-            value.status = true
-        } else {
-            value.status = false
-        }
-
-
-        value.image = "pencil_icon.png";
-
-        data.push(value);
-
-        localStorage.setItem('data2', JSON.stringify(data));
-
-        local_data()
-
-    };
-
+    // ************************************** Pagination **************************************
     const itemsPerPage = 10;
-    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
+    const [filteredData, setFilteredData] = useState(data);
 
-    const local_data = async () => {
-        const dataFromStorage = await JSON.parse(localStorage.getItem('data3'));
-        if (dataFromStorage) {
-            const total = Math.ceil(dataFromStorage.length / itemsPerPage);
-            setTotalPages(total);
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-
-            setData(dataFromStorage.slice(startIndex, endIndex));
-        }
-    };
-
-    useEffect(() => {
-        local_data();
-    }, [currentPage]);
-
-
-    const [image, setImage] = useState(null);
-
-    const init = {
-        name: "",
-        status: ""
-    };
-
-    const validation = Yup.object({
-        name: Yup.string().min(2, "Enter At least 2 characters").max(15, "Too Long For Category").required("Category Must Be required"),
-    });
-
-    let { handleBlur, handleChange, handleSubmit, handleReset, touched, errors, values } = useFormik({
-        initialValues: init,
-        validationSchema: validation,
-        onSubmit: (value) => {
-            store_data(value)
-            handleReset();
-        }
-    });
-
-    const handleImageChange = (event) => {
-        const file = event.currentTarget.files[0];
-        setImage(file);
-    };
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return;
-        setCurrentPage(newPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
     };
 
     const getPaginationButtons = () => {
         const buttons = [];
-        const maxButtonsToShow = 3;
-        let startPage = Math.max(currentPage - 1, 1);
-        let endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
-
+        const maxButtonsToShow = 5;
+        
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+        
+        // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(endPage - maxButtonsToShow + 1, 1);
+            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
 
+        // Add first page if not included
+        if (startPage > 1) {
+            buttons.push(1);
+            if (startPage > 2) buttons.push('...');
+        }
+
+        // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
 
+        // Add last page if not included
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) buttons.push('...');
+            buttons.push(totalPages);
+        }
         return buttons;
     };
 
-    // Sort Functions
-    const [filteredData, setFilteredData] = useState(data1);
-
-    // Pagenation
-    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const paginatedData = filteredData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+    // *******************************************************************************
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
@@ -365,7 +285,7 @@ const Size = (props) => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <button><Link to='/dashboard/addsize'>+ Add</Link></button>
+                                            <Link to='/addsize'><button>+ Add</button></Link>
                                         </div>
                                     </div>
                                 </div>
@@ -374,38 +294,36 @@ const Size = (props) => {
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
-                                        {checkboxes.isIDChecked && <th className=''>ID</th>}
-                                        {checkboxes.isMaincategoryChecked && <th className=''>Main Category</th>}
-                                        {checkboxes.isCategoryChecked && <th className=''>Category</th>}
-                                        {checkboxes.isSubcategoryChecked && <th className=''>Sub Category</th>}
-                                        {checkboxes.isSizenameChecked && <th className=''>Size Name</th>}
-                                        {checkboxes.isSizeChecked && <th className=''>Size</th>}
-                                        {checkboxes.isUnitChecked && <th className=''>Unit</th>}
-                                        {checkboxes.isActionChecked && <th className='d-flex align-items-center justify-content-end'>Action</th>}
+                                        <th className=''>ID</th>
+                                        <th className=''>Main Category</th>
+                                        <th className=''>Category</th>
+                                        <th className=''>Sub Category</th>
+                                        <th className=''>Size Name</th>
+                                        <th className=''>Size</th>
+                                        <th className=''>Unit</th>
+                                        <th className='d-flex align-items-center justify-content-end'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.map((item, index) => (
+                                        {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            {checkboxes.isIDChecked && <td>{item.id}</td>}
-                                            {checkboxes.isMaincategoryChecked && <td>{item.maincategory}</td>}
-                                            {checkboxes.isCategoryChecked && <td>{item.category}</td>}
-                                            {checkboxes.isSubcategoryChecked && <td>{item.subcategory}</td>}
-                                            {checkboxes.isSizenameChecked && <td>{item.sizename}</td>}
-                                            {checkboxes.isSizeChecked && <td>{item.size}</td>}
-                                            {checkboxes.isUnitChecked && <td>{item.unit}</td>}
-                                            {checkboxes.isActionChecked && (
-                                                <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon" onClick={handleditsize}>
-                                                        <Link to='/dashboard/addSize' state={{ editSize: true }}>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                                </td>
-                                            )}
+                                            <td>{item.id}</td>
+                                            <td>{item.maincategory}</td>
+                                            <td>{item.category}</td>
+                                            <td>{item.subcategory}</td>
+                                            <td>{item.sizename}</td>
+                                            <td>{item.size}</td>
+                                            <td>{item.unit}</td>
+                                            <td className='d-flex align-items-center justify-content-end'>
+                                                <div className="mv_pencil_icon" onClick={handleditsize}>
+                                                    <Link to='/addSize' state={{ editSize: true }}>
+                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                    </Link>
+                                                </div>
+                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                </div>
+                                            </td>
                                         </tr>
                                         ))}
                                     </tbody>

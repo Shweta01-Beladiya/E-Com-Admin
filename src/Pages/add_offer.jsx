@@ -3,15 +3,19 @@ import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { useLocation } from 'react-router-dom';
 
-const Addsize = () => {
+const Addoffer = () => {
     // State variables
     let [isedit, setisedit] = useState(false);
+    let [name, setname] = useState('');
     let [mainCategory, setMainCategory] = useState("");
     let [category, setCategory] = useState("");
     let [subCategory, setSubCategory] = useState("");
-    let [sizeName, setSizeName] = useState("");
-    let [size, setSize] = useState("");
-    let [unit, setUnit] = useState("");
+    let [offerType, setOfferType] = useState("");
+    let [offerName, setOfferName] = useState("");
+    let [buttonText, setButtonText] = useState("");
+    let [startDate, setStartDate] = useState("");
+    let [endDate, setEndDate] = useState("");
+    let [description, setDescription] = useState("");
 
     let change_edit = () => {
         setisedit(!isedit);
@@ -19,35 +23,54 @@ const Addsize = () => {
 
     let handlesubmit = (event) => {
         event.preventDefault();
-
+    
         const formData = {
+            name,
             mainCategory,
             category,
             subCategory,
-            sizeName,
-            size,
-            unit,
+            offerType,
+            offerName,
+            buttonText,
+            startDate,
+            endDate,
+            description,
         };
-
-        console.log('Form Submitted:', formData);
+    
+        console.log("Form Submitted:", formData);
         setisedit(false);
     };
 
-    // Edit Size
+    // Edit Offer
     const location = useLocation();
-    const editSize = location.state?.editSize;
-    console.log(editSize)
+    const editOffer = location.state?.editOffer;
+    console.log(editOffer)
+
+    // Date function
+    let [date, setDate] = useState('Select Date');
+    let [date1, setDate1] = useState('Select Date');
+
+    const handleDateChange = (e, dateType) => {
+        const [year, month, day] = e.target.value.split("-");
+        const formattedDate = `${day}-${month}-${year}`;
+        
+        if (dateType === 'start') {
+            setDate(formattedDate);
+        } else if (dateType === 'end') {
+            setDate1(formattedDate);
+        }
+    };
 
     return (
         <>
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editSize ? 'Edit Size' : 'Add Size'}</p>
+                        <p className='mb-1'>{editOffer ? 'Edit Offer' : 'Add Offer'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editSize ? 'Edit Size' : 'Add Size'}
+                                {editOffer ? 'Edit Offer' : 'Add Offer'}
                             </p>
                         </div>
                     </div>
@@ -119,12 +142,12 @@ const Addsize = () => {
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
-                                                <label className='mv_label_input'>Size Name</label>
+                                                <label className='mv_label_input'>Offer Type</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={sizeName}
-                                                        onChange={(e) => setSizeName(e.target.value)}
-                                                        placeholder="Enter size name"
+                                                        value={offerType}
+                                                        onChange={(e) => setOfferType(e.target.value)}
+                                                        placeholder="Enter Offer Type"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
                                                     />
@@ -133,30 +156,78 @@ const Addsize = () => {
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
-                                                <label className='mv_label_input'>Size</label>
-                                                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                                <label className='mv_label_input'>Offer Name</label>
+                                                <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={size}
-                                                        onChange={(e) => setSize(e.target.value)}
-                                                        type=""
-                                                        placeholder="Enter size" />
-                                                </Form.Group>
+                                                        value={offerName}
+                                                        onChange={(e) => setOfferName(e.target.value)}
+                                                        placeholder="Enter Offer Name"
+                                                        aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
-                                                <label className='mv_label_input'>Unit</label>
-                                                <Form.Select
-                                                    value={unit}
-                                                    onChange={(e) => setUnit(e.target.value)}
-                                                    aria-label="Default select example"
-                                                    className='mv_form_select mb-3'>
-                                                    <option value="">Select</option>
-                                                    <option value="gm">gm</option>
-                                                    <option value="ltr">ltr</option>
-                                                    <option value="ml">ml</option>
-                                                    <option value="GB">GB</option>
-                                                </Form.Select>
+                                                <label className='mv_edit_profile_label'>Description Image</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                    placeholder="Choose Image"
+                                                    aria-label=""
+                                                    readOnly
+                                                    />
+                                                    <label className="mv_browse_button">
+                                                    Browse
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                    />
+                                                    </label>
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Button Text</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={buttonText}
+                                                        onChange={(e) => setButtonText(e.target.value)}
+                                                        placeholder="Enter Button Text"
+                                                        aria-label="name"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <label className='mv_offcanvas_filter_category'>Start Date</label>
+                                            <div className="mv_input_content mv_add_product_date_scheduled">
+                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
+                                                <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <label className='mv_offcanvas_filter_category'>End Date</label>
+                                            <div className="mv_input_content mv_add_product_date_scheduled">
+                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
+                                                <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="mv_input_content">
+                                                <label className='mv_label_input'>Description</label>
+                                                <InputGroup className="mb-3">
+                                                    <Form.Control
+                                                        value={description}
+                                                        onChange={(e) => setDescription(e.target.value)}
+                                                        placeholder="Enter Description"
+                                                        as="textarea" 
+                                                        aria-label="With textarea"
+                                                        aria-describedby="basic-addon1"
+                                                    />
+                                                </InputGroup>
                                             </div>
                                         </div>
                                         <div className='text-center mt-5'>
@@ -164,7 +235,7 @@ const Addsize = () => {
                                                 <button className='border-0 bg-transparent'>
                                                     Cnacel
                                                 </button>
-                                                {editSize === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                {editOffer === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
                                                     Update
                                                 </button> : 
                                                 <button className='border-0 bg-transparent' onClick={change_edit}>
@@ -184,4 +255,4 @@ const Addsize = () => {
     );
 };
 
-export default Addsize;
+export default Addoffer;
