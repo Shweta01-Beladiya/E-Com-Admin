@@ -7,6 +7,7 @@ import {
   Toolbar,
   Typography,
   IconButton,
+  Divider,
 } from '@mui/material';
 import { FiMenu } from 'react-icons/fi';
 import Button from '@mui/material/Button';
@@ -14,6 +15,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
+import { FaPowerOff, FaUser } from 'react-icons/fa';
 
 const drawerWidth = 280;
 
@@ -51,7 +53,7 @@ const Header = ({ open, handleDrawerOpen }) => {
   const [modalShow, setModalShow] = React.useState(false);
 
   return (
-    <AppBar position="fixed" open={open}>
+    <AppBar position="fixed" open={open} sx={{paddingRight:'0 !important'}}>
       <Toolbar className='bg-white text-black'>
         <IconButton
           color="inherit"
@@ -71,13 +73,14 @@ const Header = ({ open, handleDrawerOpen }) => {
         {/* <div className='ml-auto'>
        <img src={require('../s_img/loginUser.png')} alt=""  />
        </div> */}
-        <div className='ml-auto'>
+        {/* <div> */}
           <Button
             id="basic-button"
             aria-controls={isMenuOpen ? 'basic-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={isMenuOpen ? 'true' : undefined}
             onClick={handleClick}
+            sx={{marginLeft:'auto'}}
           >
             <img src={require('../s_img/loginUser.png')} alt="" />
           </Button>
@@ -89,24 +92,26 @@ const Header = ({ open, handleDrawerOpen }) => {
             MenuListProps={{
               'aria-labelledby': 'basic-button',
             }}
+            className='p-3'
           >
             <MenuItem onClick={handleClose}>
-              <div className='flex'>
+              <div className='d-flex'>
                 <div>
-                  <Link to='/dashboard/view_profile'>
-                    <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-2' />
-                  </Link>
+                    <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-3' />
                 </div>
                 <div>
-                  <p><b>John Patel</b></p>
-                  <p className='text-[#7D7D7D]'>example@gmail.com</p>
+                  <p className='mb-0'><b>John Patel</b></p>
+                  <p className='text-[#7D7D7D] mb-0'>example@gmail.com</p>
                 </div>
               </div>
             </MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={() => { handleClose(); setModalShow(true); }}>Logout</MenuItem>
+              <Divider sx={{borderColor:'rgba(0, 0, 0, 0.8)'}} />
+              <Link to='/view_profile' className='text-decoration-none text-dark'>
+            <MenuItem onClick={handleClose}><FaUser  className='me-3'/> My Profile</MenuItem>
+            </Link>
+            <MenuItem onClick={() => { handleClose(); setModalShow(true); }}><FaPowerOff className='me-3' />Logout</MenuItem>
           </Menu>
-        </div>
+        {/* </div> */}
       </Toolbar>
 
       {/* Logout Modal */}
