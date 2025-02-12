@@ -5,7 +5,7 @@ import "../CSS/riya.css";
 import { FaSearch } from 'react-icons/fa';
 
 
-const SubCategoryManagement = () => {
+const SubCategory = () => {
     const mainCategories = [
         "Woman",
         "Men",
@@ -407,4 +407,4 @@ const SubCategoryManagement = () => {
     );
 };
 
-export default SubCategoryManagement;
+export default SubCategory;

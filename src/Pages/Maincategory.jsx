@@ -4,7 +4,7 @@ import { Modal, Button, Form, Table, InputGroup, Col, Row } from "react-bootstra
 import '../CSS/riya.css';
 import { FaSearch } from 'react-icons/fa';
 
-const App = () => {
+const MainCategory = () => {
   const [categories, setCategories] = useState([
     { id: 1, name: "Women", status: true },
     { id: 2, name: "Men", status: false },
@@ -228,4 +228,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default MainCategory;

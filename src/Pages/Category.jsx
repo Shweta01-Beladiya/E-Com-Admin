@@ -7,7 +7,7 @@ import { FiFilter } from 'react-icons/fi';
 import { FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
 
-const CategoryManagement = () => {
+const Category = () => {
     // Main categories for dropdown
     const mainCategories = [
         "Electronics",
@@ -437,4 +437,4 @@ const CategoryManagement = () => {
     );
 };
 
-export default CategoryManagement;
+export default Category;
