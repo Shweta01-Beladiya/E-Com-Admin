@@ -163,7 +163,7 @@ const UserTable = () => {
         {/* Search and Filter Section */}
         <Row className="mb-4 align-items-center">
           <Col xs={12} md={6} lg={4}>
-            <InputGroup className="mb-3 search-input-group">
+            <InputGroup className="mb-3 search-input-group r_inputgroup">
               <InputGroup.Text className="search-icon-container">
                 <FaSearch className="search-icon" />
               </InputGroup.Text >
@@ -309,7 +309,7 @@ const UserTable = () => {
               <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
                 Cancel
               </Button>
-              <Button onClick={confirmDelete} className=" r_delete">
+              <Button onClick={confirmDelete} className="r_delete">
                 Delete
               </Button>
             </div>
