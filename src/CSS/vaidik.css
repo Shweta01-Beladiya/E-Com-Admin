@@ -7,6 +7,15 @@
 
 
 /******************** Deshboard *******************/
+.mv_top_pro_bg{
+    background-color: #FDFDFD !important;
+}
+.mv_sales_table_con thead tr{
+    background-color: #FDFDFD !important;
+}
+.mv_sales_table_con thead tr th{
+    background-color: #FDFDFD !important;
+}
 .mv_main_heading p{
     font-size: 26px;
     font-weight: 600;
@@ -754,6 +763,17 @@
 }
 .mv_form_select:disabled{
     background-color: transparent !important;
+}
+.mv_input_content textarea {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    border: 1px solid #95908F;
+    border-radius: 4px;
+}
+.mv_input_content textarea:focus{
+    box-shadow: none;
+    border: 1px solid #95908F;
 }
 .mv_update_profile button{
     width: 400px;

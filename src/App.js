@@ -14,6 +14,7 @@ import VerifyOTP from './Pages/Veriftotp';
 import ResetPassword from './Pages/Resetpassword';
 import UserTable from './Pages/User';
 
+
 const OrderManagement = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -70,6 +71,11 @@ import Size from './Pages/size';
 import Addsize from './Pages/add_size';
 import Stock from './Pages/stock';
 import Addstock from './Pages/add_stock';
+
+import Coupon from './Pages/coupon';
+import Addcoupon from './Pages/add_coupon';
+import Productoffer from './Pages/product_offer';
+import Addproductoffer from './Pages/add_product_offer';
 import Login from './Pages/Login';
 import DeactivatedAccount from './Pages/DeactivatedAccount';
 
@@ -79,7 +85,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* <Route path='/' element={<LoginPage />}></Route> */}
-          <Route path='/' element={<Login/>}></Route>
+          {/* <Route path='/' element={<Login/>}></Route> */}
           <Route path='/verify-otp' element={<VerifyOTP />}></Route>
           <Route path='/forgot-password' element={<Forgotpassword />}></Route>
           <Route path='/reset-password' element={<ResetPassword />}></Route>
@@ -271,11 +277,21 @@ function App() {
               <Form.Control type="date" />
             </Form.Group>
 
+            <Route path='coupon' element={<Coupon />}></Route>
+            <Route path='addcoupon' element={<Addcoupon />}></Route>
+            <Route path='Productoffer' element={<Productoffer />}></Route>
+            <Route path='addproductoffer' element={<Addproductoffer />}></Route>
+
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+}
             <Form.Group className="mb-3">
               <Form.Label>Customer Name</Form.Label>
               <Form.Control type="text" placeholder="Search customer..." />
             </Form.Group>
-
             <div className="d-grid gap-2">
               <Button variant="primary">Apply Filters</Button>
               <Button variant="light" onClick={handleFilterClose}>Cancel</Button>

@@ -434,19 +434,10 @@ const Dashboard = () => {
         <div className="row mt-4">
           <div className="col-xl-9">
             <div className="mv_product_table_content">
-              <div className="mv_product_heading d-flex justify-content-between align-items-center">
+              <div className="mv_product_heading mv_top_pro_bg">
                 <div className="mv_product">
                   <p className='mb-0'>Top Product</p>
                 </div>
-                {/* <div className="mv_product_search">
-                  <InputGroup>
-                    <Form.Control
-                      placeholder="Search..."
-                      aria-label="Username"
-                      aria-describedby="basic-addon1"
-                    />
-                  </InputGroup>
-                </div> */}
               </div>
               <div className="mv_product_table_padd">
                 <table className='mv_product_table mv_top_table_product'>
@@ -489,7 +480,7 @@ const Dashboard = () => {
           <div className="col-xl-3">
             {/* Sales by Location */}
             <div className="mv_product_table_content">
-              <table className='mv_sales_by_location_table'>
+              <table className='mv_sales_by_location_table mv_sales_table_con'>
                 <thead>
                   <tr>
                     <th>Sales by Location</th>
