@@ -5,6 +5,7 @@
 }
 tr th{
   background-color: #FFF9F6 !important;
+  line-height: 31.47px;
 }
 /* SearchBar */
 .search-icon-container {
@@ -38,9 +39,6 @@ tr th{
   .r_inputgroup{
     width: 250px !important;
   }
-  /* .input-group{
-    width: 250px !important;
-  } */
   .r_filterbtn{
     border-radius: 5px !important;
     border: 1px solid #95908F !important;
@@ -50,24 +48,25 @@ tr th{
   }
   .r_deleticon{
     border: 1px solid #95908F !important;
-   padding: 3px !important;
-   border-radius: 3px !important;
+   border-radius: 4px !important;
    background-color: transparent !important;
+   padding: 0 !important;
   }
   .r_deletimg{
     width: 100% !important;
-    height: 100% !important;
+    height:34px !important;
     box-sizing: border-box !important;
     object-fit: cover !important;
+    padding: 8px;
   }
   .pagination li{
-    margin: 0 5px;
+    margin: 0 5px !important;
     background-color: transparent !important;
   }
   .page-item{
-    --bs-pagination-active-bg: black ;
-    --bs-pagination-active-border-color: black;
-    --bs-pagination-active-color: #fff;
+    --bs-pagination-active-bg: black !important;
+    --bs-pagination-active-border-color: black !important;
+    --bs-pagination-active-color: #fff !important;
   }
   .page-link{
     color: black;

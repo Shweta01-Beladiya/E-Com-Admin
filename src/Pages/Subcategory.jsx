@@ -65,28 +65,15 @@ const SubCategory = () => {
         "Smart Home",
     ]
     const [subCategories, setSubCategories] = useState([
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
-        { id: 1, name: 'SubCategory 1', category: 'Category 1', mainCategory: 'Main Category 1', status: 'Active' },
-        { id: 2, name: 'SubCategory 2', category: 'Category 2', mainCategory: 'Main Category 2', status: 'Inactive' },
+        { id: 1, name: 'Saree', category: 'Indian Wear', mainCategory: 'Woman', status: true },
+        { id: 2, name: 'Blazer', category: 'Western Wear', mainCategory: 'Men', status: false },
+        { id: 3, name: 'Baby Soap', category: 'Baby Care', mainCategory: 'Beauty & Health', status: true },
+        { id: 4, name: 'Sports Shoes', category: 'Shoes', mainCategory: 'Sports', status: true },
+        { id: 5, name: 'Duffle Bag', category: 'Bag Packs', mainCategory: 'Luggage', status: false },
+        { id: 6, name: 'Mens San', category: 'Footwear', mainCategory: 'Men', status: true },
+        { id: 7, name: 'SubCategory 1', category: 'Sunglasses & Frames', mainCategory: 'Women', status: false },
+        { id: 8, name: 'SubCategory 2', category: 'Skin Care', mainCategory: 'Beauty & Health', status: true },
+
     ]);
     const [showFilter, setShowFilter] = useState(false);
     const [showAddEditModal, setShowAddEditModal] = useState(false);
@@ -97,12 +84,23 @@ const SubCategory = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
+    const mainCategoriesObj = mainCategories.map((category) => ({ value: category, label: category }));
+    const categoriesObj = categories.map((category) => ({ value: category, label: category }));
+
+    const handleStatusChange = (id) => {
+        setSubCategories(prev =>
+            prev.map(sub =>
+                sub.id === id ? { ...sub, status: !sub.status } : sub
+            )
+        );
+    };
+
     const filteredSubCategories = subCategories.filter((sub) => {
         return (
             sub.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
             (!filters.category || sub.category === filters.category) &&
             (!filters.mainCategory || sub.mainCategory === filters.mainCategory) &&
-            (!filters.status || sub.status === filters.status)
+            (!filters.status || (filters.status === 'Active' ? sub.status : !sub.status))
         );
     });
 
@@ -157,7 +155,7 @@ const SubCategory = () => {
             name: formData.get('name'),
             category: formData.get('category'),
             mainCategory: formData.get('mainCategory'),
-            status: formData.get('status'),
+            status: formData.get('status') === 'Active',
         };
 
         if (currentSubCategory) {
@@ -229,18 +227,24 @@ const SubCategory = () => {
                                 <td>{sub.mainCategory}</td>
                                 <td>{sub.category}</td>
                                 <td>{sub.name}</td>
-                                <td>{sub.status}</td>
+                                <td>
+                                    <Form.Check
+                                        type="switch"
+                                        id={`status-switch-${sub.id}`}
+                                        checked={sub.status}
+                                        onChange={() => handleStatusChange(sub.id)}
+                                        className="status-switch"
+                                    />
+                                </td>
                                 <td>
                                     <Button
-
                                         className="r_deleticon me-2"
                                         onClick={() => {
                                             setCurrentSubCategory(sub);
                                             setShowAddEditModal(true);
                                         }}
                                     >
-                                        {/* <FaEdit /> */}
-                                        <img src={require('../Photos/edit.png')} class="r_deletimg"></img>
+                                        <img src={require('../Photos/edit.png')} className="r_deletimg" alt="edit" />
                                     </Button>
                                     <Button
                                         className="r_deleticon"
@@ -248,10 +252,8 @@ const SubCategory = () => {
                                             setCurrentSubCategory(sub);
                                             setShowDeleteModal(true);
                                         }}
-
                                     >
-                                        {/* <FaTrash /> */}
-                                        <img src={require('../Photos/delet.png')} class="r_deletimg"></img>
+                                        <img src={require('../Photos/delet.png')} className="r_deletimg" alt="delete" />
                                     </Button>
                                 </td>
                             </tr>
@@ -277,18 +279,6 @@ const SubCategory = () => {
                             setShowFilter(false);
                         }}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Category</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    value={filters.category}
-                                    onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                                >
-                                    <option value="">Select Category</option>
-                                    <option value="Category 1">Category 1</option>
-                                    <option value="Category 2">Category 2</option>
-                                </Form.Control>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
                                 <Form.Label>Main Category</Form.Label>
                                 <Form.Control
                                     as="select"
@@ -296,8 +286,22 @@ const SubCategory = () => {
                                     onChange={(e) => setFilters({ ...filters, mainCategory: e.target.value })}
                                 >
                                     <option value="">Select Main Category</option>
-                                    <option value="Main Category 1">Main Category 1</option>
-                                    <option value="Main Category 2">Main Category 2</option>
+                                    {mainCategoriesObj.map((mainCat) => (
+                                        <option key={mainCat.value} value={mainCat.value}>{mainCat.label}</option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Category</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={filters.category}
+                                    onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categoriesObj.map((cat) => (
+                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                    ))}
                                 </Form.Control>
                             </Form.Group>
                             <Form.Group className="mb-3">
@@ -327,14 +331,12 @@ const SubCategory = () => {
                 </Offcanvas>
 
                 {/* Add Subcategory Modal */}
-                <Modal show={showAddEditModal} onHide={() => setShowAddEditModal(false)} centered>
+                <Modal show={showAddEditModal && !currentSubCategory} onHide={() => setShowAddEditModal(false)} centered>
                     <Modal.Header closeButton className="r_modalheader">
                     </Modal.Header>
                     <Modal.Body className="r_modalbody">
-                        <h6 className='text-center fw-bold'>Add Sub Category</h6>
+                    <h6 className='text-center fw-bold'>Add Sub Category</h6>
                         <Form onSubmit={handleAddEditSave} className="r_form">
-
-
                             {/* Select for Main Categories */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Main Category</Form.Label>
@@ -369,7 +371,6 @@ const SubCategory = () => {
                                     type="text"
                                     name="name"
                                     placeholder='Enter Sub Category'
-                                    defaultValue={currentSubCategory?.name || ''}
                                     required
                                 />
                             </Form.Group>
@@ -385,6 +386,65 @@ const SubCategory = () => {
                     </Modal.Body>
                 </Modal>
 
+                {/* Edit Subcategory Modal */}
+                <Modal show={showAddEditModal && currentSubCategory} onHide={() => setShowAddEditModal(false)} centered>
+                    <Modal.Header closeButton className="r_modalheader">
+                    </Modal.Header>
+                    <Modal.Body className="r_modalbody">
+                    <h6 className='text-center fw-bold'>Edit Sub Category</h6>
+                        <Form onSubmit={handleAddEditSave} className="r_form">
+                            {/* Select for Main Categories */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>Main Category</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    name="mainCategory"
+                                    defaultValue={currentSubCategory?.mainCategory}
+                                    required
+                                >
+                                    <option value="">Select</option>
+                                    {mainCategories.map((mainCategory, index) => (
+                                        <option key={index} value={mainCategory}>{mainCategory}</option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+                            {/* Select for Categories */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>Category</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    name="category"
+                                    defaultValue={currentSubCategory?.category}
+                                    required
+                                >
+                                    <option value="">Select </option>
+                                    {categories.map((category, index) => (
+                                        <option key={index} value={category}>{category}</option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Sub Category</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="name"
+                                    placeholder='Enter Sub Category'
+                                    defaultValue={currentSubCategory?.name || ''}
+                                    required
+                                />
+                            </Form.Group>
+                            <div className="d-flex justify-content-center gap-2 mt-4">
+                                <Button onClick={() => setShowAddEditModal(false)} className="r_cancel">
+                                    Cancel
+                                </Button>
+                                <Button type="submit" className="r_delete">
+                                    Update
+                                </Button>
+                            </div>
+                        </Form>
+                    </Modal.Body>
+                </Modal>
+
                 {/* Delete Confirmation Modal */}
                 <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
 
@@ -392,15 +452,15 @@ const SubCategory = () => {
                         <h6 className='text-center fw-bold mb-3'>Delete</h6>
                         <p className='mb-4 text-center text-muted'>Are you sure you want to delete this sub-category?</p>
                         <div className="d-flex justify-content-center gap-2">
-                        <Button className="r_cancel" onClick={() => setShowDeleteModal(false)}>
-                            Cancel
-                        </Button>
-                        <Button className="r_delete" onClick={handleDelete}>
-                            Delete
-                        </Button>
+                            <Button className="r_cancel" onClick={() => setShowDeleteModal(false)}>
+                                Cancel
+                            </Button>
+                            <Button className="r_delete" onClick={handleDelete}>
+                                Delete
+                            </Button>
                         </div>
                     </Modal.Body>
-                   
+
                 </Modal>
             </div>
         </div>

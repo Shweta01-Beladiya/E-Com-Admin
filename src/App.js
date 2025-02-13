@@ -19,12 +19,13 @@ import Coupon from './Pages/coupon';
 import Addcoupon from './Pages/add_coupon';
 import Productoffer from './Pages/product_offer';
 import Addproductoffer from './Pages/add_product_offer';
-import Login from './Pages/Login';
 import DeactivatedAccount from './Pages/DeactivatedAccount';
 import MainCategory from './Pages/Maincategory';
 import Category from './Pages/Category';
 import SubCategory from './Pages/Subcategory';
 import Viewprofile from './Pages/Viewprofile';
+import Login from './Pages/Login';
+import ReviewManagement from './Pages/Review';
 
 function App() {
   return (
@@ -50,7 +51,7 @@ function App() {
             <Route path='/addsize' element={<Addsize />}></Route>
             <Route path='/stock' element={<Stock />}></Route>
             <Route path='/addstock' element={<Addstock />}></Route>
-            {/* <Route path="/riyansee" element={<Riyansee/>}></Route> */}
+      <Route path='/review' element={<ReviewManagement />}></Route>
             <Route path="/DeactivateAccount" element={<DeactivatedAccount/>}></Route>
             <Route path='/coupon' element={<Coupon />}></Route>
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
