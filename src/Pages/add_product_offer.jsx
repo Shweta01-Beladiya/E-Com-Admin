@@ -21,34 +21,6 @@ const Addproductoffer = () => {
     let [maxPurchase, setMaxPurchase] = useState("");
     let [description, setDescription] = useState("");
 
-
-    let handle_onload = () => {
-        let data = JSON.parse(localStorage.getItem('user'));
-        console.log(data);
-        if (data) {
-            setname(data.name || "");
-            setMainCategory(data.mainCategory || "");
-            setCategory(data.category || "");
-            setSubCategory(data.subCategory || "");
-            setProduct(data.product || "");
-            setOfferName(data.offerName || "");
-            setCode(data.code || "");
-            setDiscountPrice(data.discountPrice || "");
-            setPrice(data.price || "");
-            setStartDate(data.startDate || "");
-            setEndDate(data.endDate || "");
-            setMinPurchase(data.minPurchase || "");
-            setMaxPurchase(data.maxPurchase || "");
-            setDescription(data.description || "");
-        } else {
-            return;
-        }
-    }
-
-    useEffect(() => {
-        handle_onload();
-    }, []);
-
     let change_edit = () => {
         setisedit(!isedit);
     };
@@ -74,7 +46,6 @@ const Addproductoffer = () => {
         };
     
         console.log("Form Submitted:", formData);
-        localStorage.setItem("user", JSON.stringify(formData));
         setisedit(false);
     };
 
@@ -274,7 +245,7 @@ const Addproductoffer = () => {
                                                     <Form.Control
                                                         value={minPurchase}
                                                         onChange={(e) => setMinPurchase(e.target.value)}
-                                                        placeholder="Enter Minimum Purchase"
+                                                        placeholder="Minimum Purchase"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
                                                     />
@@ -288,7 +259,7 @@ const Addproductoffer = () => {
                                                     <Form.Control
                                                         value={maxPurchase}
                                                         onChange={(e) => setMaxPurchase(e.target.value)}
-                                                        placeholder="Enter Maximum Purchase"
+                                                        placeholder="Maximum Purchase"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
                                                     />

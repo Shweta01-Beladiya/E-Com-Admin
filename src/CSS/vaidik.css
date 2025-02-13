@@ -137,21 +137,22 @@
 }
 .mv_product_table thead tr th{
     padding: 20px 30px;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 600;
     line-height: 24.2px;
     color: #2B221E;
     background-color: #FFF9F6 !important;
 }
-.mv_top_table_product thead tr th{
-    background-color: transparent !important;
-}
 .mv_product_table thead tr th:last-child{
     margin-right: 45px !important;
 }
+.mv_top_table_product thead tr th{
+    font-size: 18px;
+    background-color: transparent !important;
+}
 .mv_product_table tbody tr td{
     padding: 10px 30px;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 21.78px;
     text-wrap: nowrap !important;
@@ -539,10 +540,13 @@
         width: 100%;
     }
     .mv_product_table thead tr th {
-        font-size: 18px;
+        font-size: 15px;
+    }
+    .mv_top_table_product thead tr th{
+        font-size: 16px;
     }
     .mv_product_table tbody tr td{
-        font-size: 15px;
+        font-size: 14px;
     }
     .mv_earning_revenue_profile{
         display: block !important;
@@ -742,7 +746,7 @@
 }
 .mv_input_content input:focus{
     box-shadow: none;
-    border: 1px solid #002846;
+    border: 1px solid #95908F;
 }
 .mv_input_content select{
     font-size: 16px;

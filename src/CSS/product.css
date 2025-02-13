@@ -188,7 +188,7 @@
 }
 .mv_browse_button{
     display: inline-block;
-    background-color: #002846;
+    background-color: #2B221E;
     border-radius: 3px;
     padding: 10px 12px 5px 12px;
     outline: none;
@@ -342,5 +342,81 @@
     font-size: 16px;
     font-weight: 400;
     color: #000000;
+}
+/* ************************************************ */
+
+
+
+
+/******************** Coupen ************************/
+.mv_main_product{
+    box-shadow: 1px 1px 20px 0.5px #0000000F;
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 4px;
+}
+.mv_main_view_product_con{
+    --bs-gutter-x: 0 !important;
+    margin-bottom: 20px;
+}
+.mv_view_product_img{
+    width: 100%;
+    height: auto;
+}
+.mv_view_product_heading{
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19.36px;
+    letter-spacing: 0px;
+    color: #6A6A6A;
+}
+.mv_view_product_sub_heading{
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19.36px;
+    letter-spacing: 0%;
+    color: #000000;
+}
+.mv_main_offerdetails_con{
+    box-shadow: 1px 1px 20px 0.5px #0000000F;
+}
+.mv_offer_details_heading{
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 21.78px;
+    letter-spacing: 0px;
+    color: #2B221E;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-bottom: 0.91px solid #D8D8D8 !important;
+}
+.mv_main_offerdetails{
+    padding: 20px 30px;
+    background-color: #fff;
+}
+
+
+@media(max-width:575px){
+    .mv_view_product_img{
+        margin-bottom: 15px;
+    }
+    .mv_main_offerdetails {
+        padding: 10px 10px;
+    }
+    .mv_offer_details_heading {
+        padding: 10px 10px;
+    }
+    .mv_view_product_heading{
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    .mv_view_product_sub_heading{
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    .mv_offer_details_sub_heading{
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
 }
 /* ************************************************ */

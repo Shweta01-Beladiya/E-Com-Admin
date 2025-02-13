@@ -13,27 +13,6 @@ const Addstock = () => {
     let [stockStatus, setStockStatus] = useState("");
     let [quantity, setQuantity] = useState("");
 
-    const [profileImage, setProfileImage] = useState(require('../mv_img/profile_img.png'));
-
-    let handle_onload = () => {
-        let data = JSON.parse(localStorage.getItem('user'));
-        console.log(data);
-        if (data) {
-            setMainCategory(data.mainCategory || "");
-            setCategory(data.category || "");
-            setSubCategory(data.subCategory || "");
-            setProduct(data.product || "");
-            setStockStatus(data.stockStatus || "");
-            setQuantity(data.quantity || "");
-        } else {
-            return;
-        }
-    }
-
-    useEffect(() => {
-        handle_onload();
-    }, []);
-
     let change_edit = () => {
         setisedit(!isedit);
     };
@@ -51,7 +30,6 @@ const Addstock = () => {
         };
 
         console.log('Form Submitted:', formData);
-        localStorage.setItem('user', JSON.stringify(formData));
         setisedit(false);
     };
 

@@ -4,17 +4,14 @@ import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import * as Yup from 'yup'
-import { isFunction, useFormik } from 'formik';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-// import ReactSlider from 'react-slider';
+import ReactSlider from 'react-slider';
 import { Link } from 'react-router-dom';
 import { FaStar } from "react-icons/fa";
 
-
 const Product = (props) => {
-    var data1 = [
+    var data = [
         {   
             id: 1,
             category: "Women",
@@ -115,185 +112,70 @@ const Product = (props) => {
             rating: "4.5",
             stock:"Out of Stock",
         },
+        {   
+            id: 11,
+            category: "Women",
+            subcategory: "Indian Wear",
+            productimg: "saree.png",
+            name: "Premium Saree",
+            price: "$120",
+            rating: "4.5",
+            stock:"In Stock",
+        },
     ];
 
-    localStorage.setItem('data3', JSON.stringify(data1))
-
-    const [checkboxes, setCheckboxes] = useState({
-        isIDChecked: true,
-        isCategoryChecked: true,
-        isSubCategoryChecked: true,
-        isNameChecked: true,
-        isPriceChecked: true,
-        isRatingChecked: true,
-        isStockStatus: true,
-        isActionChecked: true,
-    });
-
-    useEffect(() => {
-        const savedCheckboxes = {
-            isIDChecked: localStorage.getItem('isIDChecked') === 'true' || true,
-            isCategoryChecked: localStorage.getItem('isCategoryChecked') === 'true' || true,
-            isSubCategoryChecked: localStorage.getItem('isSubCategoryChecked') === 'true' || true,
-            isNameChecked: localStorage.getItem('isNameChecked') === 'true' || true,
-            isPriceChecked: localStorage.getItem('isPriceChecked') === 'true' || true,
-            isRatingChecked: localStorage.getItem('isRatingChecked') === 'true' || true,
-            isStockStatus: localStorage.getItem('isStockStatus') === 'true' || true,
-            isActionChecked: localStorage.getItem('isActionChecked') === 'true' || true,
-        };
-
-        setCheckboxes(savedCheckboxes);
-    }, []);
-
-    const store_data = (value) => {
-        let data = JSON.parse(localStorage.getItem('data2')) || [];
-
-        let id = data.length
-
-        value.id = id + 1;
-
-        if (value.status == 'active') {
-            value.status = true
-        } else {
-            value.status = false
-        }
-
-
-        value.image = "pencil_icon.png";
-
-        data.push(value);
-
-        localStorage.setItem('data2', JSON.stringify(data));
-
-        local_data()
-
-    };
-
+    // ************************************** Pagination **************************************
     const itemsPerPage = 10;
-    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
+    const [filteredData, setFilteredData] = useState(data);
 
-    const local_data = async () => {
-        const dataFromStorage = await JSON.parse(localStorage.getItem('data3'));
-        if (dataFromStorage) {
-            const total = Math.ceil(dataFromStorage.length / itemsPerPage);
-            setTotalPages(total);
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-
-            setData(dataFromStorage.slice(startIndex, endIndex));
-        }
-    };
-
-    useEffect(() => {
-        local_data();
-    }, [currentPage]);
-
-
-    const [image, setImage] = useState(null);
-
-    const init = {
-        name: "",
-        status: ""
-    };
-
-    const validation = Yup.object({
-        name: Yup.string().min(2, "Enter At least 2 characters").max(15, "Too Long For Category").required("Category Must Be required"),
-    });
-
-    let { handleBlur, handleChange, handleSubmit, handleReset, touched, errors, values } = useFormik({
-        initialValues: init,
-        validationSchema: validation,
-        onSubmit: (value) => {
-            store_data(value)
-            handleReset();
-        }
-    });
-
-    const handleImageChange = (event) => {
-        const file = event.currentTarget.files[0];
-        setImage(file);
-    };
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return;
-        setCurrentPage(newPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
     };
 
     const getPaginationButtons = () => {
         const buttons = [];
-        const maxButtonsToShow = 3;
-        let startPage = Math.max(currentPage - 1, 1);
-        let endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
-
+        const maxButtonsToShow = 5;
+        
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+        
+        // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(endPage - maxButtonsToShow + 1, 1);
+            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
 
+        // Add first page if not included
+        if (startPage > 1) {
+            buttons.push(1);
+            if (startPage > 2) buttons.push('...');
+        }
+
+        // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
 
+        // Add last page if not included
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) buttons.push('...');
+            buttons.push(totalPages);
+        }
         return buttons;
     };
 
-    
+    const paginatedData = filteredData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+    // *******************************************************************************
 
-    const handleCheckboxChange = (e) => {
-        const { name, checked } = e.target;
-
-        setCheckboxes((prevCheckboxes) => {
-            const updatedCheckboxes = {
-                ...prevCheckboxes,
-                [name]: checked,
-            };
-
-            localStorage.setItem(name, checked);
-
-            return updatedCheckboxes;
-        });
-    };
-
-    let { open, setopen } = props;
-
-    // Sort Functions
-    const [filteredData, setFilteredData] = useState(data1);
-
-    const sortByName = () => {
-        const sortedData = [...filteredData].sort((a, b) => a.name.localeCompare(b.name));
-        setFilteredData(sortedData);
-        setCurrentPage(1);
-    };
-
-    const sortByPriceLowToHigh = () => {
-        const sortedData = [...filteredData].sort((a, b) => parseFloat(a.price.replace('$', '')) - parseFloat(b.price.replace('$', '')));
-        setFilteredData(sortedData);
-        setCurrentPage(1);
-    };
-
-    const sortByPriceHighToLow = () => {
-        const sortedData = [...filteredData].sort((a, b) => parseFloat(b.price.replace('$', '')) - parseFloat(a.price.replace('$', '')));
-        setFilteredData(sortedData);
-        setCurrentPage(1);
-    };
-
-    const filterByLowStock = () => {
-        const lowStockData = data1.filter(item => parseInt(item.qty) < 20);
-        setFilteredData(lowStockData);
-        setCurrentPage(1);
-    };
-
-    const filterByInStock = () => {
-        const inStockData = data1.filter(item => item.status === true);
-        setFilteredData(inStockData);
-        setCurrentPage(1);
-    };
-
-    // Pagenation
-    const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
+    // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow3, setModalShow3] = React.useState(false);
 
@@ -350,7 +232,7 @@ const Product = (props) => {
                                                         <div className="mv_input_content mt-3">
                                                             <label className='mv_offcanvas_filter_category'>Category</label>
                                                             <Form.Select className="mb-4" aria-label="Default select example">
-                                                                <option>Select Category</option>
+                                                                <option>Select</option>
                                                                 <option value="1">Vegetable</option>
                                                                 <option value="2">Fruit</option>
                                                             </Form.Select>
@@ -358,23 +240,23 @@ const Product = (props) => {
                                                         <div className="mv_input_content mt-3">
                                                             <label className='mv_offcanvas_filter_category'>Subcategory</label>
                                                             <Form.Select className="mb-4" aria-label="Default select example">
-                                                                <option>Select Subcategory</option>
+                                                                <option>Select</option>
                                                                 <option value="1">One</option>
                                                                 <option value="2">Two</option>
                                                                 <option value="3">Three</option>
                                                             </Form.Select>
                                                         </div>
                                                         <div className="mv_input_content">
-                                                            <label className='mv_offcanvas_filter_category'>Status</label>
+                                                            <label className='mv_offcanvas_filter_category'>Stock Status</label>
                                                             <Form.Select className="mb-4" aria-label="Default select example">
-                                                                <option>Select Status</option>
-                                                                <option value="1">One</option>
-                                                                <option value="2">Two</option>
-                                                                <option value="3">Three</option>
+                                                                <option>Select</option>
+                                                                <option value="In Stock">In Stock</option>
+                                                                <option value="Low Stock">Low Stock</option>
+                                                                <option value="Out of Stock">Out of Stock</option>
                                                             </Form.Select>
                                                         </div>
                                                         <label className='mv_offcanvas_filter_category'>Price</label>
-                                                        {/* <div className="mv_price_range">
+                                                        <div className="mv_price_range">
                                                             <ReactSlider
                                                                 className="mv_horisilder"
                                                                 thumbClassName="mv_thumb"
@@ -396,7 +278,7 @@ const Product = (props) => {
                                                             <div className="mv_price_label mv_price_max" style={{ left: `${(priceRange[1] / 300) * 100}%` }}>
                                                                 ${priceRange[1]}
                                                             </div>
-                                                        </div> */}
+                                                        </div>
                                                     </div>
                                                     <div className='mv_offcanvas_bottom_button'>
                                                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
@@ -412,7 +294,7 @@ const Product = (props) => {
                                             </Offcanvas>
                                         </div>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <button><Link to='/add_product'>+ Add</Link></button>
+                                            <Link to='/add_product'><button>+ Add</button></Link>
                                         </div>
                                     </div>
                                 </div>
@@ -421,65 +303,59 @@ const Product = (props) => {
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
-                                        {checkboxes.isIDChecked && <th className=''>ID</th>}
-                                        {checkboxes.isCategoryChecked && <th className=''>Main Category</th>}
-                                        {checkboxes.isSubCategoryChecked && <th className=''>Category</th>}
-                                        {checkboxes.isNameChecked && <th className=''>Product Name</th>}
-                                        {checkboxes.isPriceChecked && <th className=''>Price</th>}
-                                        {checkboxes.isRatingChecked && <th className=''>Rating</th>}
-                                        {checkboxes.isStockStatus && <th className=''>Stock Status</th>}
-                                        {checkboxes.isActionChecked && <th className=''>Action</th>}
+                                            <th className=''>ID</th>
+                                            <th className=''>Main Category</th>
+                                            <th className=''>Category</th>
+                                            <th className=''>Product Name</th>
+                                            <th className=''>Price</th>
+                                            <th className=''>Rating</th>
+                                            <th className=''>Stock Status</th>
+                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.map((item, index) => (
+                                        {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            {checkboxes.isIDChecked && <td>{item.id}</td>}
-                                            {checkboxes.isCategoryChecked && <td>{item.category}</td>}
-                                            {checkboxes.isSubCategoryChecked && <td>{item.subcategory}</td>}
+                                            <td>{item.id}</td>
+                                            <td>{item.category}</td>
+                                            <td>{item.subcategory}</td>
                                             <td>
                                                 <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.productimg}`)}  alt="" />
                                                 {item.name}
                                             </td>
-                                            {checkboxes.isPriceChecked && <td>{item.price}</td>}
-                                            {checkboxes.isRatingChecked && 
+                                            <td>{item.price}</td>
                                             <td>
                                                 <div className='mv_rating_img'>
                                                 <FaStar className='mv_star_yellow'/>
                                                 {item.rating}
                                                 </div>
                                             </td>
-                                            }
-                                            {checkboxes.isStockStatus && (
-                                                <td>
-                                                    {
-                                                        item.stock === 'In Stock' ? (
-                                                            <p className='m-0 mv_delivered_padd'>{item.stock}</p>
-                                                        ) : item.stock === 'Low Stock' ? (
-                                                            <p className='m-0 mv_pending_padd'>{item.stock}</p>
-                                                        ) : item.stock === 'Out of Stock' ? (
-                                                            <p className='m-0 mv_cancelled_padd'>{item.stock}</p>
-                                                        ) : null
-                                                    }
-                                                </td>
-                                            )}
-                                            {checkboxes.isActionChecked && (
-                                                <td className='d-flex align-items-center'>
-                                                    <div className="mv_pencil_icon">
-                                                        <Link>
-                                                            <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon">
-                                                        <Link>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                                </td>
-                                            )}
+                                            <td>
+                                                {
+                                                    item.stock === 'In Stock' ? (
+                                                        <p className='m-0 mv_delivered_padd'>{item.stock}</p>
+                                                    ) : item.stock === 'Low Stock' ? (
+                                                        <p className='m-0 mv_pending_padd'>{item.stock}</p>
+                                                    ) : item.stock === 'Out of Stock' ? (
+                                                        <p className='m-0 mv_cancelled_padd'>{item.stock}</p>
+                                                    ) : null
+                                                }
+                                            </td>
+                                            <td className='d-flex align-items-center justify-content-end'>
+                                                <div className="mv_pencil_icon">
+                                                    <Link>
+                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                    </Link>
+                                                </div>
+                                                <div className="mv_pencil_icon">
+                                                    <Link>
+                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                    </Link>
+                                                </div>
+                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                </div>
+                                            </td>
                                         </tr>
                                         ))}
                                     </tbody>
@@ -506,31 +382,14 @@ const Product = (props) => {
                 </div>
             </div>
 
-
             {/* Delete Product Model */}
             <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete?</h5>
-                    <p>Are you sure you want to delete<br /> Product?</p>
+                    <p>Are you sure you want to delete Premium Saree ?</p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>
-                        </div>
-                        <div className="mv_logout_button">
-                            <button>Delete</button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
-
-            {/* Delete All Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow3} onHide={() => setModalShow3(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
-                <Modal.Body className='text-center mv_logout'>
-                    <h5 className='mb-2'>Delete?</h5>
-                    <p>Are you sure you want to delete<br />all Product?</p>
-                    <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
-                        <div className="mv_logout_cancel">
-                            <button onClick={() => setModalShow3(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
                             <button>Delete</button>

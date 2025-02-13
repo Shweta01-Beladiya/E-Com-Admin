@@ -1,9 +1,9 @@
 /******* Logout Model *******/
-.css-7mxpdy-MuiPaper-root-MuiAppBar-root{
+.css-1ehdk56-MuiPaper-root-MuiAppBar-root{
     z-index: 11 !important;
 }
 .css-zxdg2z{
-    height: 950px !important;
+    height: 100vh !important;
 }
 .mv_logout{
     padding: 30px 80px;

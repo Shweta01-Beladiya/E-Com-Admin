@@ -30,10 +30,6 @@ const Viewprofile = () => {
         handle_onload();
     }, []);
 
-    let change_edit = () => {
-        setisedit(!isedit);
-    };
-
     let handlesubmit = (event) => {
         event.preventDefault();
 
@@ -76,10 +72,10 @@ const Viewprofile = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-          const imageURL = URL.createObjectURL(file); // Create a temporary URL for the uploaded image
-          setProfileImage(imageURL); // Update the state with the new image
+          const imageURL = URL.createObjectURL(file);
+          setProfileImage(imageURL);
         }
-      };
+    };
 
     return (
         <>
@@ -253,7 +249,7 @@ const Viewprofile = () => {
                                                             <button className='border-0 bg-transparent'>
                                                                 Cnacel
                                                             </button>
-                                                            <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                            <button className='border-0 bg-transparent'>
                                                                 Update
                                                             </button>
                                                         </div>
@@ -317,7 +313,7 @@ const Viewprofile = () => {
                                                     <button className='border-0 bg-transparent'>
                                                         Cnacel
                                                     </button>
-                                                    <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                    <button className='border-0 bg-transparent'>
                                                         Reset Password
                                                     </button>
                                                 </div>

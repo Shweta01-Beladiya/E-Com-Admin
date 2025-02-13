@@ -24,6 +24,12 @@ import MainCategory from './Pages/Maincategory';
 import Category from './Pages/Category';
 import SubCategory from './Pages/Subcategory';
 import Viewprofile from './Pages/Viewprofile';
+
+import Viewproductoffer from './Pages/view_product_offer';
+import Offer from './Pages/offfer';
+import Addoffer from './Pages/add_offer';
+import Viewoffer from './Pages/view_offer';
+
 import Help from './Pages/Help';
 import ContactUs from './Pages/ContactUs';
 import ViewContact from './Pages/ViewContact';
@@ -61,9 +67,15 @@ function App() {
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
             <Route path='/Productoffer' element={<Productoffer />}></Route>
             <Route path='/addproductoffer' element={<Addproductoffer />}></Route>
+            <Route path='/viewproductoffer' element={<Viewproductoffer />}></Route>
+            <Route path='/offer' element={<Offer />}></Route>
+            <Route path='/addoffer' element={<Addoffer />}></Route>
+            <Route path='/viewoffer' element={<Viewoffer />}></Route>
+
             <Route path='/help' element={<Help />}></Route>
             <Route path='/ContactUs' element={<ContactUs />}></Route>
             <Route path='/ViewContact' element={<ViewContact />}></Route>
+
           </Route>
         </Routes>
       </BrowserRouter>
