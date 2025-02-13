@@ -6,6 +6,29 @@ import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+
+    [theme.breakpoints.down('md')]: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      height: '100vh', 
+      display: 'block',
+      width: '100%', 
+      marginLeft: 0,
+    },
+  })
+);
+
+
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -17,7 +40,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const Layout = () => {
   const theme = useTheme();
 
-  const isLargeScreen = useMediaQuery('(min-width:769px)');
+  const isLargeScreen = useMediaQuery('(min-width:600px)');
   const [open, setOpen] = React.useState(isLargeScreen);
 
 
@@ -42,10 +65,10 @@ const Layout = () => {
         handleDrawerClose={handleDrawerClose} 
         theme={theme} 
       />
-      <Box component="main" sx={{ flexGrow: 1, p: 3}} style={{backgroundColor:'#F7F7F7'}}>
+      <Main open={open} style={{ backgroundColor: '#F7F7F7' }}>
         <DrawerHeader />
         <Outlet />
-      </Box>
+      </Main>
     </Box>
   );
 };

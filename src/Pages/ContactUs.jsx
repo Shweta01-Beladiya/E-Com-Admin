@@ -101,30 +101,6 @@ const ContactUs = () => {
 
     localStorage.setItem('data3', JSON.stringify(data1))
 
-    const store_data = (value) => {
-        let data = JSON.parse(localStorage.getItem('data2')) || [];
-
-        let id = data.length
-
-        value.id = id + 1;
-
-        if (value.status === 'active') {
-            value.status = true
-        } else {
-            value.status = false
-        }
-
-
-        value.image = "pencil_icon.png";
-
-        data.push(value);
-
-        localStorage.setItem('data2', JSON.stringify(data));
-
-        local_data()
-
-    };
-
     const itemsPerPage = 10;
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -188,10 +164,15 @@ const ContactUs = () => {
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
+    const [viewModal,setViewModal] = useState(false);
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const handleViewClose = () => setViewModal(false);
+    const handleViewShow = () => setViewModal(true);
+
     return (
         <>
             <div id='mv_container_fluid'>
@@ -281,10 +262,8 @@ const ContactUs = () => {
                                                 <td>{item.subject}</td>
                                                 <td>{item.message}</td>
                                                 <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon">
-                                                        <Link to={'/ViewContact'}>
+                                                    <div className="mv_pencil_icon" onClick={handleViewShow}>
                                                             <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                        </Link>
                                                     </div>
                                                     <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
                                                         <img src={require('../mv_img/trust_icon.png')} alt="" />
@@ -316,8 +295,38 @@ const ContactUs = () => {
                 </div>
             </div>
 
+        {/* View Contect us model */}
+            <Modal className='mv_logout_dialog' show={viewModal} onHide={handleViewClose} centered >
+                <Modal.Header closeButton>
+                    <h6 className='fw-bold mb-0'>Contact Details</h6>
+                </Modal.Header>
+                <Modal.Body>
+                    <table className='sb_table'>
+                        <tr>
+                            <td>Name:</td>
+                            <td>Mitesh Shah</td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td>mitesh@gmail.com</td>
+                        </tr>
+                        <tr>
+                            <td>Contact No:</td>
+                            <td>+91 9685968520</td>
+                        </tr>
+                        <tr>
+                            <td>Subject:</td>
+                            <td>General inquiry</td>
+                        </tr>
+                        <tr>
+                            <td>Message:</td>
+                            <td>Lorem Ipsum ifgdb hck</td>
+                        </tr>
+                    </table>
+                </Modal.Body>
+            </Modal>
 
-            {/* Delete Unit Model */}
+            {/* Delete Contect Us Model */}
             <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
