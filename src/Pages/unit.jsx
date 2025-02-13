@@ -203,11 +203,6 @@ const Unit = (props) => {
                                                     />
                                             </td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                {/* <div className="mv_pencil_icon">
-                                                    <Link>
-                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                    </Link>
-                                                </div> */}
                                                 <div className="mv_pencil_icon" onClick={() => setModalShow2(true)}>
                                                     <Link>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
@@ -221,23 +216,23 @@ const Unit = (props) => {
                                         ))}
                                     </tbody>
                                 </table>
-                                {totalPages > 1 && (
-                                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                            <MdOutlineKeyboardArrowLeft />
-                                        </p>
-                                        {getPaginationButtons().map((page, index) => (
-                                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                onClick={() => handlePageChange(page)}>
-                                                {page}
-                                            </p>
-                                        ))}
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                            <MdOutlineKeyboardArrowRight />
-                                        </p>
-                                    </div>
-                                )}
                             </div>
+                            {totalPages > 1 && (
+                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                        <MdOutlineKeyboardArrowLeft />
+                                    </p>
+                                    {getPaginationButtons().map((page, index) => (
+                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                            onClick={() => handlePageChange(page)}>
+                                            {page}
+                                        </p>
+                                    ))}
+                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                        <MdOutlineKeyboardArrowRight />
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -271,7 +266,7 @@ const Unit = (props) => {
                 <Modal.Body className='mv_edit_profile_model_padd'>
                     <form>
                         <div className="mv_input_content">
-                            <label className='mv_edit_profile_label'>Name</label>
+                            <label className='mv_label_input'>Name</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     placeholder="Enter unit name"
@@ -282,7 +277,7 @@ const Unit = (props) => {
                             </InputGroup>
                         </div>
                         <div className="mv_input_content mb-5">
-                            <label className='mv_edit_profile_label'>Short Name</label>
+                            <label className='mv_label_input'>Short Name</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     placeholder="Enter short name"
@@ -315,7 +310,7 @@ const Unit = (props) => {
                 <Modal.Body className='mv_edit_profile_model_padd'>
                     <form>
                         <div className="mv_input_content">
-                            <label className='mv_edit_profile_label'>Name</label>
+                            <label className='mv_label_input'>Name</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     placeholder="Enter unit name"
@@ -326,7 +321,7 @@ const Unit = (props) => {
                             </InputGroup>
                         </div>
                         <div className="mv_input_content mb-5">
-                            <label className='mv_edit_profile_label'>Short Name</label>
+                            <label className='mv_label_input'>Short Name</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     placeholder="Enter short name"

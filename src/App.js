@@ -33,8 +33,16 @@ import Viewoffer from './Pages/view_offer';
 import Help from './Pages/Help';
 import ContactUs from './Pages/ContactUs';
 import ViewContact from './Pages/ViewContact';
-import Login from './Pages/Login';
+import Login from './Pages/login';
 import ReviewManagement from './Pages/Review';
+import Returnorder from './Pages/return_order';
+import Viewstatus from './Pages/view_status';
+import Cancelorder from './Pages/cancel_order';
+import Reasonforcancellation from './Pages/reason_for_cancellation';
+import Termsconditions from './Pages/termsconditions';
+import Viewtermsconditions from './Pages/view_termsconditions';
+import Faqs from './Pages/faqs';
+import Accountpolicy from './Pages/account_policy';
 
 
 function App() {
@@ -75,6 +83,15 @@ function App() {
             <Route path='/help' element={<Help />}></Route>
             <Route path='/ContactUs' element={<ContactUs />}></Route>
             <Route path='/ViewContact' element={<ViewContact />}></Route>
+
+            <Route path='/returnorder' element={<Returnorder />}></Route>
+            <Route path='/viewstatus' element={<Viewstatus />}></Route>
+            <Route path='/cancelorder' element={<Cancelorder />}></Route>
+            <Route path='/reasonforcancellation' element={<Reasonforcancellation />}></Route>
+            <Route path='/termsconditions' element={<Termsconditions />}></Route>
+            <Route path='/viewtermsconditions' element={<Viewtermsconditions />}></Route>
+            <Route path='/faqs' element={<Faqs />}></Route>
+            <Route path='/accountpolicy' element={<Accountpolicy />}></Route>
 
           </Route>
         </Routes>

@@ -273,7 +273,7 @@ const Productoffer = (props) => {
                                                         </Form.Select>
                                                     </div>
                                                     <div>
-                                                        <label className='mv_offcanvas_filter_category'>Main Category</label>
+                                                        <label className='mv_offcanvas_filter_category'>Start Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
@@ -394,30 +394,30 @@ const Productoffer = (props) => {
                                         ))}
                                     </tbody>
                                 </table>
-                                {totalPages > 1 && (
-                                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                            <MdOutlineKeyboardArrowLeft />
-                                        </p>
-                                        {getPaginationButtons().map((page, index) => (
-                                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                onClick={() => handlePageChange(page)}>
-                                                {page}
-                                            </p>
-                                        ))}
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                            <MdOutlineKeyboardArrowRight />
-                                        </p>
-                                    </div>
-                                )}
                             </div>
+                            {totalPages > 1 && (
+                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                        <MdOutlineKeyboardArrowLeft />
+                                    </p>
+                                    {getPaginationButtons().map((page, index) => (
+                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                            onClick={() => handlePageChange(page)}>
+                                            {page}
+                                        </p>
+                                    ))}
+                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                        <MdOutlineKeyboardArrowRight />
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Delete Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            {/* <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
                     <p>Are you sure you want to delete <br /> coupon?</p>
@@ -430,7 +430,7 @@ const Productoffer = (props) => {
                         </div>
                     </div>
                 </Modal.Body>
-            </Modal>
+            </Modal> */}
         </>
     );
 };

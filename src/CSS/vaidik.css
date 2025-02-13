@@ -17,9 +17,9 @@
     background-color: #FDFDFD !important;
 }
 .mv_main_heading p{
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 600;
-    line-height: 31.47px;
+    /* line-height: 31.47px; */
     color: #2B221E;
 }
 .mv_revenue_item{
