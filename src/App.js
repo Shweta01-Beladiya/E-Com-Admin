@@ -19,16 +19,23 @@ import Coupon from './Pages/coupon';
 import Addcoupon from './Pages/add_coupon';
 import Productoffer from './Pages/product_offer';
 import Addproductoffer from './Pages/add_product_offer';
-import Login from './Pages/Login';
 import DeactivatedAccount from './Pages/DeactivatedAccount';
 import MainCategory from './Pages/Maincategory';
 import Category from './Pages/Category';
 import SubCategory from './Pages/Subcategory';
 import Viewprofile from './Pages/Viewprofile';
+
 import Viewproductoffer from './Pages/view_product_offer';
 import Offer from './Pages/offfer';
 import Addoffer from './Pages/add_offer';
 import Viewoffer from './Pages/view_offer';
+
+import Help from './Pages/Help';
+import ContactUs from './Pages/ContactUs';
+import ViewContact from './Pages/ViewContact';
+import Login from './Pages/Login';
+import ReviewManagement from './Pages/Review';
+
 
 function App() {
   return (
@@ -54,7 +61,7 @@ function App() {
             <Route path='/addsize' element={<Addsize />}></Route>
             <Route path='/stock' element={<Stock />}></Route>
             <Route path='/addstock' element={<Addstock />}></Route>
-            {/* <Route path="/riyansee" element={<Riyansee/>}></Route> */}
+      <Route path='/review' element={<ReviewManagement />}></Route>
             <Route path="/DeactivateAccount" element={<DeactivatedAccount/>}></Route>
             <Route path='/coupon' element={<Coupon />}></Route>
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
@@ -64,6 +71,11 @@ function App() {
             <Route path='/offer' element={<Offer />}></Route>
             <Route path='/addoffer' element={<Addoffer />}></Route>
             <Route path='/viewoffer' element={<Viewoffer />}></Route>
+
+            <Route path='/help' element={<Help />}></Route>
+            <Route path='/ContactUs' element={<ContactUs />}></Route>
+            <Route path='/ViewContact' element={<ViewContact />}></Route>
+
           </Route>
         </Routes>
       </BrowserRouter>

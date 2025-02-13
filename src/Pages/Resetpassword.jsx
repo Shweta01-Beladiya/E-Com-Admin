@@ -6,17 +6,21 @@ import { Box, Button, IconButton, InputAdornment, TextField, Typography } from "
 import Animation from "./Animaton";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ResetPasswordSchema = Yup.object().shape({
-  password: Yup.string()
+  newPassword: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    confirmPassword: Yup.string()
+    .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
     .required("Confirm Password is required"),
 });
 
 const ResetPassword = () => {
+
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const userId = localStorage.getItem('userId');
 
   const navigate = useNavigate();
 
@@ -24,17 +28,22 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const initialValues = {
-    password: "",
+    newPassword: "",
     confirmPassword: "",
   };
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleSubmit = async(values) => {
+    try {
+      const response = await axios.post(`${BaseUrl}/api/resetPassword/${userId}`, values);
+      // console.log("response",response.data);
+      if(response.data.status === 200) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Password Reset Error:', error);
+    }
   };
 
-  const handleSendOtp = () => {
-    navigate('/dashboard');
-  }
 
   return (
     <div className='relative sb_line'>
@@ -61,15 +70,15 @@ const ResetPassword = () => {
                       <Field
                         as={TextField}
                         fullWidth
-                        name="password"
+                        name="newPassword"
                         label="Password"
                         type={showPassword ? 'text' : 'password'}
                         margin="normal"
-                        error={touched.password && Boolean(errors.password)}
-                        helperText={touched.password && errors.password}
+                        error={touched.newPassword && Boolean(errors.newPassword)}
+                        helperText={touched.newPassword && errors.newPassword}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.password}
+                        value={values.newPassword}
                         InputProps={{
                           endAdornment: (
                             <InputAdornment position="end">
@@ -118,7 +127,6 @@ const ResetPassword = () => {
                         fullWidth
                         sx={{ mt: 3 }}
                         style={{ backgroundColor: '#2B221E', color: '#fff', padding: '10px 0' }}
-                        onClick={handleSendOtp}
                       >
                       Reset Password
                       </Button>
