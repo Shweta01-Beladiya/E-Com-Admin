@@ -33,8 +33,11 @@ import Viewoffer from './Pages/view_offer';
 import Help from './Pages/Help';
 import ContactUs from './Pages/ContactUs';
 import ViewContact from './Pages/ViewContact';
-import Login from './Pages/Login';
+import Login from './Pages/login';
 import ReviewManagement from './Pages/Review';
+import OrderManagement from './Pages/Order';
+import OrderDetail from './Component/Orderdetails';
+
 
 
 function App() {
@@ -61,7 +64,9 @@ function App() {
             <Route path='/addsize' element={<Addsize />}></Route>
             <Route path='/stock' element={<Stock />}></Route>
             <Route path='/addstock' element={<Addstock />}></Route>
-      <Route path='/review' element={<ReviewManagement />}></Route>
+            <Route path="/order" element={<OrderManagement/>}></Route>
+            <Route path="/order/:id" element={<OrderDetail/>}></Route>
+            <Route path='/review' element={<ReviewManagement />}></Route>
             <Route path="/DeactivateAccount" element={<DeactivatedAccount/>}></Route>
             <Route path='/coupon' element={<Coupon />}></Route>
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
