@@ -6,8 +6,12 @@ import { Button, TextField, InputAdornment, Box, Typography, IconButton } from '
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { BsTelephoneFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
+
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  // console.log("BaseUrl",BaseUrl);
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -22,13 +26,29 @@ const Login = () => {
       .matches(/^[0-9]+$/, "Mobile number must contain only digits")
       .min(10, "Mobile number must be at least 10 digits")
       .required("Mobile Number is Required"),
-    
+
     password: Yup.string()
       .required("Password is required"),
   });
-  
-  const handleSubmit = (values) => {
-    console.log('Form values:', values);
+
+  const handleSubmit = async (values) => {
+    try {
+      // console.log("values", values);
+
+      const response = await axios.post(`${BaseUrl}/api/login`, values);
+      // console.log("response", response.data.user._id);
+      const token = response.data.token;
+      const userId = response.data.user._id;
+
+      if (response.data.status === 200) {
+          localStorage.setItem('token',token);
+          localStorage.setItem('userId',userId);
+          navigate('/dashboard');
+      }
+
+    } catch (error) {
+      console.error('Login Error:', error);
+    }
   };
 
   const handleNavigate = () => {
@@ -44,7 +64,7 @@ const Login = () => {
           <div className='col-lg-7 col-12 p-0 s_animation_top' >
             <div className="d-flex justify-content-center align-items-center vh-100 md:bg-light bg-transparent">
               <Box maxWidth={400} width="100%" p={4} style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
-                <Typography variant="h5" align="center" style={{fontWeight:'700',color:'#2B221E'}}>Login</Typography>
+                <Typography variant="h5" align="center" style={{ fontWeight: '700', color: '#2B221E' }}>Login</Typography>
                 <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
                   Login to your existing account!
                 </Typography>

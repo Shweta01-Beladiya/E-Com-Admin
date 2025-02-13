@@ -1,35 +1,62 @@
 import React, { useRef } from "react";
 import { Formik, Form, Field } from "formik";
 import { FormGroup } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../CSS/riyansee.css";
 import Animation from "./Animaton";
 import { Box, Button, Typography } from "@mui/material";
+import axios from "axios";
 
 const VerifyOTP = () => {
+
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+
   const navigate = useNavigate();
-  const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+  const location = useLocation();
 
-  const handleKeyDown = (e, index, setFieldValue) => {
-    if (e.key === 'Backspace') {
-      e.preventDefault(); 
+  // console.log("locartion",location);
+  const otp = location.state.otp;
+  const mobileNo = location.state.mobileNo;
 
-      if (e.target.value) {
-        setFieldValue(`otp${index + 1}`, '');
-      }
-      else if (index > 0) {
-        inputRefs[index - 1].current.focus();
-        setFieldValue(`otp${index}`, '');
-      }
-    }
-  };
+  // console.log("otp",otp);
+  // console.log("mobileNo",mobileNo);
+  
+  const inputRefs = useRef([]);
 
   const handleKeyUp = (e, index) => {
     if (e.target.value.length === 1 && index < 3) {
-      inputRefs[index + 1].current.focus();
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
+  const handleKeyDown = (e, index, setFieldValue) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      if (e.target.value) {
+        setFieldValue(`otp${index + 1}`, "");
+      } else if (index > 0) {
+        inputRefs.current[index - 1]?.focus();
+        setFieldValue(`otp${index}`, "");
+      }
+    }
+  };
+
+  const handleSubmit = async(values) => {
+    try {
+      const enteredOtp = values.otp1 + values.otp2 + values.otp3 + values.otp4;
+
+      const response = await axios.post(`${BaseUrl}/api/verifyOtp`,{
+        mobileNo:mobileNo,
+        otp:enteredOtp
+      });
+      console.log("response",response.data);
+      if(response.data.status === 200) {
+        navigate("/reset-password");
+      }
+    } catch (error) {
+      console.error('Verify Otp Error:', error);
+    }
+  }
   return (
     <div className='relative sb_line'>
       <div className='container-fluid'>
@@ -42,15 +69,11 @@ const VerifyOTP = () => {
             <Box maxWidth={400} width="100%" p={4} style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
                 <Typography variant="h5" align="center" style={{fontWeight:'700',color:'#2B221E'}}>Verify OTP</Typography>
                 <Typography variant="body2" align="center" style={{color:'#6A6A6A'}} gutterBottom>
-                  Code has been successfully to +91 55555 55555
+                  Code has been successfully to +91 {mobileNo}
                 </Typography>
                 <Formik
                   initialValues={{ otp1: "", otp2: "", otp3: "", otp4: "" }}
-                  onSubmit={(values) => {
-                    const otp = values.otp1 + values.otp2 + values.otp3 + values.otp4;
-                    console.log("OTP Submitted", otp);
-                    navigate("/reset-password");
-                  }}
+                  onSubmit={handleSubmit}
                 >
                   {({ setFieldValue }) => (
                     <Form>
@@ -65,7 +88,8 @@ const VerifyOTP = () => {
                               style={{ width: "60px", height: "60px", fontSize: "24px" }}
                               onKeyUp={(e) => handleKeyUp(e, index)}
                               onKeyDown={(e) => handleKeyDown(e, index, setFieldValue)}
-                              innerRef={inputRefs[index]}
+                              innerRef={(el) => (inputRefs.current[index] = el)}
+                              onInput={(e) => { e.target.value = e.target.value.replace(/\D/g, ''); }}
                             />
                           </FormGroup>
                         ))}
