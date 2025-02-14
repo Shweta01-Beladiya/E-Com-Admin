@@ -173,7 +173,7 @@ const Addoffer = () => {
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
-                                                <label className='mv_edit_profile_label'>Description Image</label>
+                                                <label className='mv_label_input'>Description Image</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
                                                         placeholder="Choose Image"

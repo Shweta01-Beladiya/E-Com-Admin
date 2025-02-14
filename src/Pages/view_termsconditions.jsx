@@ -2,88 +2,6 @@ import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 
 const Viewtermsconditions = (props) => {
-   
-    var data = [
-        {   
-            id: 1,
-            title: "Terms of use",
-            description: "Lorem ipsum dolor sit amet consectetur. Elit egestas faucibus porta ipsum  Elit egestas faucibus porta ipsum d...",
-        },
-        {   
-            id: 2,
-            title: "Conditions",
-            description: "Lorem ipsum dolor sit amet consectetur. Elit egestas faucibus porta ipsum  Elit egestas faucibus porta ipsum d...",
-        },
-    ];
-
-    // ************************************** Pagination **************************************
-    const itemsPerPage = 10;
-    const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
-
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
-
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= totalPages) {
-            setCurrentPage(newPage);
-        }
-    };
-
-    const getPaginationButtons = () => {
-        const buttons = [];
-        const maxButtonsToShow = 5;
-        
-        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-        
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
-        }
-
-        // Add first page if not included
-        if (startPage > 1) {
-            buttons.push(1);
-            if (startPage > 2) buttons.push('...');
-        }
-
-        // Add main page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
-        // Add last page if not included
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) buttons.push('...');
-            buttons.push(totalPages);
-        }
-        return buttons;
-    };
-
-    const paginatedData = filteredData.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-    // *******************************************************************************
-    
-    // Modal
-    const [modalShow, setModalShow] = React.useState(false);
-    const [modalShow1, setModalShow1] = React.useState(false);
-    const [modalShow2, setModalShow2] = React.useState(false);
-
-    const [values, setValues] = useState({
-        name: "",
-        name1: ""
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setValues({ ...values, [name]: value });
-    };
-
-    // State variables
-    let [description, setDescription] = useState("");
 
     return (
         <>
@@ -91,10 +9,10 @@ const Viewtermsconditions = (props) => {
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
                         <p className='mb-1'>View Terms & Conditions</p>
-                        <div className='d-flex align-items-center'>
+                        <div className='d-flex align-items-center mv_view_term_and_con'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
-                            <p className='mv_dashboard_heading mb-0 ms-1'>Terms & Conditions /</p>
-                            <p className='mv_category_heading mv_subcategory_heading mb-0'>View Terms & Conditions</p>
+                            <p className='mv_dashboard_heading mv_term_condi_heading mb-0 ms-1'>Terms & Conditions /</p>
+                            <p className='mv_category_heading mv_subcategory_heading mv_view_term_heading mb-0'>View Terms & Conditions</p>
                         </div>
                     </div>
                 </div>

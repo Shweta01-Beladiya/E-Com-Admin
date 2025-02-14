@@ -251,7 +251,7 @@ const Faqs = (props) => {
                             <label className='mv_label_input'>FAQ Question</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    placeholder="Enter FAQ Question"
+                                    placeholder="Enter FAQ question"
                                     name='name'
                                     value={values.name}
                                     onChange={handleChange}
@@ -264,7 +264,7 @@ const Faqs = (props) => {
                                 <Form.Control
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Enter Answer"
+                                    placeholder="Enter answer"
                                     as="textarea" 
                                     aria-label="With textarea"
                                     aria-describedby="basic-addon1"
@@ -297,7 +297,7 @@ const Faqs = (props) => {
                             <label className='mv_label_input'>FAQ Question</label>
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    placeholder="Enter FAQ Question"
+                                    placeholder="Enter FAQ question"
                                     name='name'
                                     value={values.name}
                                     onChange={handleChange}
@@ -310,7 +310,7 @@ const Faqs = (props) => {
                                 <Form.Control
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Enter Answer"
+                                    placeholder="Enter answer"
                                     as="textarea" 
                                     aria-label="With textarea"
                                     aria-describedby="basic-addon1"

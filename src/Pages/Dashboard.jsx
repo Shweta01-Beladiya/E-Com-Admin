@@ -93,7 +93,7 @@ const Dashboard = () => {
           breakpoint: 480,
           options: {
             chart: {
-              width: 250,
+              width: 220,
             },
           },
         },
@@ -255,10 +255,12 @@ const Dashboard = () => {
                     <p className="mb-0 mv_tsm_text">{item.amount}</p>
                   </div>
                 </div>
-                <div>
-                  <p className={item.change.startsWith("+") ? "mv_text_plus_per" : "mv_text_mainus_per"}>
-                    {item.change}
-                  </p>
+                <div className='mv_chart_per'>
+                  <div>
+                    <p className={item.change.startsWith("+") ? "mv_text_plus_per" : "mv_text_mainus_per"}>
+                      {item.change}
+                    </p>
+                  </div>
                   <div className="h-12 w-24" style={{ height: "50px", width: "100px" }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={getChartData(item.data)}>
@@ -290,11 +292,11 @@ const Dashboard = () => {
               </div>
               <div className='mv_sub_order_summary'>
                 <div className="row">
-                  {orderSummary.map((itrm, index) => (
-                    <div className="col-xl-3 col-lg-6 col-md-3 col-sm-6 mb-3" key={index}>
+                  {orderSummary.map((item, index) => (
+                    <div className="col-xxl-3 col-xl-3 col-lg-6 col-md-3 col-sm-6 mb-3" key={index}>
                       <div className="mv_on_deli_con">
-                        <p className="mv_on_deli_per mb-2">{itrm.percentage}%</p>
-                        <p className="mv_on_deli_text mb-0">{itrm.label}</p>
+                        <p className="mv_on_deli_per mb-2">{item.percentage}%</p>
+                        <p className="mv_on_deli_text mb-0">{item.label}</p>
                       </div>
                     </div>
                   ))}
@@ -349,7 +351,7 @@ const Dashboard = () => {
                 {review.map((item) => (
                   <div key={item.id}>
                     <div className='mv_main_review d-flex justify-content-between'>
-                      <div className='d-flex'>
+                      <div className='d-flex mv_review_name_img'>
                         <div className='mv_review_user_img'>
                           <img src={item.imgSrc} alt={item.name} />
                         </div>

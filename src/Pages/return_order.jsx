@@ -225,7 +225,7 @@ const Returnorder = (props) => {
                                     </InputGroup>
                                 </div>
                                 <div className='d-flex'>
-                                    <div className="mv_column_button mv_column_padd">
+                                    <div className="mv_column_button mv_view_status_padd">
                                         <Link to="/viewstatus"><Button>View Status</Button></Link>
                                     </div>
                                 </div>
