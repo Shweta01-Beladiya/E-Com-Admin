@@ -1,5 +1,5 @@
 // Header.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './header.css';
 import { styled } from '@mui/material/styles';
 import {
@@ -8,6 +8,7 @@ import {
   Typography,
   IconButton,
   Divider,
+  useMediaQuery,
 } from '@mui/material';
 import { FiMenu } from 'react-icons/fi';
 import Button from '@mui/material/Button';
@@ -36,17 +37,24 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
+  [theme.breakpoints.down('sm')]: {
+    transition: 'none',
+    marginLeft: 0,
+    width: '100%',
+  },
 }));
 
 
 const Header = ({ open, handleDrawerOpen }) => {
 
+  const isSmallScreen = useMediaQuery('(max-width:601px)');
 
   const BaseUrl = process.env.REACT_APP_BASEURL;
   const token = localStorage.getItem('token');
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [modalShow, setModalShow] = React.useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [modalShow, setModalShow] = useState(false);
+  const [data,setData] = useState({});
 
   const isMenuOpen = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -74,9 +82,9 @@ const Header = ({ open, handleDrawerOpen }) => {
         const response = await axios.get(`${BaseUrl}/api/getUser`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("Response", response.data);
-        console.log("Response", response.data.user);
-
+        // console.log("Response", response.data);
+        // console.log("Response", response.data.user);
+        setData(response.data.user);
       } catch (error) {
         console.error('Data Fetching Error:', error);
       }
@@ -86,7 +94,7 @@ const Header = ({ open, handleDrawerOpen }) => {
   }, []);
 
   return (
-    <AppBar position="fixed" open={open} sx={{ paddingRight: '0 !important' }}>
+    <AppBar position="fixed" disableTransition={isSmallScreen} open={open} sx={{ paddingRight: '0 !important' }}>
       <Toolbar className='bg-white text-black'>
         <IconButton
           color="inherit"
@@ -133,8 +141,8 @@ const Header = ({ open, handleDrawerOpen }) => {
                 <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-3' />
               </div>
               <div>
-                <p className='mb-0'><b>John Patel</b></p>
-                <p className='text-[#7D7D7D] mb-0'>example@gmail.com</p>
+                <p className='mb-0'><b>{data.name}</b></p>
+                <p className='text-[#7D7D7D] mb-0'>{data.email ? data.email : ''}</p>
               </div>
             </div>
           </MenuItem>

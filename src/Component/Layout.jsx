@@ -1,11 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+// Layout.jsx
+import React, { useEffect } from 'react';
+import { styled,useTheme } from '@mui/material/styles';
 import { Box, CssBaseline, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
-const drawerWidth = 280; 
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+
+    [theme.breakpoints.down('md')]: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      height: '100vh', 
+      display: 'block',
+      width: '100%', 
+      marginLeft: 0,
+    },
+  })
+);
+
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -17,46 +39,36 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const Layout = () => {
   const theme = useTheme();
-  const isLargeScreen = useMediaQuery('(min-width: 769px)');
-  const [open, setOpen] = useState(isLargeScreen);
 
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
+  const isLargeScreen = useMediaQuery('(min-width:600px)');
+  const [open, setOpen] = React.useState(isLargeScreen);
+
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     setOpen(isLargeScreen);
-  }, [isLargeScreen]);
+  },[isLargeScreen]);
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      
       <Header open={open} handleDrawerOpen={handleDrawerOpen} />
-      
-      <Sidebar
-        open={open}
-        handleDrawerClose={handleDrawerClose}
-        theme={theme}
-        sx={{
-          position: isLargeScreen ? 'relative' : 'absolute',
-          zIndex: isLargeScreen ? 'auto' : 1300,
-        }}
+      <Sidebar 
+        open={open} 
+        handleDrawerClose={handleDrawerClose} 
+        theme={theme} 
       />
-      
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          backgroundColor: '#F7F7F7',
-          transition: 'margin 0.3s ease-in-out',
-          // marginLeft: isLargeScreen ? (open ? `${drawerWidth}px` : '0px') : '0px', 
-          width: isLargeScreen ? `calc(100% - ${open ? drawerWidth : 0}px)` : '100%', 
-        }}
-      >
+      <Main open={open} style={{ backgroundColor: '#F7F7F7' }}>
         <DrawerHeader />
         <Outlet />
-      </Box>
+      </Main>
     </Box>
   );
 };

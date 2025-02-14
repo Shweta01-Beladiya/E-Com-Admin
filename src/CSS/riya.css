@@ -118,7 +118,7 @@ tr th{
   /* comman modal css */
   .r_modalheader{
     border-bottom: none !important;
-    padding: 5px !important;
+    /* padding: 5px !important; */
   }
   .r_modalbody{
     padding: 0px !important;  

@@ -35,6 +35,32 @@
      color: #2B221E !important;
   }
 
+  .css-e9yuqz-MuiDrawer-docked .MuiDrawer-paper {
+     overflow-y: clip;
+  }
+
+  .css-e9yuqz-MuiDrawer-docked .MuiDrawer-paper:hover {
+     overflow-y: scroll;
+     -webkit-scrollbar: 10px;
+  }
+
+  .css-e9yuqz-MuiDrawer-docked .MuiDrawer-paper::-webkit-scrollbar {
+     width: 4px;
+     height: 0px;
+  }
+
+  .css-e9yuqz-MuiDrawer-docked .MuiDrawer-paper::-webkit-scrollbar-track {
+     background: #f1f1f1;
+  }
+
+  .css-e9yuqz-MuiDrawer-docked .MuiDrawer-paper::-webkit-scrollbar-thumb {
+     background: #888;
+  }
+
+  .css-e9yuqz-MuiDrawer-docked .MuiDrawer-paper::-webkit-scrollbar-thumb:hover {
+     background: #555;
+  }
+
   .modal-backdrop {
      --bs-backdrop-zindex: 1220 !important;
   }
@@ -99,6 +125,20 @@
      --bs-offcanvas-zindex: 1220;
   }
 
+  .sb_table{
+   width: 100%;
+  }
+  .sb_table tr td:nth-child(1){
+      width: 50%;
+      color: #868686;
+      font-weight: bold;
+      padding: 5px 0;
+  }
+  .sb_table tr td:nth-child(2){
+      width: 50%;
+      color: #000000;
+      padding: 5px 0;
+  }
   @media (min-width:1990px) {
      .illustration-container svg {
         left: 26%;
@@ -148,6 +188,17 @@
 
      .sb_line::after {
         display: none;
+     }
+
+     .css-dca0j9-MuiDrawer-docked {
+        display: none;
+     }
+
+  }
+
+  @media (max-width:600px) {
+     .css-1lwhjos-MuiPaper-root-MuiDrawer-paper {
+        top: 57px !important;
      }
   }
 

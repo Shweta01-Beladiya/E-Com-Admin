@@ -43,6 +43,9 @@ import Termsconditions from './Pages/termsconditions';
 import Viewtermsconditions from './Pages/view_termsconditions';
 import Faqs from './Pages/faqs';
 import Accountpolicy from './Pages/account_policy';
+import OrderManagement from './Pages/Order';
+import OrderDetail from './Component/Orderdetails';
+
 
 
 function App() {
@@ -51,17 +54,17 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* <Route path='/' element={<LoginPage />}></Route> */}
-          <Route path='/' element={<Login/>}></Route>
+          <Route path='/' element={<Login />}></Route>
           <Route path='/verify-otp' element={<VerifyOTP />}></Route>
           <Route path='/forgot-password' element={<Forgotpassword />}></Route>
           <Route path='/reset-password' element={<ResetPassword />}></Route>
 
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<UserTable/>}/>
-            <Route path='/maincategory' element={<MainCategory/>}></Route>
-            <Route path='/category' element={<Category/>}></Route>
-            <Route path='/subcategory' element={<SubCategory/>}></Route>
+            <Route path="/users" element={<UserTable />} />
+            <Route path='/maincategory' element={<MainCategory />}></Route>
+            <Route path='/category' element={<Category />}></Route>
+            <Route path='/subcategory' element={<SubCategory />}></Route>
             <Route path='/view_profile' element={<Viewprofile />}></Route>
             <Route path="/product" element={<Product />}></Route>
             <Route path='/unit' element={<Unit />}></Route>
@@ -69,7 +72,10 @@ function App() {
             <Route path='/addsize' element={<Addsize />}></Route>
             <Route path='/stock' element={<Stock />}></Route>
             <Route path='/addstock' element={<Addstock />}></Route>
-      <Route path='/review' element={<ReviewManagement />}></Route>
+
+            <Route path="/order" element={<OrderManagement/>}></Route>
+            <Route path="/order/:id" element={<OrderDetail/>}></Route>
+            <Route path='/review' element={<ReviewManagement />}></Route>
             <Route path="/DeactivateAccount" element={<DeactivatedAccount/>}></Route>
             <Route path='/coupon' element={<Coupon />}></Route>
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
@@ -99,5 +105,5 @@ function App() {
     </div>
   );
 }
- 
+
 export default App;

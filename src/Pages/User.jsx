@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Table,
@@ -14,44 +14,43 @@ import {
 import { FaSearch } from 'react-icons/fa';
 import { FaFilter } from "react-icons/fa";
 import '../CSS/riya.css';
+import axios from 'axios';
 
 
 const UserTable = () => {
-  // Sample data
-  const initialData = [
-    { id: "01", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "02", name: "Riya Patel", mobile: "+91 85555 85555", dob: "27/09/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "03", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "25/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "04", name: "Riya Patel", mobile: "+91 85555 85555", dob: "12/07/1994", gender: "Other", email: "example@gmail.com" },
-    { id: "05", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "22/06/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "06", name: "Riya Patel", mobile: "+91 85555 85555", dob: "21/06/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "07", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "08", name: "Riya Patel", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "09", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "10", name: "Riya Patel", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "11", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "12", name: "Riya Patel", mobile: "+91 85555 85555", dob: "27/09/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "13", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "25/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "14", name: "Riya Patel", mobile: "+91 85555 85555", dob: "12/07/1994", gender: "Other", email: "example@gmail.com" },
-    { id: "15", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "22/06/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "16", name: "Riya Patel", mobile: "+91 85555 85555", dob: "21/06/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "17", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "18", name: "Riya Patel", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Female", email: "example@gmail.com" },
-    { id: "19", name: "Mitesh Shah", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Male", email: "example@gmail.com" },
-    { id: "20", name: "Riya Patel", mobile: "+91 85555 85555", dob: "02/09/1994", gender: "Female", email: "example@gmail.com" },
-  ];
 
-  // States
-  const [data, setData] = useState(initialData);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage] = useState(10);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [showFilter, setShowFilter] = useState(false);
-  const [selectedGenders, setSelectedGenders] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
 
+   // States
+   const [data, setData] = useState([]);
+   const [currentPage, setCurrentPage] = useState(1);
+   const [searchTerm, setSearchTerm] = useState("");
+   const [itemsPerPage] = useState(10);
+   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+   const [showFilter, setShowFilter] = useState(false);
+   const [selectedGenders, setSelectedGenders] = useState([]);
+   const [showDeleteModal, setShowDeleteModal] = useState(false);
+   const [userToDelete, setUserToDelete] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async() => {
+      try {
+        const response = await axios.get(`${BaseUrl}/api/getAllUsers`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const filteredData = response.data.user.filter(user => user.role === 'user');
+        setData(filteredData);
+        // console.log("response",response.data.user);
+        
+      } catch (error) {
+        console.error('Data fetching Error:',error);
+      }
+    }
+    fetchData();
+  },[]);
 
   // Filter functionality
   const filteredData = data.filter(item => {
@@ -133,6 +132,7 @@ const UserTable = () => {
 
   const handleClearFilter = () => {
     setSelectedGenders([]);
+    setShowFilter(false)
   };
 
   // Custom styles
@@ -208,18 +208,18 @@ const UserTable = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((item) => (
+                  {currentItems.map((item, index) => (
                     <tr key={item.id}>
-                      <td>{item.id}</td>
+                      <td>0{index +1}</td>
                       <td>{item.name}</td>
-                      <td>{item.mobile}</td>
-                      <td>{item.dob}</td>
+                      <td>{item.mobileNo}</td>
+                      <td>{item.dateOfBirth}</td>
                       <td>{item.gender}</td>
                       <td>{item.email}</td>
                       <td>
                         <button
                           className="r_deleticon"
-                          onClick={() => handleDelete(item.id, item.name)}
+                          onClick={() => handleDelete(item._id, item.name)}
                         >
                           {/* <FaTrash /> */}
                           <img src={require('../Photos/delet.png')} class="r_deletimg" ></img>
