@@ -1,53 +1,121 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Table, InputGroup, Col, Row } from "react-bootstrap";
 import '../CSS/riya.css';
 import { FaSearch } from 'react-icons/fa';
+import axios from "axios";
+import { Formik } from "formik";
+import * as Yup from 'yup';
 
 const MainCategory = () => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Women", status: true },
-    { id: 2, name: "Men", status: false },
-    { id: 3, name: "Baby & Kids", status: true },
-    { id: 4, name: "Beauty & Health", status: true },
-    { id: 5, name: "Electronics & Mobile", status: true },
-    { id: 6, name: "Sports", status: true },
-    { id: 7, name: "Luggage", status: true },
-    { id: 8, name: "Home & Kitchen", status: true },
-  ]);
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
 
+  const [categories, setCategories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [id, setId] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const handleAdd = (newCategory) => {
-    setCategories([
-      ...categories,
-      { id: categories.length + 1, name: newCategory, status: true },
-    ]);
-    setShowAddModal(false);
+  const categorySchema = Yup.object().shape({
+    mainCategoryName: Yup.string()
+      .min(2, 'Main Category name must be at least 2 characters')
+      .max(50, 'Main Category name must be less than 50 characters')
+      .required('Main Category name is required')
+  });
+
+  const initialValues = ({
+    mainCategoryName: ''
+  })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // console.log("response",response.data.users);
+        setCategories(response.data.users);
+      } catch (error) {
+        console.error('Data Fetching Error:', error);
+      }
+    }
+    fetchData();
+  }, [BaseUrl, token]);
+
+  const handleSubmit = async (value, { resetForm }) => {
+    try {
+      if (id) {
+        // console.log("id",id);
+
+        const response = await axios.put(`${BaseUrl}/api/updateMainCategory/${id}`, value, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // console.log("response",response.data);
+        if (response.data.status === 200) {
+          setCategories((prevCategories) =>
+            prevCategories.map((cat) =>
+              cat._id === id ? { ...cat, ...value } : cat
+            )
+          );
+          setId(null);
+          setShowEditModal(false);
+          resetForm();
+        }
+      } else {
+        const response = await axios.post(`${BaseUrl}/api/createMaincategory`, value, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        console.log("Response", response.data);
+        if (response.data.status === 201) {
+          setCategories((prevCategories) => [...prevCategories, response.data.maincategory]);
+          setShowAddModal(false);
+          resetForm();
+        }
+      }
+    } catch (error) {
+      console.error('Data create and update Error:', error);
+    }
   };
 
-  const handleEdit = (updatedCategory) => {
-    setCategories(
-      categories.map((cat) =>
-        cat.id === currentCategory.id
-          ? { ...cat, name: updatedCategory }
-          : cat
-      )
-    );
-    setShowEditModal(false);
-  };
-
-  const handleDelete = () => {
-    setCategories(categories.filter((cat) => cat.id !== currentCategory.id));
+  const handleDelete = async () => {
+    const response = await axios.delete(`${BaseUrl}/api/deleteMainCategory/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (response.data.status === 200) {
+      setCategories((prevCategories) =>
+        prevCategories.filter((cat) => cat._id !== id)
+      );
+      setShowDeleteModal(false);
+      setId(null);
+    }
+    // setCategories(categories.filter((cat) => cat.id !== currentCategory.id));
     setShowDeleteModal(false);
   };
 
+  const handleStatusChange = async (id, status) => {
+    try {
+
+      const updatedStatus = !status
+
+      const response = await axios.put(`${BaseUrl}/api/updateMainCategory/${id}`, { status: updatedStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.status === 200) {
+        setCategories((prevCategories) =>
+          prevCategories.map((cat) =>
+            cat._id === id ? { ...cat, status: updatedStatus } : cat
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Status Upadte error', error);
+    }
+  }
+
   const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+    cat?.mainCategoryName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -89,41 +157,34 @@ const MainCategory = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCategories.map((cat) => (
+            {filteredCategories.map((cat, index) => (
               <tr key={cat.id}>
-                <td>{cat.id.toString().padStart(2, "0")}</td>
-                <td>{cat.name}</td>
+                <td>0{index + 1}</td>
+                <td>{cat.mainCategoryName}</td>
                 <td>
                   <Form.Check
                     type="switch"
                     checked={cat.status}
-                    onChange={() =>
-                      setCategories(
-                        categories.map((c) =>
-                          c.id === cat.id ? { ...c, status: !c.status } : c
-                        )
-                      )
-                    }
+                    onChange={() => handleStatusChange(cat._id, cat.status)}
+
                   />
                 </td>
                 <td>
                   <Button
                     className="r_deleticon me-2"
                     onClick={() => {
-                      setCurrentCategory(cat);
+                      setId(cat._id);
+                      setSelectedCategory(cat);
                       setShowEditModal(true);
                     }}
                   >
-                    <img src={require('../Photos/edit.png')} class="r_deletimg" ></img>
+                    <img src={require('../Photos/edit.png')} alt="" class="r_deletimg" ></img>
                   </Button>
                   <Button
                     className="r_deleticon"
-                    onClick={() => {
-                      setCurrentCategory(cat);
-                      setShowDeleteModal(true);
-                    }}
+                    onClick={() => { setId(cat._id); setShowDeleteModal(true); }}
                   >
-                    <img src={require('../Photos/delet.png')} class="r_deletimg" ></img>
+                    <img src={require('../Photos/delet.png')} alt="" class="r_deletimg" ></img>
                   </Button>
                 </td>
               </tr>
@@ -133,39 +194,54 @@ const MainCategory = () => {
       </div>
 
       {/* Add Modal */}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
-        <Modal.Header closeButton className="r_modalheader">
-
-        </Modal.Header>
+      <Modal
+        show={showAddModal}
+        onHide={() => {
+          setShowAddModal(false);
+        }}
+        centered
+      >
+        <Modal.Header closeButton className="r_modalheader" />
         <Modal.Body className="r_modalbody">
           <p className="text-center fw-bold">Add Main Category</p>
-          <Form
-            className="r_form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const newCategory = e.target.elements.categoryName.value;
-              handleAdd(newCategory);
-            }}
+          <Formik
+            validationSchema={categorySchema}
+            onSubmit={handleSubmit}
+            initialValues={initialValues}
           >
-            <Form.Group >
-              <Form.Label>Main Category</Form.Label>
-              <Form.Control
-                type="text"
-                name="categoryName"
-                placeholder="Enter main category"
-                required
-              />
-            </Form.Group>
-            <div className='d-flex justify-content-center gap-3 mt-4'>
-              <Button variant="secondary" onClick={() => setShowAddModal(false)} className="r_cancel">
-                Cancel
-              </Button>
-              <Button variant="dark" type="submit" className="r_delete">
-                Add
-              </Button>
-            </div>
-
-          </Form>
+            {({ handleChange, handleSubmit, values, errors, touched }) => (
+              <Form className="r_form" onSubmit={handleSubmit}>
+                <Form.Group>
+                  <Form.Label>Main Category</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="mainCategoryName"
+                    placeholder="Enter main category"
+                    value={values.mainCategoryName}
+                    onChange={handleChange}
+                    isInvalid={touched.mainCategoryName && errors.mainCategoryName}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.mainCategoryName}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <div className='d-flex justify-content-center gap-3 mt-4'>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setShowAddModal(false);
+                    }}
+                    className="r_cancel"
+                  >
+                    Cancel
+                  </Button>
+                  <Button variant="dark" type="submit" className="r_delete">
+                    Add
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </Modal.Body>
       </Modal>
 
@@ -179,33 +255,41 @@ const MainCategory = () => {
         </Modal.Header>
         <Modal.Body className="r_modalbody">
           <p className="text-center fw-bold">Edit Main Category</p>
-          <Form
-            className="r_form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const updatedCategory = e.target.elements.categoryName.value;
-              handleEdit(updatedCategory);
+          <Formik
+            validationSchema={categorySchema}
+            onSubmit={handleSubmit}
+            initialValues={{
+              mainCategoryName: selectedCategory?.mainCategoryName || ''
             }}
+            enableReinitialize
           >
-            <Form.Group >
-              <Form.Label>Main Category</Form.Label>
-              <Form.Control
-                type="text"
-                name="categoryName"
-                defaultValue={currentCategory?.name}
-                required
-              />
-            </Form.Group>
-            <div className='d-flex justify-content-center gap-3 mt-4'>
-              <Button onClick={() => setShowEditModal(false)} className="r_cancel">
-                Cancel
-              </Button>
-              <Button type="submit" className="r_delete">
-                Update
-              </Button>
-            </div>
-
-          </Form>
+            {({ handleChange, handleSubmit, values, errors, touched }) => (
+              <Form className="r_form" onSubmit={handleSubmit}>
+                <Form.Group>
+                  <Form.Label>Main Category</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="mainCategoryName"
+                    placeholder="Enter main category"
+                    value={values.mainCategoryName}
+                    onChange={handleChange}
+                    isInvalid={touched.mainCategoryName && errors.mainCategoryName}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.mainCategoryName}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <div className='d-flex justify-content-center gap-3 mt-4'>
+                  <Button onClick={() => setShowEditModal(false)} className="r_cancel">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="r_delete">
+                    Update
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </Modal.Body>
       </Modal>
 
@@ -213,7 +297,7 @@ const MainCategory = () => {
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Body className=" p-5" >
           <h5 className='font-weight-bold text-center mb-3'>Delete</h5>
-          <p className='text-center text-muted mb-4'> Are you sure you want to delete {currentCategory?.name}?</p>
+          <p className='text-center text-muted mb-4'> Are you sure you want to delete?</p>
           <div className='d-flex justify-content-center gap-3 mt-4'>
             <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
               Cancel

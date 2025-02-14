@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Table, Button, Offcanvas, Modal, Form, Pagination, Row,
     Col, InputGroup,
@@ -6,8 +6,13 @@ import {
 import { FiFilter } from 'react-icons/fi';
 import { FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
+import axios from 'axios';
 
 const Category = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
     // Main categories for dropdown
     const mainCategories = [
         "Electronics",
@@ -18,21 +23,7 @@ const Category = () => {
     ];
 
     // State management
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 2, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 3, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        { id: 4, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 5, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 6, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        { id: 7, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 8, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 9, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        { id: 10, name: 'Smartphones', mainCategory: 'Electronics', status: 'Active' },
-        { id: 11, name: 'Laptops', mainCategory: 'Electronics', status: 'Inactive' },
-        { id: 12, name: 'T-Shirts', mainCategory: 'Fashion', status: 'Active' },
-        // Add more sample data as needed
-    ]);
+    const [categories, setCategories] = useState([]);
 
     const [showFilter, setShowFilter] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -54,6 +45,21 @@ const Category = () => {
     });
     const [searchTerm, setSearchTerm] = useState('');
 
+
+    useEffect(() => {
+        const fetchData = async() => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                    headers: {Authorization: `Bearer ${token}`}
+                });
+                // console.log("response",response.data);
+                setCategories(response.data.category);
+            } catch (error) {
+                console.error('Data fetching Error:',error);
+            }
+        }
+        fetchData();
+    },[BaseUrl, token]);
     // Search handler
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -63,8 +69,8 @@ const Category = () => {
     // Modified filter logic to include search
     const filteredCategories = categories.filter((cat) => {
         const matchesSearch =
-            cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            cat.mainCategory.toLowerCase().includes(searchTerm.toLowerCase());
+            cat.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            cat.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesFilters =
             (!filters.mainCategory || cat.mainCategory === filters.mainCategory) &&
@@ -217,11 +223,12 @@ const Category = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((category) => (
+                        {currentItems.map((category,index) => (
+                            
                             <tr key={category.id}>
-                                <td>{category.id}</td>
-                                <td>{category.mainCategory}</td>
-                                <td>{category.name}</td>
+                                <td>0{index + 1}</td>
+                                <td>{category.mainCategoryData[0].mainCategoryName}</td>
+                                <td>{category.categoryName}</td>
 
                                 <td>
                                     <Form.Check
@@ -242,7 +249,7 @@ const Category = () => {
                                             setShowEditModal(true);
                                         }}
                                     >
-                                        <img src={require('../Photos/edit.png')} class="r_deletimg"></img>
+                                        <img src={require('../Photos/edit.png')} class="r_deletimg" alt=''></img>
                                         {/* <FiEdit size={18} /> */}
                                     </Button>
                                     <Button
@@ -252,7 +259,7 @@ const Category = () => {
                                             setShowDeleteModal(true);
                                         }}
                                     >
-                                        <img src={require('../Photos/delet.png')} class="r_deletimg"></img>
+                                        <img src={require('../Photos/delet.png')} class="r_deletimg" alt=''></img>
                                         {/* <FiTrash2 size={18} /> */}
                                     </Button>
                                 </td>

@@ -46,17 +46,17 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* <Route path='/' element={<LoginPage />}></Route> */}
-          <Route path='/' element={<Login/>}></Route>
+          <Route path='/' element={<Login />}></Route>
           <Route path='/verify-otp' element={<VerifyOTP />}></Route>
           <Route path='/forgot-password' element={<Forgotpassword />}></Route>
           <Route path='/reset-password' element={<ResetPassword />}></Route>
 
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<UserTable/>}/>
-            <Route path='/maincategory' element={<MainCategory/>}></Route>
-            <Route path='/category' element={<Category/>}></Route>
-            <Route path='/subcategory' element={<SubCategory/>}></Route>
+            <Route path="/users" element={<UserTable />} />
+            <Route path='/maincategory' element={<MainCategory />}></Route>
+            <Route path='/category' element={<Category />}></Route>
+            <Route path='/subcategory' element={<SubCategory />}></Route>
             <Route path='/view_profile' element={<Viewprofile />}></Route>
             <Route path="/product" element={<Product />}></Route>
             <Route path='/unit' element={<Unit />}></Route>
@@ -64,6 +64,7 @@ function App() {
             <Route path='/addsize' element={<Addsize />}></Route>
             <Route path='/stock' element={<Stock />}></Route>
             <Route path='/addstock' element={<Addstock />}></Route>
+
             <Route path="/order" element={<OrderManagement/>}></Route>
             <Route path="/order/:id" element={<OrderDetail/>}></Route>
             <Route path='/review' element={<ReviewManagement />}></Route>
@@ -87,5 +88,5 @@ function App() {
     </div>
   );
 }
- 
+
 export default App;
