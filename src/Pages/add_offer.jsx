@@ -61,6 +61,9 @@ const Addoffer = () => {
         }
     };
 
+    // Select img
+    let [img, setimg] = useState("");
+
     return (
         <>
             <div>
@@ -173,16 +176,14 @@ const Addoffer = () => {
                                                 <label className='mv_edit_profile_label'>Description Image</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                    placeholder="Choose Image"
-                                                    aria-label=""
-                                                    readOnly
+                                                        placeholder="Choose Image"
+                                                        aria-label=""
+                                                        readOnly
+                                                        value={img}
                                                     />
                                                     <label className="mv_browse_button">
                                                     Browse
-                                                    <input
-                                                        type="file"
-                                                        hidden
-                                                    />
+                                                    <input type="file" hidden onChange={(e) => { setimg(e.currentTarget.files[0].name) }} />
                                                     </label>
                                                 </InputGroup>
                                             </div>

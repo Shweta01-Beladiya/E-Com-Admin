@@ -46,9 +46,9 @@
 .mv_price_max{
     transform: translateX(-80%);
 }
-/* .mv_other_category {
-    margin-top: 25px;
-} */
+.mv_other_category {
+    padding: 0px 20px;
+}
 .mv_dashboard_heading{
     color: #6A6A6A !important;
     font-size: 16px !important;
@@ -258,6 +258,14 @@
         font-size: 14px;
     }
 }
+@media(max-width: 767px){
+    .mv_table_search{
+        display: block;
+    }
+    .mv_product_search{
+        margin-bottom: 10px;
+    }
+}
 @media(max-width: 375px){
     .mv_dashboard_heading{
         font-size: 13px !important;
@@ -417,6 +425,66 @@
     .mv_offer_details_sub_heading{
         font-size: 12px;
         margin-bottom: 10px;
+    }
+}
+/* ************************************************ */
+
+
+
+
+/******************** Return Order *******************/
+.mv_ro_status_button{
+    border: none !important;
+}
+.mv_accept_status{
+    padding: 5px 10px;
+    color: #0D894F;
+    background-color: #E7F4EE;
+    width: 120px;
+    text-align: center;
+    font-weight: 600;
+}
+.mv_reject_status{
+    padding: 5px 10px;
+    color: #FF0000;
+    background-color: #E7F4EE;
+    width: 120px;
+    text-align: center;
+    font-weight: 600;
+}
+/* ************************************************ */
+
+
+
+
+/*************** View Terms & Conditions **************/
+.mv_main_view_terms_conditions{
+    background-color: #fff;
+    padding: 20px;
+}
+.mv_privacy_policy{
+    background-color: #fff;
+    padding: 20px;
+}
+.mv_privacy_policy_text{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19.36px;
+    color: #6A6A6A;
+}
+.mv_terms_of_heading{
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 24.2px;
+    color: #2B221E;
+}
+
+
+
+
+@media(max-width:425px){
+    .mv_main_view_terms_conditions {
+        padding: 20px 10px;
     }
 }
 /* ************************************************ */

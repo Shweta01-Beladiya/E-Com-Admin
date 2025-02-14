@@ -3,144 +3,100 @@ import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
-const Coupon = (props) => {
-
-    // Edit Coupon
-    const [editstok,setEditcoupon] = useState(false);
-
-    const navigate = useNavigate();
-
-    const handleditcoupon = () => {
-        setEditcoupon(true);
-        // navigate('addsize')
-    }
+const Viewstatus = (props) => {
 
     var data = [
         {   
             id: 1,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statusone: "Accept",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 2,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: false,
+            name: "Nizam Patel",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statustwo: "Reject",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 3,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statustwo: "Reject",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 4,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Nizam Patel",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statustwo: "Reject",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 5,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Nizam Patel",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statustwo: "Reject",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 6,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Nizam Patel",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statusone: "Accept",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 7,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statusone: "Accept",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 8,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statusone: "Accept",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 9,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statusone: "Accept",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 10,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statustwo: "Reject",
+            reason: "Lorem ipsum dolor sit amet",
         },
         {   
             id: 11,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
+            name: "Johan Desai",
+            product: "Smart Watch",
+            date: "02/09/1994",
+            statusone: "Accept",
+            reason: "Lorem ipsum dolor sit amet",
         },
     ];
 
@@ -195,14 +151,17 @@ const Coupon = (props) => {
     );
     // *******************************************************************************
 
-    // Modal
-    const [modalShow, setModalShow] = React.useState(false);
-
     // Offcanvas
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    // offcanvas price
+    const [priceRange, setPriceRange] = useState([0, 300]);
+    const handleSliderChange = (newRange) => {
+        setPriceRange(newRange);
+    };
 
     // Date function
     let [date, setDate] = useState('Select Date');
@@ -219,15 +178,23 @@ const Coupon = (props) => {
         }
     };
 
+    // Return Order Status
+    const [selectedStatus, setSelectedStatus] = useState({});
+
+    const handleStatusChange = (id, status) => {
+        setSelectedStatus((prev) => ({ ...prev, [id]: status }));
+        console.log(`Status changed for ID: ${id}, Status: ${status}`);
+    };
+
     return (
         <>
             <div id='mv_container_fluid'>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>Coupon</p>
+                        <p className='mb-1'>Return Order</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
-                            <p className='mv_category_heading mv_subcategory_heading mb-0'>Coupon</p>
+                            <p className='mv_category_heading mv_subcategory_heading mb-0'>Return Order</p>
                         </div>
                     </div>
                 </div>
@@ -256,15 +223,17 @@ const Coupon = (props) => {
                                             </Offcanvas.Header>
                                             <Offcanvas.Body className=''>
                                                 <div>
-                                                    <div>
-                                                        <label className='mv_offcanvas_filter_category'>Start Date</label>
-                                                        <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
-                                                        </div>
+                                                    <div className="mv_input_content">
+                                                        <label className='mv_offcanvas_filter_category'>Product Name</label>
+                                                        <InputGroup className="mb-3">
+                                                            <Form.Control
+                                                                placeholder="Enter Product Name"
+                                                                name='name'
+                                                            />
+                                                        </InputGroup>
                                                     </div>
                                                     <div>
-                                                        <label className='mv_offcanvas_filter_category'>End Date</label>
+                                                        <label className='mv_offcanvas_filter_category'>Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
@@ -274,8 +243,8 @@ const Coupon = (props) => {
                                                         <label className='mv_offcanvas_filter_category'>Status</label>
                                                         <Form.Select className="mb-3" aria-label="Default select example">
                                                             <option>Select Status</option>
-                                                            <option value="True">True</option>
-                                                            <option value="False">False</option>
+                                                            <option value="Accepted">Accepted</option>
+                                                            <option value="Rejected">Rejected</option>
                                                         </Form.Select>
                                                     </div>
                                                 </div>
@@ -292,11 +261,6 @@ const Coupon = (props) => {
                                             </Offcanvas.Body>
                                         </Offcanvas>
                                     </div>
-                                    <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <Link to='/addcoupon'><button>+ Add</button></Link>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             <div className="mv_product_table_padd">
@@ -304,48 +268,42 @@ const Coupon = (props) => {
                                     <thead>
                                         <tr>
                                             <th className=''>ID</th>
-                                            <th className=''>Code</th>
-                                            <th className=''>Coupon Name</th>
-                                            <th className=''>Description</th>
-                                            <th className=''>Coupon Type</th>
-                                            <th className=''>Price</th>
-                                            <th className=''>Start Date</th>
-                                            <th className=''>End Date</th>
+                                            <th className=''>Customer name</th>
+                                            <th className=''>Product</th>
+                                            <th className=''>Date</th>
                                             <th className=''>Status</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                            <th className=''>Reason</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {paginatedData.map((item, index) => (
-                                        <tr key={index}>
+                                            <tr key={index}>
                                             <td>{item.id}</td>
-                                            <td>{item.code}</td>
-                                            <td>{item.coupenname}</td>
-                                            <td>{item.description}</td>
-                                            <td>{item.coupontype}</td>
-                                            <td>${item.price}</td>
-                                            <td>{item.startdate}</td>
-                                            <td>{item.enddate}</td>
+                                            <td>{item.name}</td>
+                                            <td>{item.product}</td>
+                                            <td>{item.date}</td>
                                             <td>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id={`custom-switch-${item.id}`}
-                                                    label=""
-                                                    checked={item.status}
-                                                    className=''
-                                                />
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={handleditcoupon}>
-                                                    <Link to='/addcoupon' state={{ editCoupon: true }}>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
+                                                <div className="d-flex">
+                                                {selectedStatus[item.id] !== item.statusone && (
+                                                    <button
+                                                    className="me-3 mv_ro_status_button"
+                                                    onClick={() => handleStatusChange(item.id, item.statusone)}
+                                                    >
+                                                    <p className="m-0 mv_accept_status">{item.statusone}</p>
+                                                    </button>
+                                                )}
+                                                {selectedStatus[item.id] !== item.statustwo && (
+                                                    <button
+                                                    className="mv_ro_status_button"
+                                                    onClick={() => handleStatusChange(item.id, item.statustwo)}
+                                                    >
+                                                    <p className="m-0 mv_reject_status">{item.statustwo}</p>
+                                                    </button>
+                                                )}
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
                                             </td>
-                                        </tr>
+                                            <td>{item.reason}</td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -371,23 +329,8 @@ const Coupon = (props) => {
                 </div>
             </div>
 
-            {/* Delete Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
-                <Modal.Body className='text-center mv_logout'>
-                    <h5 className='mb-2'>Delete</h5>
-                    <p>Are you sure you want to delete <br /> coupon?</p>
-                    <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
-                        <div className="mv_logout_cancel">
-                            <button onClick={() => setModalShow(false)}>Cancel</button>
-                        </div>
-                        <div className="mv_logout_button">
-                            <button>Delete</button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
         </>
     );
 };
 
-export default Coupon
+export default Viewstatus

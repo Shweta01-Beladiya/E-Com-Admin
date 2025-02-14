@@ -360,23 +360,23 @@ const Product = (props) => {
                                         ))}
                                     </tbody>
                                 </table>
-                                {totalPages > 1 && (
-                                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4'>
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                            <MdOutlineKeyboardArrowLeft />
-                                        </p>
-                                        {getPaginationButtons().map((page, index) => (
-                                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                onClick={() => handlePageChange(page)}>
-                                                {page}
-                                            </p>
-                                        ))}
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                            <MdOutlineKeyboardArrowRight />
-                                        </p>
-                                    </div>
-                                )}
                             </div>
+                            {totalPages > 1 && (
+                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4'>
+                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                        <MdOutlineKeyboardArrowLeft />
+                                    </p>
+                                    {getPaginationButtons().map((page, index) => (
+                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                            onClick={() => handlePageChange(page)}>
+                                            {page}
+                                        </p>
+                                    ))}
+                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                        <MdOutlineKeyboardArrowRight />
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
