@@ -153,7 +153,7 @@ const UserTable = () => {
 
   return (
 
-    <Container fluid className="py-3" style={{ backgroundColor: '#F7F7F7', height: '100vh' }}>
+    <div fluid className="py-3" style={{ backgroundColor: '#F7F7F7', height: '100vh' }}>
       <h5 className="mb-0 fw-bold">User</h5>
       <div className='d-flex'>
         <p class="text-muted">Dashboard /</p>
@@ -193,7 +193,7 @@ const UserTable = () => {
           <>
             {/* Table Section */}
             <div className="table-responsive">
-              <Table hover borderless>
+              <Table borderless>
                 <thead>
                   <tr>
                     {['ID', 'Name', 'Mobile No.', 'DOB', 'Gender', 'Email', 'Action'].map((header, index) => (
@@ -316,7 +316,7 @@ const UserTable = () => {
           </Modal.Body>
         </Modal>
       </div>
-    </Container>
+    </div>
   );
 };
 

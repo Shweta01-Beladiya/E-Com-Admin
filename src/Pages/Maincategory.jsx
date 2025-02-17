@@ -4,7 +4,7 @@ import { Modal, Button, Form, Table, InputGroup, Col, Row } from "react-bootstra
 import '../CSS/riya.css';
 import { FaSearch } from 'react-icons/fa';
 import axios from "axios";
-import { Formik,ErrorMessage,Field } from "formik";
+import { Formik, ErrorMessage, Field } from "formik";
 import * as Yup from 'yup';
 
 const MainCategory = () => {
@@ -120,14 +120,31 @@ const MainCategory = () => {
     cat?.mainCategoryName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
+   // No Results Found Component
+  const NoResultsFound = () => (
+    <div style={{transform: 'translateY(50%)'}}>
+      <div className="text-center">
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+        <img src={require('../Photos/notfind.png')}></img>
+      </div>
     <div>
+    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
+    </div>
+  <div>
+        <p className="text-gray-500">Whoops... No matching data found</p>
+  </div>
+    </div>
+    </div>
+  );
+
+  return (
+    <div >
       <h5 className="mb-0 fw-bold">Main Category</h5>
       <div className='d-flex'>
         <p class="text-muted">Dashboard /</p>
         <p className='ms-1'>Main Category</p>
       </div>
-      <div style={{ backgroundColor: 'white', padding: '20px' }}>
+      <div style={{ backgroundColor: 'white', padding: '20px',height:'100vh' }}>
         <Row className="mb-4 align-items-center">
           <Col xs={12} md={6} lg={4}>
             <InputGroup className="mb-3 search-input-group r_inputgroup">
@@ -148,51 +165,55 @@ const MainCategory = () => {
             </Button>
           </Col>
         </Row>
-
-        <Table hover responsive borderless>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCategories.map((cat, index) => (
-              <tr key={cat.id}>
-                <td>{index + 1}</td>
-                <td>{cat.mainCategoryName}</td>
-                <td>
-                  <Form.Check
-                    type="switch"
-                    checked={cat.status}
-                    onChange={() => handleStatusChange(cat._id, cat.status)}
-
-                  />
-                </td>
-                <td>
-                  <Button
-                    className="r_deleticon me-2"
-                    onClick={() => {
-                      setId(cat._id);
-                      setSelectedCategory(cat);
-                      setShowEditModal(true);
-                    }}
-                  >
-                    <img src={require('../Photos/edit.png')} alt="" class="r_deletimg" ></img>
-                  </Button>
-                  <Button
-                    className="r_deleticon"
-                    onClick={() => { setId(cat._id); setShowDeleteModal(true); setCategoryToDelete(cat); }}
-                  >
-                    <img src={require('../Photos/delet.png')} alt="" class="r_deletimg" ></img>
-                  </Button>
-                </td>
+        {filteredCategories.length > 0 ? (
+          <Table responsive borderless>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {filteredCategories.map((cat, index) => (
+                <tr key={cat.id}>
+                  <td>{index + 1}</td>
+                  <td>{cat.mainCategoryName}</td>
+                  <td>
+                    <Form.Check
+                      type="switch"
+                      checked={cat.status}
+                      onChange={() => handleStatusChange(cat._id, cat.status)}
+
+                    />
+                  </td>
+                  <td>
+                    <Button
+                      className="r_deleticon me-2"
+                      onClick={() => {
+                        setId(cat._id);
+                        setSelectedCategory(cat);
+                        setShowEditModal(true);
+                      }}
+                    >
+                      <img src={require('../Photos/edit.png')} alt="" class="r_deletimg" ></img>
+                    </Button>
+                    <Button
+                      className="r_deleticon"
+                      onClick={() => { setId(cat._id); setShowDeleteModal(true); setCategoryToDelete(cat); }}
+                    >
+                      <img src={require('../Photos/delet.png')} alt="" class="r_deletimg" ></img>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+        ) : (
+          <NoResultsFound />
+        )}
       </div>
 
       {/* Add Modal */}
@@ -222,9 +243,9 @@ const MainCategory = () => {
                     value={values.mainCategoryName}
                     onChange={handleChange}
                   /> */}
-                    <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category "  value={values.mainCategoryName}
+                  <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category " value={values.mainCategoryName}
                     onChange={handleChange} />
-                <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
+                  <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
                 </Form.Group>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button
@@ -268,9 +289,9 @@ const MainCategory = () => {
               <Form className="r_form" onSubmit={handleSubmit}>
                 <Form.Group>
                   <Form.Label>Main Category</Form.Label>
-                  <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category "  value={values.mainCategoryName}
+                  <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category " value={values.mainCategoryName}
                     onChange={handleChange} />
-                <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
+                  <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
                 </Form.Group>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button onClick={() => setShowEditModal(false)} className="r_cancel">

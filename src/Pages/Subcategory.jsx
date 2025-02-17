@@ -244,8 +244,9 @@ const SubCategory = () => {
         setFilters({ category: '', mainCategory: '', status: '' });
         setSearchQuery('');
     };
+
     return (
-        <div className="container-fluid">
+        <div>
             <h5 className="mb-0 fw-bold">Sub Category</h5>
             <div className='d-flex'>
                 <p class="text-muted">Dashboard /</p>
@@ -280,7 +281,7 @@ const SubCategory = () => {
                         </div>
                     </Col>
                 </Row>
-                <Table hover responsive borderless>
+                <Table responsive borderless>
                     <thead>
                         <tr>
                             <th>ID</th>

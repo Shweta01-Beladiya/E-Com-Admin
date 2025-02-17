@@ -294,7 +294,7 @@ const Product = (props) => {
                                             </Offcanvas>
                                         </div>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <Link to='/add_product'><button>+ Add</button></Link>
+                                            <Link to='/addProduct'><button>+ Add</button></Link>
                                         </div>
                                     </div>
                                 </div>
