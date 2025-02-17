@@ -22,6 +22,7 @@ import { BsArrowRepeat, BsBoxes, BsBoxSeamFill } from 'react-icons/bs';
 import { GiStarsStack } from 'react-icons/gi';
 import { RiDiscountPercentFill } from 'react-icons/ri';
 import { HiGiftTop } from 'react-icons/hi2';
+import { FaFileCircleCheck, FaFileCircleXmark, FaFileShield } from 'react-icons/fa6';
 
 // Constants
 const drawerWidth = 280;
@@ -146,10 +147,10 @@ const menuItems = [
   },
   { text: 'Return Order', icon: <BsArrowRepeat size={20} />, path: '' },
   { text: 'Cancel Order', icon: <BsBoxSeamFill size={20} />, path: '' },
-  { text: 'Reason for Cancellation', icon: <BsBoxSeamFill size={20} />, path: '' },
-  { text: 'Terms & Conditions', icon: <BsBoxSeamFill size={20} />, path: '' },
+  { text: 'Reason for Cancellation', icon: <FaFileCircleXmark size={20} />, path: '' },
+  { text: 'Terms & Conditions', icon: <FaFileCircleCheck size={20} />, path: '' },
   { text: 'FAQ', icon: <BiSolidMessage size={20} />, path: '' },
-  { text: 'Account Policy', icon: <BiSolidMessage size={20} />, path: '' },
+  { text: 'Account Policy', icon: <FaFileShield size={20} />, path: '' },
   { text: 'Deactivated Account', icon: <FaUserSlash size={20} />, path: '/DeactivateAccount' },
   { text: 'Help', icon: <IoHelpCircleSharp size={20} />, path: '/help' },
   { text: 'Contact Us', icon: <AiFillMessage size={20} />, path: '/ContactUs' },

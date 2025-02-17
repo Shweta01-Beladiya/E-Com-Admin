@@ -4,7 +4,7 @@ import { Modal, Button, Form, Table, InputGroup, Col, Row } from "react-bootstra
 import '../CSS/riya.css';
 import { FaSearch } from 'react-icons/fa';
 import axios from "axios";
-import { Formik } from "formik";
+import { Formik,ErrorMessage,Field } from "formik";
 import * as Yup from 'yup';
 
 const MainCategory = () => {
@@ -18,6 +18,7 @@ const MainCategory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [id, setId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const categorySchema = Yup.object().shape({
     mainCategoryName: Yup.string()
@@ -67,7 +68,7 @@ const MainCategory = () => {
         const response = await axios.post(`${BaseUrl}/api/createMaincategory`, value, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        console.log("Response", response.data);
+        // console.log("Response", response.data);
         if (response.data.status === 201) {
           setCategories((prevCategories) => [...prevCategories, response.data.maincategory]);
           setShowAddModal(false);
@@ -89,6 +90,7 @@ const MainCategory = () => {
       );
       setShowDeleteModal(false);
       setId(null);
+      setCategoryToDelete(null);
     }
     // setCategories(categories.filter((cat) => cat.id !== currentCategory.id));
     setShowDeleteModal(false);
@@ -159,7 +161,7 @@ const MainCategory = () => {
           <tbody>
             {filteredCategories.map((cat, index) => (
               <tr key={cat.id}>
-                <td>0{index + 1}</td>
+                <td>{index + 1}</td>
                 <td>{cat.mainCategoryName}</td>
                 <td>
                   <Form.Check
@@ -182,7 +184,7 @@ const MainCategory = () => {
                   </Button>
                   <Button
                     className="r_deleticon"
-                    onClick={() => { setId(cat._id); setShowDeleteModal(true); }}
+                    onClick={() => { setId(cat._id); setShowDeleteModal(true); setCategoryToDelete(cat); }}
                   >
                     <img src={require('../Photos/delet.png')} alt="" class="r_deletimg" ></img>
                   </Button>
@@ -213,17 +215,16 @@ const MainCategory = () => {
               <Form className="r_form" onSubmit={handleSubmit}>
                 <Form.Group>
                   <Form.Label>Main Category</Form.Label>
-                  <Form.Control
+                  {/* <Form.Control
                     type="text"
                     name="mainCategoryName"
                     placeholder="Enter main category"
                     value={values.mainCategoryName}
                     onChange={handleChange}
-                    isInvalid={touched.mainCategoryName && errors.mainCategoryName}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.mainCategoryName}
-                  </Form.Control.Feedback>
+                  /> */}
+                    <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category "  value={values.mainCategoryName}
+                    onChange={handleChange} />
+                <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
                 </Form.Group>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button
@@ -267,17 +268,9 @@ const MainCategory = () => {
               <Form className="r_form" onSubmit={handleSubmit}>
                 <Form.Group>
                   <Form.Label>Main Category</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="mainCategoryName"
-                    placeholder="Enter main category"
-                    value={values.mainCategoryName}
-                    onChange={handleChange}
-                    isInvalid={touched.mainCategoryName && errors.mainCategoryName}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.mainCategoryName}
-                  </Form.Control.Feedback>
+                  <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category "  value={values.mainCategoryName}
+                    onChange={handleChange} />
+                <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
                 </Form.Group>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button onClick={() => setShowEditModal(false)} className="r_cancel">
@@ -297,7 +290,7 @@ const MainCategory = () => {
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Body className=" p-5" >
           <h5 className='font-weight-bold text-center mb-3'>Delete</h5>
-          <p className='text-center text-muted mb-4'> Are you sure you want to delete?</p>
+          <p className='text-center text-muted mb-4'> Are you sure you want to delete {categoryToDelete?.mainCategoryName}?</p>
           <div className='d-flex justify-content-center gap-3 mt-4'>
             <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
               Cancel

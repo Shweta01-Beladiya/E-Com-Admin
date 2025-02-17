@@ -64,12 +64,12 @@ tr th{
     background-color: transparent !important;
   }
   .page-item{
-    --bs-pagination-active-bg: black !important;
-    --bs-pagination-active-border-color: black !important;
+    --bs-pagination-active-bg: #2B221E !important;
+    --bs-pagination-active-border-color: #2B221E !important;
     --bs-pagination-active-color: #fff !important;
   }
   .page-link{
-    color: black;
+    color: #2B221E;
   }
   /* filter offcanvas */
   .r_filtertitle{
@@ -96,7 +96,7 @@ tr th{
     border: 1px solid #95908F !important;
     padding: 7px 20px;
     width: 150px;
-    color: black !important;
+    color: #2B221E !important;
     background-color: transparent !important;
   }
   .r_delete{
@@ -104,12 +104,12 @@ tr th{
     border: 1px solid #95908F !important;
     padding: 7px 20px !important;
     width: 150px !important;
-    background-color: black !important;
+    background-color: #2B221E !important;
     color:white !important;
     
   }
   .r_add{
-    background-color: black !important;
+    background-color: #2B221E !important;
     color: white !important;
     padding: 5px 30px;
     border: none !important;
