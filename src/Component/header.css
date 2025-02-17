@@ -97,6 +97,10 @@
     .mv_logout_button button{
         font-size: 14px;
     }
+    /* responsive screen padding */
+    .css-1qpv54f{
+        padding: 10px 5px !important;
+    }
 }
 @media (max-width: 375px){
     .modal-dialog {

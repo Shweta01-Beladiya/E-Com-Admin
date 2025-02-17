@@ -464,6 +464,9 @@
     .mv_product_table_padd{
         overflow-x: scroll !important;
     }
+    .mv_product_table_content{
+        overflow-x: scroll !important;
+    }
 }
 @media (max-width: 1440px){
     /* Order Summary */

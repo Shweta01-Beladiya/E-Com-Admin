@@ -177,21 +177,6 @@ const Popularbrands = (props) => {
         setPriceRange(newRange);
     };
 
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
-        }
-    };
-
     return (
         <>
             <div id='mv_container_fluid'>
