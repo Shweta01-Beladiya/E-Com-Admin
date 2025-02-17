@@ -210,11 +210,6 @@ const Cancelorder = (props) => {
                                         />
                                     </InputGroup>
                                 </div>
-                                <div className='d-flex'>
-                                    <div className="mv_column_button mv_column_padd">
-                                        <Link to="/viewstatus"><Button>View Status</Button></Link>
-                                    </div>
-                                </div>
                             </div>
                             <div className="mv_product_table_padd">
                                 <table className='mv_product_table justify-content-between'>

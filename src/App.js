@@ -45,6 +45,11 @@ import Faqs from './Pages/faqs';
 import Accountpolicy from './Pages/account_policy';
 import OrderManagement from './Pages/Order';
 import OrderDetail from './Component/Orderdetails';
+import Aboutus from './Pages/about_us';
+import Viewaboutus from './Pages/view_aboutus';
+import Cards from './Pages/card';
+import Popularbrands from './Pages/popular_brands';
+import Addpopularbrands from './Pages/add_popularbrands';
 
 
 
@@ -98,6 +103,11 @@ function App() {
             <Route path='/viewtermsconditions' element={<Viewtermsconditions />}></Route>
             <Route path='/faqs' element={<Faqs />}></Route>
             <Route path='/accountpolicy' element={<Accountpolicy />}></Route>
+            <Route path='/aboutus' element={<Aboutus />}></Route>
+            <Route path='/viewaboutus' element={<Viewaboutus />}></Route>
+            <Route path='/cards' element={<Cards />}></Route>
+            <Route path='/popularbrands' element={<Popularbrands />}></Route>
+            <Route path='/addpopularbrands' element={<Addpopularbrands />}></Route>
 
           </Route>
         </Routes>

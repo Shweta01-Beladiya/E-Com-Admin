@@ -117,7 +117,7 @@ const Termsconditions = (props) => {
                                 </div>
                                 <div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
-                                        <div className="mv_column_button mv_column_padd">
+                                        <div className="mv_column_button mv_view_status_padd">
                                             <Link to="/viewtermsconditions"><button>View Status</button></Link>
                                         </div>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>

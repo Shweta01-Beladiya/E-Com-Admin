@@ -2,11 +2,23 @@
 .mv_offcanvas_filter_heading {
     border-bottom: 0.8px solid #D2D2D2;
 }
+.mv_offcanvas_filter_heading  .btn-close:focus{
+    box-shadow: none !important;
+}
 .mv_offcanvas_bottom_button {
     position: absolute;
     bottom: 0;
     width: 100%;
     padding: 20px 0px;
+}
+.mv_offcanvas_filter_category {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 19.36px;
+    color: #2B221E;
+}
+.mv_cancel_apply_btn {
+    margin-right: 30px;
 }
 .mv_price_range{
     position: relative;
@@ -241,21 +253,6 @@
     .mv_column_button button{
         margin-right: 15px !important;
         /* margin-bottom: 10px; */
-        text-align: end;
-    }
-}
-@media(max-width: 425px){
-    .mv_dashboard_heading{
-        font-size: 14px !important;
-    }
-    .mv_category_heading{
-        font-size: 14px !important;
-    }
-    .mv_column_button button{
-        font-size: 14px;
-    }
-    .mv_add_category button{
-        font-size: 14px;
     }
 }
 @media(max-width: 767px){
@@ -264,6 +261,38 @@
     }
     .mv_product_search{
         margin-bottom: 10px;
+    }
+}
+@media(max-width: 768px){
+    .mv_offcanvas_filter{
+        max-width: 350px !important;
+    }
+}
+@media(max-width: 575px){
+    .mv_view_status_padd button{
+        width: 101px !important;
+    }
+}
+@media(max-width: 425px){
+    .mv_table_search{
+        padding: 10px 15px;
+    }
+    .mv_column_button button {
+        width: 95px;
+        font-size: 14px;
+    }
+    .mv_add_category button {
+        width: 95px;
+        font-size: 14px;
+    }
+    .mv_dashboard_heading{
+        font-size: 14px !important;
+    }
+    .mv_category_heading{
+        font-size: 14px !important;
+    }
+    .mv_offcanvas_filter{
+        max-width: 300px !important;
     }
 }
 @media(max-width: 375px){
@@ -322,11 +351,9 @@
 
 
 /******************** Coupen ************************/
-.mv_offcanvas_filter_category {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 19.36px;
-    color: #2B221E;
+
+@media(max-width: 425px){
+    
 }
 /* ************************************************ */
 
@@ -461,6 +488,7 @@
 .mv_main_view_terms_conditions{
     background-color: #fff;
     padding: 20px;
+    box-shadow: 1px 1px 20px 0.5px #0000000F;
 }
 .mv_privacy_policy{
     background-color: #fff;
@@ -482,9 +510,82 @@
 
 
 
+@media(max-width:575px){
+    .mv_view_term_and_con{
+        display: block !important;
+    }
+    .mv_term_condi_heading{
+        margin-left: 0px !important;
+    }
+    .mv_view_term_heading{
+        margin-left: 0px !important;
+    }
+    .mv_terms_of_heading {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .mv_privacy_policy_text {
+        font-size: 14px;
+    }
+}
 @media(max-width:425px){
     .mv_main_view_terms_conditions {
         padding: 20px 10px;
+    }
+}
+/* ************************************************ */
+
+
+
+
+/******************** Contact Us *******************/
+.mv_contect_details_header {
+    padding: 1rem 1rem !important;
+    text-align: center !important;
+}
+.mv_contect_details_header button:focus{
+    box-shadow: none !important;
+}
+/* ************************************************ */
+
+
+
+
+/******************** View About Us *******************/
+.mv_quickcart_heading{
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 33.89px;
+    color: #2A221E;
+}
+.mv_quickcart_text{
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 26px;
+    color: #6A6A6A;
+}
+
+
+
+
+@media(max-width:575px){
+    .mv_quickcart_heading {
+        font-size: 20px;
+        line-height: 22px;
+        margin-bottom: 10px;
+    }
+    .mv_quickcart_text {
+        font-size: 14px;
+        line-height: 18px;
+        margin-bottom: 10px;
+    }
+}
+@media(max-width:767px){
+    .mv_main_quickcart {
+        flex-wrap: wrap-reverse !important;
+    }
+    .mv_quickcart_img{
+        margin-bottom: 10px;
     }
 }
 /* ************************************************ */
