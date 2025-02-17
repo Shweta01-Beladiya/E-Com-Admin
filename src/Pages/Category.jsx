@@ -1,90 +1,111 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Table, Button, Offcanvas, Modal, Form, Pagination, Row,
+    Table, Button, Offcanvas, Modal, Form, Row,
     Col, InputGroup,
 } from 'react-bootstrap';
 import { FiFilter } from 'react-icons/fi';
 import { FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
 import axios from 'axios';
+import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 const Category = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
-    // Main categories for dropdown
-    const mainCategories = [
-        "Electronics",
-        "Fashion",
-        "Home & Living",
-        "Books",
-        "Sports"
-    ];
-
     // State management
     const [categories, setCategories] = useState([]);
-
+    const [mainCategory, setMainCategory] = useState([]);
     const [showFilter, setShowFilter] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [categoryToDelete,setCategoryToDelete] =useState(null);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [id, setId] = useState(null);
     const [filters, setFilters] = useState({
         mainCategory: '',
         status: ''
     });
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [deletingCategory, setDeletingCategory] = useState(null);
-    const [newCategory, setNewCategory] = useState({
-        name: '',
-        mainCategory: '',
-        status: 'Active'
+    const [initialValues, setInitialValues] = useState({
+        mainCategoryId: '',
+        categoryName: '',
     });
     const [searchTerm, setSearchTerm] = useState('');
 
+    const CategorySchema = Yup.object().shape({
+        mainCategoryId: Yup.string().required('Main Category is required'),
+        categoryName: Yup.string()
+            .min(2, 'Too Short!')
+            .max(50, 'Too Long!')
+            .required('Category Name is required'),
+    });
 
     useEffect(() => {
-        const fetchData = async() => {
+        const fetchData = async () => {
             try {
                 const response = await axios.get(`${BaseUrl}/api/allCategory`, {
-                    headers: {Authorization: `Bearer ${token}`}
+                    headers: { Authorization: `Bearer ${token}` }
                 });
-                // console.log("response",response.data);
+                // console.log("allCategory>>>",response.data);
                 setCategories(response.data.category);
             } catch (error) {
-                console.error('Data fetching Error:',error);
+                console.error('Data fetching Error:', error);
             }
         }
+
+        const fetchMainCategory = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response", response.data.users);
+                setMainCategory(response.data.users);
+            } catch (error) {
+                console.error('Data fetching Error:', error);
+            }
+        }
+
+        fetchMainCategory();
         fetchData();
-    },[BaseUrl, token]);
-    // Search handler
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1); // Reset to first page when searching
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [BaseUrl, token]);
 
-    // Modified filter logic to include search
-    const filteredCategories = categories.filter((cat) => {
-        const matchesSearch =
-            cat.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            cat.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesFilters =
-            (!filters.mainCategory || cat.mainCategory === filters.mainCategory) &&
-            (!filters.status || cat.status === filters.status);
-
-        return matchesSearch && matchesFilters;
-    });
+    useEffect(() => {
+        const fetchSingleData = async () => {
+            if (id) {
+                try {
+                    const response = await axios.get(`${BaseUrl}/api/getCategory/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const categoryData = response.data.category;
+                    setInitialValues({
+                        mainCategoryId: categoryData.mainCategoryId,
+                        categoryName: categoryData.categoryName,
+                    });
+                } catch (error) {
+                    console.error('Data fetching Error:', error);
+                }
+            } else {
+                setInitialValues({
+                    mainCategoryId: '',
+                    categoryName: '',
+                });
+            }
+        };
+        fetchSingleData();
+    }, [id, BaseUrl, token]);
 
     // Previous handlers remain the same
     const handleFilterChange = (e) => {
-        setFilters({
-            ...filters,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [name]: value,
+        }));
     };
 
     const applyFilters = () => {
@@ -101,74 +122,141 @@ const Category = () => {
         setShowFilter(false);
     };
 
-    // Previous CRUD operations remain the same
-    const handleAddCategory = () => {
-        setCategories([...categories, { ...newCategory, id: categories.length + 1 }]);
-        setNewCategory({ name: '', mainCategory: '', status: 'Active' });
-        setShowAddModal(false);
-    };
+    const handleSubmit = async (values) => {
+        try {
 
-    const handleEditCategory = () => {
-        setCategories(
-            categories.map((cat) =>
-                cat.id === editingCategory.id ? editingCategory : cat
-            )
-        );
-        setShowEditModal(false);
-    };
+            if (id) {
+                const response = await axios.put(`${BaseUrl}/api/updateCategry/${id}`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("Response", response.data);
+                if (response.data.status === 200) {
+                    setShowAddModal(false);
+                    setId(null);                   
+                    setCategories((prevCategories) =>
+                        prevCategories.map((cat) =>
+                          cat._id === id ? { ...cat, ...values } : cat
+                        )
+                      );
+                }
+            } else {
+                const response = await axios.post(`${BaseUrl}/api/createCategory`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("Careate category",response.data);
 
-    const handleDeleteCategory = () => {
-        setCategories(categories.filter((cat) => cat.id !== deletingCategory.id));
-        setShowDeleteModal(false);
-    };
-
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-
-    const handlePreviousPage = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
-    };
-
-    const handleNextPage = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    };
-
-    const paginationItems = [];
-    paginationItems.push(
-        <Pagination.Prev
-            key="prev"
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-        />
-    );
-
-    for (let number = 1; number <= totalPages; number++) {
-        paginationItems.push(
-            <Pagination.Item
-                key={number}
-                active={number === currentPage}
-                onClick={() => setCurrentPage(number)}
-            >
-                {number}
-            </Pagination.Item>
-        );
+                if (response.data.status === 201) {
+                    setShowAddModal(false);
+                    // fetchData();
+                    setCategories((prevCategories) => [...prevCategories, response.data.category]);
+                }
+            }
+        } catch (error) {
+            console.error('Data Create and update Error:', error);
+        }
     }
 
-    paginationItems.push(
-        <Pagination.Next
-            key="next"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-        />
-    );
+    const handleDeleteCategory = async () => {
+        const response = await axios.delete(`${BaseUrl}/api/deleteCategory/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.status === 200) {
+            setCategories((prevCatgory) => prevCatgory.filter((cat) => cat._id !== id))
+            setShowDeleteModal(false);
+            setCategoryToDelete(null)
+        }
+        // console.log("Response", response.data);
+    };
 
-    const handleStatusToggle = (id) => {
-        setCategories(categories.map((cat) =>
-            cat.id === id ? { ...cat, status: cat.status === 'Active' ? 'Inactive' : 'Active' } : cat
-        ));
+    // ************************************** Pagination **************************************
+    const itemsPerPage = 10;
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const filteredCategories = categories.filter((cat) => {
+        const matchesSearch = searchTerm ? (
+            cat.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            cat.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+        ) : true;
+
+        const selectedMainCategory = filters.mainCategory ? filters.mainCategory.toString() : '';
+        const selectedStatus = filters.status === 'Active' ? true : filters.status === 'Inactive' ? false : '';
+
+        // Ensure correct comparisons
+        const matchesFilters =
+            (!filters.mainCategory || cat.mainCategoryId?.toString() === selectedMainCategory) &&
+            (selectedStatus === '' || cat.status === selectedStatus);
+
+        return matchesSearch && matchesFilters;
+    });
+
+    // Calculate pagination values
+    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+
+    // Get current page data
+    const getCurrentPageData = () => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredCategories.slice(startIndex, endIndex);
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
+    // Reset to first page when filters or search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filters]);
+
+    const getPaginationButtons = () => {
+        const buttons = [];
+        const maxButtonsToShow = 5;
+
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+
+        if (endPage - startPage + 1 < maxButtonsToShow) {
+            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+        }
+
+        if (startPage > 1) {
+            buttons.push(1);
+            if (startPage > 2) buttons.push('...');
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(i);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) buttons.push('...');
+            buttons.push(totalPages);
+        }
+
+        return buttons;
+    };
+    // *******************************************************************************
+
+    const handleStatusChange = async (id, status) => {
+        try {
+
+            const updatedStatus = !status
+
+            const response = await axios.put(`${BaseUrl}/api/updateCategry/${id}`, { status: updatedStatus }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.status === 200) {
+                setCategories((prevCategories) =>
+                    prevCategories.map((cat) =>
+                        cat._id === id ? { ...cat, status: updatedStatus } : cat
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Status Upadte error', error);
+        }
     };
 
     return (
@@ -223,59 +311,61 @@ const Category = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((category,index) => (
-                            
+                        {getCurrentPageData().map((category, index) => (
                             <tr key={category.id}>
-                                <td>0{index + 1}</td>
-                                <td>{category.mainCategoryData[0].mainCategoryName}</td>
+                                <td>{index + 1}</td>
+                                <td> {mainCategory.find(cat => cat._id === category.mainCategoryId)?.mainCategoryName || ''}</td>
                                 <td>{category.categoryName}</td>
-
                                 <td>
                                     <Form.Check
                                         type="switch"
-                                        id={`status-switch-${category.id}`}
-
-                                        checked={category.status === 'Active'}
-                                        onChange={() => handleStatusToggle(category.id)}
+                                        checked={category.status}
+                                        onChange={() => handleStatusChange(category._id, category.status)}
                                     />
                                 </td>
                                 <td>
                                     <Button
                                         className="r_deleticon me-2"
-                                      
-
                                         onClick={() => {
-                                            setEditingCategory(category);
-                                            setShowEditModal(true);
+                                            setShowAddModal(true);
+                                            setId(category._id);
                                         }}
-                                    >
+                                        >
                                         <img src={require('../Photos/edit.png')} class="r_deletimg" alt=''></img>
                                         {/* <FiEdit size={18} /> */}
                                     </Button>
                                     <Button
                                         className="r_deleticon"
                                         onClick={() => {
-                                            setDeletingCategory(category);
                                             setShowDeleteModal(true);
+                                            setId(category._id);   
+                                            setCategoryToDelete(category);
                                         }}
                                     >
                                         <img src={require('../Photos/delet.png')} class="r_deletimg" alt=''></img>
-                                        {/* <FiTrash2 size={18} /> */}
                                     </Button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
-                {/* Enhanced Pagination */}
-                <div className="d-flex justify-content-end mt-3">
-                    <Pagination className="mb-0">
-                        {paginationItems}
-                    </Pagination>
-                </div>
+                {totalPages > 1 && (
+                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                            <MdOutlineKeyboardArrowLeft />
+                        </p>
+                        {getPaginationButtons().map((page, index) => (
+                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                onClick={() => handlePageChange(page)}>
+                                {page}
+                            </p>
+                        ))}
+                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                            <MdOutlineKeyboardArrowRight />
+                        </p>
+                    </div>
+                )}
             </div>
-
-
 
             {/* Filter Offcanvas */}
             <Offcanvas show={showFilter} onHide={() => setShowFilter(false)} placement="end" style={{ zIndex: 9999 }}>
@@ -292,9 +382,9 @@ const Category = () => {
                                 onChange={handleFilterChange}
                             >
                                 <option value="">Select</option>
-                                {mainCategories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
+                                {mainCategory.map((category) => (
+                                    <option key={category._id} value={category._id}>
+                                        {category.mainCategoryName}
                                     </option>
                                 ))}
                             </Form.Select>
@@ -316,120 +406,70 @@ const Category = () => {
                 <div className="p-3 mt-auto">
                     <div className="d-flex gap-5">
                         <Button className="flex-grow-1 r_outlinebtn" onClick={clearFilters}>
-                            Cnncel
+                            Cancel
                         </Button>
                         <Button className="flex-grow-1 r_bgbtn" onClick={applyFilters}>
-                            Applay
+                            Apply
                         </Button>
 
                     </div>
                 </div>
             </Offcanvas>
 
-            {/* Add Category Modal */}
-            <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
-                <Modal.Header closeButton className="r_modalheader">
-
-                </Modal.Header>
+            {/* Add and Edt Category Modal */}
+            <Modal show={showAddModal} onHide={() => { setShowAddModal(false); setId(null); }} centered>
+                <Modal.Header closeButton className="r_modalheader"></Modal.Header>
                 <Modal.Body className="r_modalbody">
-                    <h6 className='text-center fw-bold'>Add Category</h6>
-                    <Form className="r_form">
-                        <Form.Group className="mb-3">
-                            <Form.Label>Main Category</Form.Label>
-                            <Form.Select
-                                value={newCategory.mainCategory}
-                                onChange={(e) =>
-                                    setNewCategory({ ...newCategory, mainCategory: e.target.value })
-                                }
-                            >
-                                <option value="">Select Main Category</option>
-                                {mainCategories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Category Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={newCategory.name}
-                                onChange={(e) =>
-                                    setNewCategory({ ...newCategory, name: e.target.value })
-                                }
-                                placeholder="Enter category name"
-                            />
-                        </Form.Group>
-                        <div className="d-flex justify-content-center gap-2 mt-4">
-                            <Button onClick={() => setShowAddModal(false)} className="r_cancel">
-                                Cancel
-                            </Button>
-                            <Button onClick={handleAddCategory} className="r_delete">
-                                Add
-                            </Button>
-                        </div>
-                    </Form>
-                </Modal.Body>
-            </Modal>
+                    <h6 className='text-center fw-bold'>{id ? 'Edit Category' : 'Add Category'}</h6>
 
-            {/* Edit Category Modal */}
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-                <Modal.Header closeButton className="r_modalheader" >
-                </Modal.Header>
-                <Modal.Body className="r_modalbody">
-                    <h6 className='text-center fw-bold'>Edit Category</h6>
-                    <Form className="r_form">
-                        <Form.Group className="mb-3">
-                            <Form.Label>Main Category</Form.Label>
-                            <Form.Select
-                                value={editingCategory?.mainCategory || ''}
-                                onChange={(e) =>
-                                    setEditingCategory({
-                                        ...editingCategory,
-                                        mainCategory: e.target.value
-                                    })
-                                }
-                            >
-                                <option value="">Select Main Category</option>
-                                {mainCategories.map((category, index) => (
-                                    <option key={index} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-5">
-                            <Form.Label>Category Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={editingCategory?.name || ''}
-                                onChange={(e) =>
-                                    setEditingCategory({
-                                        ...editingCategory,
-                                        name: e.target.value
-                                    })
-                                }
-                                placeholder="Enter category name"
-                            />
-                        </Form.Group>
-                        <div className="d-flex justify-content-center gap-2">
-                            <Button onClick={() => setShowEditModal(false)} className="r_cancel">
-                                Cancel
-                            </Button>
-                            <Button onClick={handleEditCategory} className="r_delete">
-                                Update
-                            </Button>
-                        </div>
-                    </Form>
+                    <Formik
+                        enableReinitialize={true}
+                        initialValues={initialValues}
+                        validationSchema={CategorySchema}
+                        onSubmit={handleSubmit}
+                    >
+                        {({ isSubmitting }) => (
+                            <FormikForm className="r_form">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Main Category</Form.Label>
+                                    <Field as="select" name="mainCategoryId" className="form-control">
+                                        <option value="">Select Main Category</option>
+                                        {mainCategory.map((category) => (
+                                            <option key={category._id} value={category._id}>
+                                                {category.mainCategoryName}
+                                            </option>
+                                        ))}
+                                    </Field>
+                                    <ErrorMessage name="mainCategoryId" component="div" className="text-danger small" />
+                                </Form.Group>
+
+                                <Form.Group className="mb-4">
+                                    <Form.Label>Category Name</Form.Label>
+                                    <Field type="text" name="categoryName" className="form-control" placeholder="Enter category name" />
+                                    <ErrorMessage name="categoryName" component="div" className="text-danger small" />
+                                </Form.Group>
+
+                                <div className="d-flex justify-content-center gap-2 mt-4">
+                                    <Button onClick={() => { setShowAddModal(false); setId(null) }} className="r_cancel">
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" className="r_delete" disabled={isSubmitting}>
+                                        {id ? 'Update' : 'Add'}
+                                    </Button>
+                                </div>
+                            </FormikForm>
+                        )}
+                    </Formik>
                 </Modal.Body>
-            </Modal>
+            </Modal>;
+
 
             {/* Delete Confirmation Modal */}
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Body className='p-5'>
                     <h6 className='text-center fw-bold mb-3'>Delete</h6>
-                    <p className='mb-4 text-center text-muted'> Are you sure you want to delete {deletingCategory?.name}?</p>
+                    
+                    <p className='mb-4 text-center text-muted'> Are you sure you want to delete {categoryToDelete?.categoryName}?</p>
                     <div className="d-flex justify-content-center gap-2">
                         <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
                             Cancel

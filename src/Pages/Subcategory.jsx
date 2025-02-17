@@ -1,178 +1,249 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Table, Pagination, Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
 import { FaFilter } from "react-icons/fa6";
 import "../CSS/riya.css";
 import { FaSearch } from 'react-icons/fa';
+import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-icons/md';
+import axios from 'axios';
+import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 
 const SubCategory = () => {
-    const mainCategories = [
-        "Woman",
-        "Men",
-        "Kids",
-        "Beauty & Health",
-        "Mobile & Electronics",
-        "Sports",
-        "Luggage",
-        "Home & Kitchen"
-    ];
 
-    const categories = [
-        "Indian Wear",
-        "Western Wear",
-        "Watches",
-        "Footwear",
-        "Sports & Active Wear",
-        "Lingerie & Sleepwear",
-        "Beauty & Personal Care",
-        "Belts, Scarves & More",
-        "Maternity",
-        "Sunglasses & Frames",
-        "Jewellary",
-        "Bags",
-        "Topwear",
-        "Indian & Festive Wear",
-        "Bottomwear",
-        "Footwear",
-        "Innerwear & Sleepwear",
-        "Personal Care & Grooming",
-        "Boy",
-        "Girl",
-        "Toys & Games",
-        "Kids Accessories",
-        "Personal Care",
-        "Winterwear",
-        "Mackup",
-        "Skin Care",
-        "Health & Personal Care",
-        "Fragrances",
-        "Baby Care",
-        "Men's Grooming",
-        "Makeup Set",
-        "Company",
-        "Mobile, TV & More",
-        "Wearable Device",
-        "Games",
-        "Accessories",
-        "Shoes",
-        "Sport Accessories & Gear",
-        "Trolley Bag",
-        "Duffle Bags",
-        "Backpacks",
-        "Cookwear & Kitchenwear",
-        "Table wear & Dinner wear",
-        "Home Decor",
-        "Smart Home",
-    ]
-    const [subCategories, setSubCategories] = useState([
-        { id: 1, name: 'Saree', category: 'Indian Wear', mainCategory: 'Woman', status: true },
-        { id: 2, name: 'Blazer', category: 'Western Wear', mainCategory: 'Men', status: false },
-        { id: 3, name: 'Baby Soap', category: 'Baby Care', mainCategory: 'Beauty & Health', status: true },
-        { id: 4, name: 'Sports Shoes', category: 'Shoes', mainCategory: 'Sports', status: true },
-        { id: 5, name: 'Duffle Bag', category: 'Bag Packs', mainCategory: 'Luggage', status: false },
-        { id: 6, name: 'Mens San', category: 'Footwear', mainCategory: 'Men', status: true },
-        { id: 7, name: 'SubCategory 1', category: 'Sunglasses & Frames', mainCategory: 'Women', status: false },
-        { id: 8, name: 'SubCategory 2', category: 'Skin Care', mainCategory: 'Beauty & Health', status: true },
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
-    ]);
+    const [subCategories, setSubCategories] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [mainCategory, setMainCategory] = useState([]);
     const [showFilter, setShowFilter] = useState(false);
     const [showAddEditModal, setShowAddEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [currentSubCategory, setCurrentSubCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters] = useState({ category: '', mainCategory: '', status: '' });
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [id, setId] = useState(null);
+    const [subCatToDelete, setSubCatToDelete] = useState(null);
 
-    const mainCategoriesObj = mainCategories.map((category) => ({ value: category, label: category }));
-    const categoriesObj = categories.map((category) => ({ value: category, label: category }));
-
-    const handleStatusChange = (id) => {
-        setSubCategories(prev =>
-            prev.map(sub =>
-                sub.id === id ? { ...sub, status: !sub.status } : sub
-            )
-        );
-    };
-
-    const filteredSubCategories = subCategories.filter((sub) => {
-        return (
-            sub.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (!filters.category || sub.category === filters.category) &&
-            (!filters.mainCategory || sub.mainCategory === filters.mainCategory) &&
-            (!filters.status || (filters.status === 'Active' ? sub.status : !sub.status))
-        );
+    const [initialValues, setInitialValues] = useState({
+        mainCategoryId: '',
+        categoryId: '',
+        subCategoryName: '',
     });
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredSubCategories.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredSubCategories.length / itemsPerPage);
+    const validationSchema = Yup.object().shape({
+        mainCategoryId: Yup.string().required('Main Category is required'),
+        categoryId: Yup.string().required('Category is required'),
+        subCategoryName: Yup.string().min(2, 'Too Short!')
+            .max(50, 'Too Long!')
+            .required('Sub Category Name is required'),
+    });
 
-    const handlePreviousPage = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
-    };
+    useEffect(() => {
+        const fetchSubCategory = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response??????",response.data.subCategory);
+                setSubCategories(response.data.subCategory);
+            } catch (error) {
+                console.error('Data fetching error:', error);
+            }
+        }
 
-    const handleNextPage = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    };
+        const fetchCategory = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("Response>>>>>>>",response.data.category);
+                setCategory(response.data.category);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        const fetchMainCategory = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("Response>>>>>>>",response.data.users);
+                setMainCategory(response.data.users);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
 
-    const paginationItems = [];
-    paginationItems.push(
-        <Pagination.Prev
-            key="prev"
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-        />
-    );
+        fetchSubCategory();
+        fetchCategory();
+        fetchMainCategory();
+    }, []);
 
-    for (let number = 1; number <= totalPages; number++) {
-        paginationItems.push(
-            <Pagination.Item
-                key={number}
-                active={number === currentPage}
-                onClick={() => setCurrentPage(number)}
-            >
-                {number}
-            </Pagination.Item>
-        );
+    useEffect(() => {
+        const fetchSingleSubCategory = async () => {
+            if (id) {
+                try {
+                    const response = await axios.get(`${BaseUrl}/api/getSubCategory/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    console.log("response", response.data.subCategory);
+                    const subcategoryData = response.data.subCategory;
+                    setInitialValues({
+                        mainCategoryId: subcategoryData.mainCategoryId,
+                        categoryId: subcategoryData.categoryId,
+                        subCategoryName: subcategoryData.subCategoryName
+                    })
+                } catch (error) {
+                    console.error('Data Fetching Error:', error);
+                }
+            } else {
+                setInitialValues({
+                    mainCategoryId: '',
+                    categoryId: '',
+                    subCategoryName: ''
+                })
+            }
+        }
+        fetchSingleSubCategory();
+
+    }, [id, BaseUrl, token])
+
+    const handleSubmit = async (values) => {
+        setId(id);
+        try {
+            if (id) {
+                const response = await axios.put(`${BaseUrl}/api/updateSubCategory/${id}`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("REsposne", response);
+                if (response.data.status === 200) {
+                    setId(null);
+                    setShowAddEditModal(false);
+                    setSubCategories((prevSubCat) => prevSubCat.map((sub) => sub._id === id ? { ...sub, ...values } : sub));
+                }
+            } else {
+                const response = await axios.post(`${BaseUrl}/api/createSubCategory`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response", response);
+                if (response.data.status === 201) {
+                    setShowAddEditModal(false);
+                    setSubCategories((prevSubCat) => [...prevSubCat, response.data.subCategory]);
+                }
+            }
+        } catch (error) {
+            console.error('Data Create and update error:', error);
+        }
     }
 
-    paginationItems.push(
-        <Pagination.Next
-            key="next"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-        />
-    );
-
-    const handleAddEditSave = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const subCategory = {
-            id: currentSubCategory ? currentSubCategory.id : Date.now(),
-            name: formData.get('name'),
-            category: formData.get('category'),
-            mainCategory: formData.get('mainCategory'),
-            status: formData.get('status') === 'Active',
-        };
-
-        if (currentSubCategory) {
-            setSubCategories((prev) =>
-                prev.map((sub) => (sub.id === currentSubCategory.id ? subCategory : sub))
-            );
-        } else {
-            setSubCategories((prev) => [...prev, subCategory]);
+    const handleStatusChange = async (id, status) => {
+        try {
+            const updatedStatus = !status
+            const response = await axios.put(`${BaseUrl}/api/updateSubCategory/${id}`, { status: updatedStatus }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("Response",response.data);
+            if (response.data.status === 200) {
+                setSubCategories((prevSubCat) => prevSubCat.map((sub) =>
+                    sub._id === id ? { ...sub, status: updatedStatus } : sub
+                ))
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
         }
-        setShowAddEditModal(false);
+
     };
 
-    const handleDelete = () => {
-        setSubCategories((prev) => prev.filter((sub) => sub.id !== currentSubCategory.id));
-        setShowDeleteModal(false);
+    const getFilteredData = () => {
+        return subCategories.filter((sub) => {
+
+            const matchesSearch = sub.subCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            sub.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            sub.categoriesData[0].categoryName.toLowerCase().includes(searchQuery.toLowerCase());
+
+            const matchesMainCategory = !filters.mainCategory || sub.mainCategoryId === filters.mainCategory;
+            const matchesCategory = !filters.category || sub.categoryId === filters.category;
+            const matchesStatus = !filters.status ||
+                (filters.status === 'Active' ? sub.status : filters.status === 'Inactive' ? !sub.status : true);
+
+            return matchesSearch && matchesMainCategory && matchesCategory && matchesStatus;
+        });
     };
 
+    useEffect(() => {
+        const filtered = getFilteredData();
+        setFilteredData(filtered);
+        setCurrentPage(1);
+    }, [searchQuery, filters, subCategories]);
+
+    // ************************************** Pagination **************************************
+    const itemsPerPage = 10;
+    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredData, setFilteredData] = useState(subCategories);
+
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
+    //   console.log("totalpage",totalPages)
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
+    const getPaginationButtons = () => {
+        const buttons = [];
+        const maxButtonsToShow = 5;
+
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+
+        if (endPage - startPage + 1 < maxButtonsToShow) {
+            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+        }
+
+        if (startPage > 1) {
+            buttons.push(1);
+            if (startPage > 2) buttons.push('...');
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(i);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) buttons.push('...');
+            buttons.push(totalPages);
+        }
+        return buttons;
+    };
+
+    const paginatedData = filteredData?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+    // *******************************************************************************
+
+    const handleDelete = async () => {
+        const response = await axios.delete(`${BaseUrl}/api/deleteSubCategory/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        // console.log("DeleteRespo", response.data);
+        if (response.data.status === 200) {
+            setSubCategories((prevSubCat) => prevSubCat.filter((sub) => sub._id !== id));
+            setShowDeleteModal(false);
+            setSubCatToDelete(null);
+        }
+    };
+
+    const handleApplyFilters = () => {
+        setShowFilter(false);
+    };
+
+    const handleClearFilters = () => {
+        setFilters({ category: '', mainCategory: '', status: '' });
+        setSearchQuery('');
+    };
     return (
         <div className="container-fluid">
             <h5 className="mb-0 fw-bold">Sub Category</h5>
@@ -201,7 +272,7 @@ const SubCategory = () => {
                                 <FaFilter className='me-2' /> Filter
                             </Button>
                             <Button onClick={() => {
-                                setCurrentSubCategory(null);
+                                // setCurrentSubCategory(null);
                                 setShowAddEditModal(true);
                             }} className="r_add">
                                 + Add
@@ -221,18 +292,18 @@ const SubCategory = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((sub) => (
-                            <tr key={sub.id}>
-                                <td>{sub.id}</td>
-                                <td>{sub.mainCategory}</td>
-                                <td>{sub.category}</td>
-                                <td>{sub.name}</td>
+                        {paginatedData.map((sub, index) => (
+                            <tr key={index}>
+                                {/* {console.log("sub?????????",sub)} */}
+                                <td>{index + 1}</td>
+                                <td>{mainCategory.find((main) => main._id === sub.mainCategoryId)?.mainCategoryName || ''}</td>
+                                <td>{category.find((main) => main._id === sub.categoryId)?.categoryName || ''}</td>
+                                <td>{sub.subCategoryName}</td>
                                 <td>
                                     <Form.Check
                                         type="switch"
-                                        id={`status-switch-${sub.id}`}
                                         checked={sub.status}
-                                        onChange={() => handleStatusChange(sub.id)}
+                                        onChange={() => handleStatusChange(sub._id, sub.status)}
                                         className="status-switch"
                                     />
                                 </td>
@@ -240,7 +311,7 @@ const SubCategory = () => {
                                     <Button
                                         className="r_deleticon me-2"
                                         onClick={() => {
-                                            setCurrentSubCategory(sub);
+                                            setId(sub._id);
                                             setShowAddEditModal(true);
                                         }}
                                     >
@@ -249,8 +320,9 @@ const SubCategory = () => {
                                     <Button
                                         className="r_deleticon"
                                         onClick={() => {
-                                            setCurrentSubCategory(sub);
+                                            setId(sub._id);
                                             setShowDeleteModal(true);
+                                            setSubCatToDelete(sub.subCategoryName);
                                         }}
                                     >
                                         <img src={require('../Photos/delet.png')} className="r_deletimg" alt="delete" />
@@ -262,11 +334,22 @@ const SubCategory = () => {
                 </Table>
 
                 {/* Enhanced Pagination */}
-                <div className="d-flex justify-content-end mt-3">
-                    <Pagination className="mb-0">
-                        {paginationItems}
-                    </Pagination>
-                </div>
+                {totalPages > 1 && (
+                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                            <MdOutlineKeyboardArrowLeft />
+                        </p>
+                        {getPaginationButtons().map((page, index) => (
+                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                onClick={() => handlePageChange(page)}>
+                                {page}
+                            </p>
+                        ))}
+                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                            <MdOutlineKeyboardArrowRight />
+                        </p>
+                    </div>
+                )}
 
                 {/* Filter Offcanvas */}
                 <Offcanvas show={showFilter} onHide={() => setShowFilter(false)} placement="end">
@@ -286,8 +369,8 @@ const SubCategory = () => {
                                     onChange={(e) => setFilters({ ...filters, mainCategory: e.target.value })}
                                 >
                                     <option value="">Select Main Category</option>
-                                    {mainCategoriesObj.map((mainCat) => (
-                                        <option key={mainCat.value} value={mainCat.value}>{mainCat.label}</option>
+                                    {mainCategory.map((mainCat) => (
+                                        <option key={mainCat._id} value={mainCat._id}>{mainCat.mainCategoryName}</option>
                                     ))}
                                 </Form.Control>
                             </Form.Group>
@@ -299,8 +382,8 @@ const SubCategory = () => {
                                     onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                                 >
                                     <option value="">Select Category</option>
-                                    {categoriesObj.map((cat) => (
-                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                    {category.map((cat) => (
+                                        <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
                                     ))}
                                 </Form.Control>
                             </Form.Group>
@@ -320,128 +403,86 @@ const SubCategory = () => {
                     </Offcanvas.Body>
                     <div className="p-3 mt-auto">
                         <div className="d-flex gap-5">
-                            <Button className="flex-grow-1 r_outlinebtn" onClick={() => setFilters({ category: '', mainCategory: '', status: '' })}>
-                                Clear
+                            <Button className="flex-grow-1 r_outlinebtn" onClick={handleClearFilters}>
+                                Cancel
                             </Button>
-                            <Button className="flex-grow-1 r_bgbtn" type="submit">
+                            <Button className="flex-grow-1 r_bgbtn" type="submit" onClick={handleApplyFilters}>
                                 Apply
                             </Button>
                         </div>
                     </div>
                 </Offcanvas>
 
-                {/* Add Subcategory Modal */}
-                <Modal show={showAddEditModal && !currentSubCategory} onHide={() => setShowAddEditModal(false)} centered>
+                {/* Add and Update Subcategory Modal */}
+                <Modal show={showAddEditModal} onHide={() => { setShowAddEditModal(false); setId(null); }} centered>
                     <Modal.Header closeButton className="r_modalheader">
                     </Modal.Header>
                     <Modal.Body className="r_modalbody">
-                    <h6 className='text-center fw-bold'>Add Sub Category</h6>
-                        <Form onSubmit={handleAddEditSave} className="r_form">
-                            {/* Select for Main Categories */}
-                            <Form.Group className="mb-3">
-                                <Form.Label>Main Category</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    name="mainCategory"
-                                    required
-                                >
-                                    <option value="">Select</option>
-                                    {mainCategories.map((mainCategory, index) => (
-                                        <option key={index} value={mainCategory}>{mainCategory}</option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                            {/* Select for Categories */}
-                            <Form.Group className="mb-3">
-                                <Form.Label>Category</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    name="category"
-                                    required
-                                >
-                                    <option value="">Select </option>
-                                    {categories.map((category, index) => (
-                                        <option key={index} value={category}>{category}</option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Sub Category</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="name"
-                                    placeholder='Enter Sub Category'
-                                    required
-                                />
-                            </Form.Group>
-                            <div className="d-flex justify-content-center gap-2 mt-4">
-                                <Button onClick={() => setShowAddEditModal(false)} className="r_cancel">
-                                    Cancel
-                                </Button>
-                                <Button type="submit" className="r_delete">
-                                    Save
-                                </Button>
-                            </div>
-                        </Form>
-                    </Modal.Body>
-                </Modal>
+                        <h6 className='text-center fw-bold'>{id ? 'Edit Sub Category' : 'Add Sub Category'}</h6>
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={validationSchema}
+                            onSubmit={handleSubmit}
+                            enableReinitialize={true}
+                        >
+                            {({ handleSubmit }) => (
+                                <FormikForm onSubmit={handleSubmit} className="r_form">
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Main Category</Form.Label>
+                                        <Field
+                                            as="select"
+                                            name="mainCategoryId"
+                                            className="form-control"
+                                        >
+                                            <option value="">Select</option>
+                                            {mainCategory.map((main) => (
+                                                <option key={main._id} value={main._id}>
+                                                    {main.mainCategoryName}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="mainCategoryId" component="div" className="text-danger" />
+                                    </Form.Group>
 
-                {/* Edit Subcategory Modal */}
-                <Modal show={showAddEditModal && currentSubCategory} onHide={() => setShowAddEditModal(false)} centered>
-                    <Modal.Header closeButton className="r_modalheader">
-                    </Modal.Header>
-                    <Modal.Body className="r_modalbody">
-                    <h6 className='text-center fw-bold'>Edit Sub Category</h6>
-                        <Form onSubmit={handleAddEditSave} className="r_form">
-                            {/* Select for Main Categories */}
-                            <Form.Group className="mb-3">
-                                <Form.Label>Main Category</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    name="mainCategory"
-                                    defaultValue={currentSubCategory?.mainCategory}
-                                    required
-                                >
-                                    <option value="">Select</option>
-                                    {mainCategories.map((mainCategory, index) => (
-                                        <option key={index} value={mainCategory}>{mainCategory}</option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                            {/* Select for Categories */}
-                            <Form.Group className="mb-3">
-                                <Form.Label>Category</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    name="category"
-                                    defaultValue={currentSubCategory?.category}
-                                    required
-                                >
-                                    <option value="">Select </option>
-                                    {categories.map((category, index) => (
-                                        <option key={index} value={category}>{category}</option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Sub Category</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="name"
-                                    placeholder='Enter Sub Category'
-                                    defaultValue={currentSubCategory?.name || ''}
-                                    required
-                                />
-                            </Form.Group>
-                            <div className="d-flex justify-content-center gap-2 mt-4">
-                                <Button onClick={() => setShowAddEditModal(false)} className="r_cancel">
-                                    Cancel
-                                </Button>
-                                <Button type="submit" className="r_delete">
-                                    Update
-                                </Button>
-                            </div>
-                        </Form>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Category</Form.Label>
+                                        <Field
+                                            as="select"
+                                            name="categoryId"
+                                            className="form-control"
+                                        >
+                                            <option value="">Select</option>
+                                            {category.map((cat) => (
+                                                <option key={cat._id} value={cat._id}>
+                                                    {cat.categoryName}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="categoryId" component="div" className="text-danger" />
+                                    </Form.Group>
+
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Sub Category</Form.Label>
+                                        <Field
+                                            type="text"
+                                            name="subCategoryName"
+                                            placeholder="Enter Sub Category"
+                                            className="form-control"
+                                        />
+                                        <ErrorMessage name="subCategoryName" component="div" className="text-danger" />
+                                    </Form.Group>
+
+                                    <div className="d-flex justify-content-center gap-2 mt-4">
+                                        <Button onClick={() => setShowAddEditModal(false)} className="r_cancel">
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit" className="r_delete">
+                                            {id ? 'Update' : 'Add'}
+                                        </Button>
+                                    </div>
+                                </FormikForm>
+                            )}
+                        </Formik>
                     </Modal.Body>
                 </Modal>
 
@@ -450,7 +491,7 @@ const SubCategory = () => {
 
                     <Modal.Body className='p-5'>
                         <h6 className='text-center fw-bold mb-3'>Delete</h6>
-                        <p className='mb-4 text-center text-muted'>Are you sure you want to delete this sub-category?</p>
+                        <p className='mb-4 text-center text-muted'>Are you sure you want to delete {subCatToDelete}?</p>
                         <div className="d-flex justify-content-center gap-2">
                             <Button className="r_cancel" onClick={() => setShowDeleteModal(false)}>
                                 Cancel
