@@ -612,6 +612,7 @@
     .mv_chart_per {
         display: flex;
         justify-content: center;
+        align-items: center;
     }
     .mv_sub_order_summary{
         padding: 10px;

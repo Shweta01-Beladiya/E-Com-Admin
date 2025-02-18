@@ -22,7 +22,7 @@ const Category = () => {
     const [showFilter, setShowFilter] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [categoryToDelete,setCategoryToDelete] =useState(null);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
 
     const [id, setId] = useState(null);
     const [filters, setFilters] = useState({
@@ -132,12 +132,12 @@ const Category = () => {
                 // console.log("Response", response.data);
                 if (response.data.status === 200) {
                     setShowAddModal(false);
-                    setId(null);                   
+                    setId(null);
                     setCategories((prevCategories) =>
                         prevCategories.map((cat) =>
-                          cat._id === id ? { ...cat, ...values } : cat
+                            cat._id === id ? { ...cat, ...values } : cat
                         )
-                      );
+                    );
                 }
             } else {
                 const response = await axios.post(`${BaseUrl}/api/createCategory`, values, {
@@ -259,6 +259,23 @@ const Category = () => {
         }
     };
 
+    // No Results Found Component
+    const NoResultsFound = () => (
+        <div style={{ transform: 'translateY(50%)' }}>
+            <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                    <img src={require('../Photos/notfind.png')}></img>
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
+                </div>
+                <div>
+                    <p className="text-gray-500">Whoops... No matching data found</p>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div>
             {/* Header with title and buttons */}
@@ -270,7 +287,7 @@ const Category = () => {
 
 
             {/* Main Table */}
-            <div className="bg-white rounded shadow-sm" style={{ padding: '20px' }}>
+            <div className="bg-white rounded shadow-sm" style={{ padding: '20px',height:'100vh'  }}>
                 <Row className="mb-4 align-items-center">
                     <Col xs={12} md={6} lg={4}>
                         <InputGroup className="mb-3 search-input-group r_inputgroup">
@@ -300,71 +317,78 @@ const Category = () => {
                     </Col>
                 </Row>
                 {/* Table component */}
-                <Table responsive borderless className="mb-0">
-                    <thead className="bg-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Main Category</th>
-                            <th> Name</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {getCurrentPageData().map((category, index) => (
-                            <tr key={category.id}>
-                                <td>{index + 1}</td>
-                                <td> {mainCategory.find(cat => cat._id === category.mainCategoryId)?.mainCategoryName || ''}</td>
-                                <td>{category.categoryName}</td>
-                                <td>
-                                    <Form.Check
-                                        type="switch"
-                                        checked={category.status}
-                                        onChange={() => handleStatusChange(category._id, category.status)}
-                                    />
-                                </td>
-                                <td>
-                                    <Button
-                                        className="r_deleticon me-2"
-                                        onClick={() => {
-                                            setShowAddModal(true);
-                                            setId(category._id);
-                                        }}
-                                        >
-                                        <img src={require('../Photos/edit.png')} class="r_deletimg" alt=''></img>
-                                        {/* <FiEdit size={18} /> */}
-                                    </Button>
-                                    <Button
-                                        className="r_deleticon"
-                                        onClick={() => {
-                                            setShowDeleteModal(true);
-                                            setId(category._id);   
-                                            setCategoryToDelete(category);
-                                        }}
-                                    >
-                                        <img src={require('../Photos/delet.png')} class="r_deletimg" alt=''></img>
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-                {totalPages > 1 && (
-                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                            <MdOutlineKeyboardArrowLeft />
-                        </p>
-                        {getPaginationButtons().map((page, index) => (
-                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                onClick={() => handlePageChange(page)}>
-                                {page}
-                            </p>
-                        ))}
-                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                            <MdOutlineKeyboardArrowRight />
-                        </p>
-                    </div>
+                {getCurrentPageData().length > 0 ? (
+                    <>
+                        <Table responsive borderless className="mb-0">
+                            <thead className="bg-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Main Category</th>
+                                    <th> Name</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {getCurrentPageData().map((category, index) => (
+                                    <tr key={category.id}>
+                                        <td>{index + 1}</td>
+                                        <td> {mainCategory.find(cat => cat._id === category.mainCategoryId)?.mainCategoryName || ''}</td>
+                                        <td>{category.categoryName}</td>
+                                        <td>
+                                            <Form.Check
+                                                type="switch"
+                                                checked={category.status}
+                                                onChange={() => handleStatusChange(category._id, category.status)}
+                                            />
+                                        </td>
+                                        <td>
+                                            <Button
+                                                className="r_deleticon me-2"
+                                                onClick={() => {
+                                                    setShowAddModal(true);
+                                                    setId(category._id);
+                                                }}
+                                            >
+                                                <img src={require('../Photos/edit.png')} class="r_deletimg" alt=''></img>
+                                                {/* <FiEdit size={18} /> */}
+                                            </Button>
+                                            <Button
+                                                className="r_deleticon"
+                                                onClick={() => {
+                                                    setShowDeleteModal(true);
+                                                    setId(category._id);
+                                                    setCategoryToDelete(category);
+                                                }}
+                                            >
+                                                <img src={require('../Photos/delet.png')} class="r_deletimg" alt=''></img>
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                        {totalPages > 1 && (
+                            <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                    <MdOutlineKeyboardArrowLeft />
+                                </p>
+                                {getPaginationButtons().map((page, index) => (
+                                    <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                        onClick={() => handlePageChange(page)}>
+                                        {page}
+                                    </p>
+                                ))}
+                                <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                    <MdOutlineKeyboardArrowRight />
+                                </p>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <NoResultsFound />
                 )}
+
             </div>
 
             {/* Filter Offcanvas */}
@@ -468,7 +492,7 @@ const Category = () => {
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
                 <Modal.Body className='p-5'>
                     <h6 className='text-center fw-bold mb-3'>Delete</h6>
-                    
+
                     <p className='mb-4 text-center text-muted'> Are you sure you want to delete {categoryToDelete?.categoryName}?</p>
                     <div className="d-flex justify-content-center gap-2">
                         <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
