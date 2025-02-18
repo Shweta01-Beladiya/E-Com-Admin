@@ -50,6 +50,7 @@ import Viewaboutus from './Pages/view_aboutus';
 import Cards from './Pages/card';
 import Popularbrands from './Pages/popular_brands';
 import Addpopularbrands from './Pages/add_popularbrands';
+import AddProduct from './Pages/AddProduct';
 
 
 
@@ -72,6 +73,7 @@ function App() {
             <Route path='/subcategory' element={<SubCategory />}></Route>
             <Route path='/view_profile' element={<Viewprofile />}></Route>
             <Route path="/product" element={<Product />}></Route>
+            <Route path="/addProduct" element={<AddProduct />}></Route>
             <Route path='/unit' element={<Unit />}></Route>
             <Route path='/size' element={<Size />}></Route>
             <Route path='/addsize' element={<Addsize />}></Route>

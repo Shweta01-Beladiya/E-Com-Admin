@@ -752,6 +752,11 @@
     height: 790px !important;
     background-color: #fff;
 }
+.mv_main_profile_change1{
+    box-shadow: -2px 4px 58px 0px #2C2C2C1A;
+    height: auto !important;
+    background-color: #fff;
+}
 .mv_profile_img img{
     width: 120px !important;
     height: 120px !important;

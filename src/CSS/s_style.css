@@ -125,20 +125,23 @@
      --bs-offcanvas-zindex: 1220;
   }
 
-  .sb_table{
-   width: 100%;
+  .sb_table {
+     width: 100%;
   }
-  .sb_table tr td:nth-child(1){
-      width: 50%;
-      color: #868686;
-      font-weight: bold;
-      padding: 5px 0;
+
+  .sb_table tr td:nth-child(1) {
+     width: 50%;
+     color: #868686;
+     font-weight: bold;
+     padding: 5px 0;
   }
-  .sb_table tr td:nth-child(2){
-      width: 50%;
-      color: #000000;
-      padding: 5px 0;
+
+  .sb_table tr td:nth-child(2) {
+     width: 50%;
+     color: #000000;
+     padding: 5px 0;
   }
+
   @media (min-width:1990px) {
      .illustration-container svg {
         left: 26%;

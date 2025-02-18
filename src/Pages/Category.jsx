@@ -260,7 +260,7 @@ const Category = () => {
     };
 
     return (
-        <div className="container-fluid">
+        <div>
             {/* Header with title and buttons */}
             <h5 className="mb-0 fw-bold">Category</h5>
             <div className='d-flex'>
@@ -300,7 +300,7 @@ const Category = () => {
                     </Col>
                 </Row>
                 {/* Table component */}
-                <Table responsive hover borderless className="mb-0">
+                <Table responsive borderless className="mb-0">
                     <thead className="bg-light">
                         <tr>
                             <th>ID</th>

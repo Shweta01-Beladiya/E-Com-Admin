@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 
 
-const ContactUs = (props) => {
+const ContactUs = () => {
    
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
@@ -19,17 +18,80 @@ const ContactUs = (props) => {
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const [filteredData, setFilteredData] = useState(data);
     const [id, setId] = useState(null);
     const [viewData, setViewData] = useState({});
     const [selectedSubject, setSelectedSubject] = useState("");
     const [data,setData] = useState([]);
-    const [viewModal, setViewModal] = useState(false);
+    // const [filteredData, setFilteredData] = useState(data);
+    // const [viewModal, setViewModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
     // const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     // console.log("totalpage",totalPages)
 
+    const local_data = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allContactUs`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("reponse",response.data.contactUs);
+            const dataFromStorage = response.data.contactUs
+            if (dataFromStorage) {
+                const total = Math.ceil(dataFromStorage.length / itemsPerPage);
+                setTotalPages(total);
+
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+
+                setData(dataFromStorage.slice(startIndex, endIndex));
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    };
+
+    useEffect(() => {
+        local_data();
+    }, [currentPage]);
+
+    useEffect(() => {
+        const fetchdata = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/getContactUs/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response", response.data.contactUs);
+                setViewData(response.data.contactUs);
+
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchdata();
+    }, [id]);
+
+    const handleSearch = (event) => {
+        setSearchQuery(event.target.value);
+        setCurrentPage(1);
+    };
+    const handleSubjectChange = (event) => {
+        setSelectedSubject(event.target.value);
+        setCurrentPage(1);
+    };
+    // Filter data based on search query
+    const filteredData = data.filter((item) => {
+        const matchesSearch =
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.message.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesSubject = selectedSubject === "" || item.subject === selectedSubject;
+
+        return matchesSearch && matchesSubject;
+    });
+    
+    
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
@@ -71,24 +133,12 @@ const ContactUs = (props) => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    // *******************************************************************************
-    
+
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
-    const [modalShow1, setModalShow1] = React.useState(false);
+    const [viewModal, setViewModal] = useState(false);
+    const [show, setShow] = useState(false); // offcanvas
 
-    const [values, setValues] = useState({
-        name: "",
-        name1: ""
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setValues({ ...values, [name]: value });
-    };
-
-    // Offcanvas
-    const [show, setShow] = useState(false);
 
     const handleClose = () => {
         setShow(false);
@@ -133,33 +183,7 @@ const ContactUs = (props) => {
             console.error('Data Fetching Error:', error);
         }
     }
-    const handleSubjectChange = (event) => {
-        setSelectedSubject(event.target.value);
-        setCurrentPage(1);
-    };
-    const local_data = async () => {
-        try {
-            const response = await axios.get(`${BaseUrl}/api/allContactUs`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // console.log("reponse",response.data.contactUs);
-            const dataFromStorage = response.data.contactUs
-            if (dataFromStorage) {
-                const total = Math.ceil(dataFromStorage.length / itemsPerPage);
-                setTotalPages(total);
 
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-
-                setData(dataFromStorage.slice(startIndex, endIndex));
-            }
-        } catch (error) {
-            console.error('Data Fetching Error:', error);
-        }
-    };
-    useEffect(() => {
-        local_data();
-    }, [currentPage]);
     return (
         <>
             <div id='mv_container_fluid'>
@@ -182,6 +206,8 @@ const ContactUs = (props) => {
                                         placeholder="Search..."
                                         aria-label="Username"
                                         aria-describedby="basic-addon1"
+                                        value={searchQuery}
+                                        onChange={handleSearch}
                                         />
                                     </InputGroup>
                                 </div>
@@ -237,10 +263,10 @@ const ContactUs = (props) => {
                                     <tbody>
                                         {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
+                                            <td>{index + 1}</td>
                                             <td>{item.name}</td>
                                             <td>{item.email}</td>
-                                            <td>{item.contactno}</td>
+                                            <td>{item.contactNo}</td>
                                             <td>{item.subject}</td>
                                             <td>{item.message}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
@@ -294,7 +320,7 @@ const ContactUs = (props) => {
             </Modal>
 
             {/* View Contact Us Model */}
-            <Modal className='mv_logout_dialog' show={modalShow1} onHide={() => setModalShow1(false)}  centered >
+            <Modal className='mv_logout_dialog' show={viewModal} onHide={() => handleViewClose(false)}  centered >
                 <Modal.Header className='mv_contect_details_header' closeButton>
                     <h6 className='fw-bold mb-0'>Contact Details</h6>
                 </Modal.Header>
