@@ -27,25 +27,10 @@ const Addpopularbrands = () => {
         setisedit(false);
     };
 
-    // Edit Offer
+    // Edit Popularbrands
     const location = useLocation();
-    const editOffer = location.state?.editOffer;
-    console.log(editOffer)
-
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
-        }
-    };
+    const editPopularbrands = location.state?.editPopularbrands;
+    console.log(editPopularbrands)
 
     // Select img
     let [brandimg, setbrandimg] = useState("");
@@ -56,11 +41,11 @@ const Addpopularbrands = () => {
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editOffer ? 'Edit Popular Brands' : 'Add Popular Brands'}</p>
+                        <p className='mb-1'>{editPopularbrands ? 'Edit Popular Brands' : 'Add Popular Brands'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editOffer ? 'Edit Popular Brands' : 'Add Popular Brands'}
+                                {editPopularbrands ? 'Edit Popular Brands' : 'Add Popular Brands'}
                             </p>
                         </div>
                     </div>
@@ -155,7 +140,7 @@ const Addpopularbrands = () => {
                                                 <button className='border-0 bg-transparent'>
                                                     Cnacel
                                                 </button>
-                                                {editOffer === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                {editPopularbrands === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
                                                     Update
                                                 </button> : 
                                                 <button className='border-0 bg-transparent' onClick={change_edit}>

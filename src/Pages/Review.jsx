@@ -1,14 +1,35 @@
 
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Card, Button, Modal } from 'react-bootstrap';
 import { FaStar, FaEye, FaTrashAlt } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 const ReviewManagement = () => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+
+  
+  // API
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
+  
+  // Get 
+  const [reviewdata,setReviewdata] = useState([])
+  
+  useEffect(() => {
+    const fetchReview = async() => {
+      const response = await axios.get(`${BaseUrl}/api/allratingAndReview`,{
+        headers: {Authorization:`Bearer ${token}`}
+      })
+      console.log("review",response.data.ratingAndReview);
+      setReviewdata(response.data.ratingAndReview);
+    }
+
+    fetchReview();
+  },[])
 
   // Sample review data
   const reviews = [
@@ -86,24 +107,20 @@ const ReviewManagement = () => {
               <tr>
                 <th>Customer</th>
                 <th>Product</th>
-                <th>Rating</th>
                 <th>Date</th>
-                <th>Status</th>
+                <th>Rate</th>
+                <th>Description</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {reviews.map((review) => (
+              {reviewdata.map((review) => (
                 <tr key={review.id}>
-                  <td>{review.customerName}</td>
+                  <td>{review.userData.map((user) => user.name)}</td>
                   <td>{review.productName}</td>
+                  <td>{new Date(review.createdAt).toLocaleDateString("en-GB")}</td>
                   <td>{renderStars(review.rating)}</td>
-                  <td>{review.date}</td>
-                  <td>
-                    <span style={styles.statusBadge}>
-                      {review.status}
-                    </span>
-                  </td>
+                  <td>{review.review}</td>
                   <td>
                     <Button 
                       variant="outline-primary"
