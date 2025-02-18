@@ -5,6 +5,8 @@ import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const Unit = (props) => {
    
@@ -131,17 +133,45 @@ const Unit = (props) => {
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
-    const [modalShow2, setModalShow2] = React.useState(false);
 
-    const [values, setValues] = useState({
-        name: "",
-        name1: ""
-    });
+    // const [values, setValues] = useState({
+    //     name: "",
+    //     name1: ""
+    // });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setValues({ ...values, [name]: value });
-    };
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setValues({ ...values, [name]: value });
+    // };
+
+
+    // ******************************* Validation *******************************
+    const [id, setId] = useState(null);
+
+    const init = {
+        name:"",
+        shortname:""
+    }
+
+    const validate = Yup.object().shape({
+        name:Yup.string().required("Unit Name is required"),
+        shortname:Yup.string().required("Short Name is required")
+    })
+
+    const {values, handleBlur, handleChange, handleSubmit,errors,touched} = useFormik({
+        initialValues:init,
+        validationSchema:validate,
+        onSubmit: (values) => {
+            console.log(values);   
+            // addunit(values)
+        }
+    })
+    
+    // const addunit = () => {
+
+    // }
+    // *******************************************************************************
+
 
     return (
         <>
@@ -203,7 +233,7 @@ const Unit = (props) => {
                                                     />
                                             </td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow2(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
                                                     <Link>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
@@ -255,93 +285,56 @@ const Unit = (props) => {
                 </Modal.Body>
             </Modal>
 
-            {/* Add Unit Model */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            {/* Add Edit Unit Model */}
+            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
                 <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
-                    Add Unit
+                    {id ? 'Edit Unit' : 'Add Unit'}
                 </Modal.Title>
                 <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form>
-                        <div className="mv_input_content">
+                    <form onSubmit={handleSubmit}>
+                        <div className="mv_input_content mb-3">
                             <label className='mv_label_input'>Name</label>
-                            <InputGroup className="mb-3">
+                            <InputGroup className="">
                                 <Form.Control
                                     placeholder="Enter unit name"
                                     name='name'
                                     value={values.name}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
+                            {errors.name && touched.name && <div className="text-danger small">{errors.name}</div>}
                         </div>
                         <div className="mv_input_content mb-5">
                             <label className='mv_label_input'>Short Name</label>
-                            <InputGroup className="mb-3">
+                            <InputGroup className="">
                                 <Form.Control
                                     placeholder="Enter short name"
-                                    name='name1'
-                                    value={values.name1}
+                                    name='shortname'
+                                    value={values.shortname}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
+                            {errors.shortname && touched.shortname && <div className="text-danger small">{errors.shortname}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
                                 <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
-                                <button type="submit">Add</button>
+                                <button type="submit">
+                                    {id ? 'Update' : 'Add'}
+                                </button>
                             </div>
                         </div>
                     </form>
                 </Modal.Body>
             </Modal>
 
-            {/* Edit  Model */}
-            <Modal show={modalShow2} onHide={() => { setModalShow2(false);  }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
-                <Modal.Header className='mv_edit_profile_header' closeButton>
-                    
-                </Modal.Header>
-                <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
-                    Edit Unit
-                </Modal.Title>
-                <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form>
-                        <div className="mv_input_content">
-                            <label className='mv_label_input'>Name</label>
-                            <InputGroup className="mb-3">
-                                <Form.Control
-                                    placeholder="Enter unit name"
-                                    name='name'
-                                    value={values.name}
-                                    onChange={handleChange}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="mv_input_content mb-5">
-                            <label className='mv_label_input'>Short Name</label>
-                            <InputGroup className="mb-3">
-                                <Form.Control
-                                    placeholder="Enter short name"
-                                    name='name1'
-                                    value={values.name1}
-                                    onChange={handleChange}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
-                            <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow2(false)}>Cancel</button>
-                            </div>
-                            <div className="mv_logout_button">
-                                <button type="submit">Update</button>
-                            </div>
-                        </div>
-                    </form>
-                </Modal.Body>
-            </Modal>
         </>
     );
 };
