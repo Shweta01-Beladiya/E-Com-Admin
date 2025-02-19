@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form, Table, Pagination, Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
+import { Button, Modal, Form, Table, Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
 import { FaFilter } from "react-icons/fa6";
 import "../CSS/riya.css";
 import { FaSearch } from 'react-icons/fa';
@@ -7,6 +7,7 @@ import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-i
 import axios from 'axios';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import NoResultsFound from '../Component/Noresult';
 
 
 const SubCategory = () => {
@@ -78,7 +79,7 @@ const SubCategory = () => {
         fetchSubCategory();
         fetchCategory();
         fetchMainCategory();
-    }, []);
+    }, [BaseUrl, token]);
 
     useEffect(() => {
         const fetchSingleSubCategory = async () => {
@@ -267,23 +268,6 @@ const SubCategory = () => {
         setSearchQuery('');
     };
 
-    // No Results Found Component
-    const NoResultsFound = () => (
-        <div style={{ transform: 'translateY(50%)' }}>
-            <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                    <img src={require('../Photos/notfind.png')}></img>
-                </div>
-                <div>
-                    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
-                </div>
-                <div>
-                    <p className="text-gray-500">Whoops... No matching data found</p>
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <div>
             <h5 className="mb-0 fw-bold">Sub Category</h5>
@@ -291,7 +275,7 @@ const SubCategory = () => {
                 <p class="text-muted">Dashboard /</p>
                 <p className='ms-1'>Sub Category</p>
             </div>
-            <div style={{ backgroundColor: 'white', padding: '20px', height:'100vh' }}>
+            <div style={{ backgroundColor: 'white', padding: '20px', height:'80vh' }}>
                 <Row className="mb-4 align-items-center">
                     <Col xs={12} md={6} lg={4}>
                         <InputGroup className="mb-3 search-input-group r_inputgroup">

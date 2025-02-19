@@ -176,7 +176,7 @@ const Sidebar = ({ open, handleDrawerClose, theme }) => {
   return (
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
-        <h2 className="pe-5 text-white">LOGO</h2>
+        <h2 className="pe-5 text-white mb-0">LOGO</h2>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === 'rtl' ? (
             <FiChevronRight className="text-white w-6 h-6" />

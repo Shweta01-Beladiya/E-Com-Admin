@@ -10,6 +10,7 @@ import axios from 'axios';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-icons/md';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import NoResultsFound from '../Component/Noresult';
 
 const Category = () => {
 
@@ -259,23 +260,6 @@ const Category = () => {
         }
     };
 
-    // No Results Found Component
-    const NoResultsFound = () => (
-        <div style={{ transform: 'translateY(50%)' }}>
-            <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                    <img src={require('../Photos/notfind.png')}></img>
-                </div>
-                <div>
-                    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
-                </div>
-                <div>
-                    <p className="text-gray-500">Whoops... No matching data found</p>
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <div>
             {/* Header with title and buttons */}
@@ -287,7 +271,7 @@ const Category = () => {
 
 
             {/* Main Table */}
-            <div className="bg-white rounded shadow-sm" style={{ padding: '20px',height:'100vh'  }}>
+            <div className="bg-white rounded shadow-sm" style={{ padding: '20px',height:'80vh'  }}>
                 <Row className="mb-4 align-items-center">
                     <Col xs={12} md={6} lg={4}>
                         <InputGroup className="mb-3 search-input-group r_inputgroup">
