@@ -24,7 +24,7 @@ const SubCategory = () => {
     const [filters, setFilters] = useState({ category: '', mainCategory: '', status: '' });
     const [id, setId] = useState(null);
     const [subCatToDelete, setSubCatToDelete] = useState(null);
-
+    const [filteredCategories, setFilteredCategories] = useState([]); // use for Fileter category
     const [initialValues, setInitialValues] = useState({
         mainCategoryId: '',
         categoryId: '',
@@ -158,9 +158,9 @@ const SubCategory = () => {
     const getFilteredData = () => {
         return subCategories.filter((sub) => {
 
-            const matchesSearch = sub.subCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            sub.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            sub.categoriesData[0].categoryName.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearch = sub.subCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                sub.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                sub.categoriesData[0].categoryName.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesMainCategory = !filters.mainCategory || sub.mainCategoryId === filters.mainCategory;
             const matchesCategory = !filters.category || sub.categoryId === filters.category;
@@ -176,6 +176,28 @@ const SubCategory = () => {
         setFilteredData(filtered);
         setCurrentPage(1);
     }, [searchQuery, filters, subCategories]);
+
+    useEffect(() => {
+        const handleCategoryFilter = (mainCatId) => {
+            if (!mainCatId) {
+                setFilteredCategories([]); // Reset filtered categories if no main category selected
+                return;
+            }
+
+            const relatedCategories = category.filter(cat => cat.mainCategoryId === mainCatId);
+            setFilteredCategories(relatedCategories);
+        };
+
+        // For the filter modal
+        if (filters.mainCategory) {
+            handleCategoryFilter(filters.mainCategory);
+        }
+
+        // For the add/edit form - watch initialValues.mainCategoryId
+        if (initialValues.mainCategoryId) {
+            handleCategoryFilter(initialValues.mainCategoryId);
+        }
+    }, [filters.mainCategory, initialValues.mainCategoryId, category]);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -245,6 +267,23 @@ const SubCategory = () => {
         setSearchQuery('');
     };
 
+    // No Results Found Component
+    const NoResultsFound = () => (
+        <div style={{ transform: 'translateY(50%)' }}>
+            <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                    <img src={require('../Photos/notfind.png')}></img>
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
+                </div>
+                <div>
+                    <p className="text-gray-500">Whoops... No matching data found</p>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div>
             <h5 className="mb-0 fw-bold">Sub Category</h5>
@@ -252,7 +291,7 @@ const SubCategory = () => {
                 <p class="text-muted">Dashboard /</p>
                 <p className='ms-1'>Sub Category</p>
             </div>
-            <div style={{ backgroundColor: 'white', padding: '20px' }}>
+            <div style={{ backgroundColor: 'white', padding: '20px', height:'100vh' }}>
                 <Row className="mb-4 align-items-center">
                     <Col xs={12} md={6} lg={4}>
                         <InputGroup className="mb-3 search-input-group r_inputgroup">
@@ -281,75 +320,81 @@ const SubCategory = () => {
                         </div>
                     </Col>
                 </Row>
-                <Table responsive borderless>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Main Category</th>
-                            <th>Category</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedData.map((sub, index) => (
-                            <tr key={index}>
-                                {/* {console.log("sub?????????",sub)} */}
-                                <td>{index + 1}</td>
-                                <td>{mainCategory.find((main) => main._id === sub.mainCategoryId)?.mainCategoryName || ''}</td>
-                                <td>{category.find((main) => main._id === sub.categoryId)?.categoryName || ''}</td>
-                                <td>{sub.subCategoryName}</td>
-                                <td>
-                                    <Form.Check
-                                        type="switch"
-                                        checked={sub.status}
-                                        onChange={() => handleStatusChange(sub._id, sub.status)}
-                                        className="status-switch"
-                                    />
-                                </td>
-                                <td>
-                                    <Button
-                                        className="r_deleticon me-2"
-                                        onClick={() => {
-                                            setId(sub._id);
-                                            setShowAddEditModal(true);
-                                        }}
-                                    >
-                                        <img src={require('../Photos/edit.png')} className="r_deletimg" alt="edit" />
-                                    </Button>
-                                    <Button
-                                        className="r_deleticon"
-                                        onClick={() => {
-                                            setId(sub._id);
-                                            setShowDeleteModal(true);
-                                            setSubCatToDelete(sub.subCategoryName);
-                                        }}
-                                    >
-                                        <img src={require('../Photos/delet.png')} className="r_deletimg" alt="delete" />
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                {paginatedData.length > 0 ? (
+                    <>
+                        <Table responsive borderless>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Main Category</th>
+                                    <th>Category</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedData.map((sub, index) => (
+                                    <tr key={index}>
+                                        {/* {console.log("sub?????????",sub)} */}
+                                        <td>{index + 1}</td>
+                                        <td>{mainCategory.find((main) => main._id === sub.mainCategoryId)?.mainCategoryName || ''}</td>
+                                        <td>{category.find((main) => main._id === sub.categoryId)?.categoryName || ''}</td>
+                                        <td>{sub.subCategoryName}</td>
+                                        <td>
+                                            <Form.Check
+                                                type="switch"
+                                                checked={sub.status}
+                                                onChange={() => handleStatusChange(sub._id, sub.status)}
+                                                className="status-switch"
+                                            />
+                                        </td>
+                                        <td>
+                                            <Button
+                                                className="r_deleticon me-2"
+                                                onClick={() => {
+                                                    setId(sub._id);
+                                                    setShowAddEditModal(true);
+                                                }}
+                                            >
+                                                <img src={require('../Photos/edit.png')} className="r_deletimg" alt="edit" />
+                                            </Button>
+                                            <Button
+                                                className="r_deleticon"
+                                                onClick={() => {
+                                                    setId(sub._id);
+                                                    setShowDeleteModal(true);
+                                                    setSubCatToDelete(sub.subCategoryName);
+                                                }}
+                                            >
+                                                <img src={require('../Photos/delet.png')} className="r_deletimg" alt="delete" />
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
 
-                {/* Enhanced Pagination */}
-                {totalPages > 1 && (
-                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                            <MdOutlineKeyboardArrowLeft />
-                        </p>
-                        {getPaginationButtons().map((page, index) => (
-                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                onClick={() => handlePageChange(page)}>
-                                {page}
-                            </p>
-                        ))}
-                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                            <MdOutlineKeyboardArrowRight />
-                        </p>
-                    </div>
+                        {/* Enhanced Pagination */}
+                        {totalPages > 1 && (
+                            <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                    <MdOutlineKeyboardArrowLeft />
+                                </p>
+                                {getPaginationButtons().map((page, index) => (
+                                    <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                        onClick={() => handlePageChange(page)}>
+                                        {page}
+                                    </p>
+                                ))}
+                                <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                    <MdOutlineKeyboardArrowRight />
+                                </p>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <NoResultsFound />
                 )}
 
                 {/* Filter Offcanvas */}
@@ -426,7 +471,7 @@ const SubCategory = () => {
                             onSubmit={handleSubmit}
                             enableReinitialize={true}
                         >
-                            {({ handleSubmit }) => (
+                            {({ handleSubmit, setFieldValue }) => (
                                 <FormikForm onSubmit={handleSubmit} className="r_form">
                                     <Form.Group className="mb-3">
                                         <Form.Label>Main Category</Form.Label>
@@ -434,6 +479,14 @@ const SubCategory = () => {
                                             as="select"
                                             name="mainCategoryId"
                                             className="form-control"
+                                            onChange={(e) => {
+                                                setFieldValue('mainCategoryId', e.target.value);
+                                                setFieldValue('categoryId', ''); // Reset category when main category changes
+                                                const relatedCategories = category.filter(
+                                                    cat => cat.mainCategoryId === e.target.value
+                                                );
+                                                setFilteredCategories(relatedCategories);
+                                            }}
                                         >
                                             <option value="">Select</option>
                                             {mainCategory.map((main) => (
@@ -451,9 +504,10 @@ const SubCategory = () => {
                                             as="select"
                                             name="categoryId"
                                             className="form-control"
+                                        // disabled={!initialValues.mainCategoryId} 
                                         >
                                             <option value="">Select</option>
-                                            {category.map((cat) => (
+                                            {filteredCategories.map((cat) => (
                                                 <option key={cat._id} value={cat._id}>
                                                     {cat.categoryName}
                                                 </option>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
@@ -10,77 +10,77 @@ import ReactSlider from 'react-slider';
 import { Link } from 'react-router-dom';
 import { FaStar } from "react-icons/fa";
 
-const Product = (props) => {
+const Product = () => {
     var data = [
-        {   
+        {
             id: 1,
             category: "Women",
             subcategory: "Indian Wear",
             productimg: "saree.png",
             name: "Premium Saree",
-            price: "$120",
+            price: "$20",
             rating: "4.5",
-            stock:"In Stock",
+            stock: "In Stock",
         },
         {
             id: 2,
-            category: "Women",
-            subcategory: "Indian Wear",
+            category: "men",
+            subcategory: "Western Wear",
             productimg: "lehenga.png",
-            name: "Premium Lehenga",
-            price: "$120",
+            name: "Blazer",
+            price: "$80",
             rating: "4.5",
-            stock:"Low Stock",
+            stock: "Low Stock",
         },
         {
             id: 3,
-            category: "Women",
-            subcategory: "Indian Wear",
+            category: "Baby & Kids",
+            subcategory: "Baby Care",
             productimg: "saree.png",
-            name: "Premium Saree",
+            name: "Body location",
             price: "$120",
             rating: "4.5",
-            stock:"Out of Stock",
+            stock: "Out of Stock",
         },
-        {   
+        {
             id: 4,
             category: "Women",
-            subcategory: "Indian Wear",
+            subcategory: "Treditional Wear",
             productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$120",
+            name: "Premium Choli",
+            price: "$100",
             rating: "4.5",
-            stock:"In Stock",
+            stock: "In Stock",
         },
         {
             id: 5,
-            category: "Women",
-            subcategory: "Indian Wear",
+            category: "men",
+            subcategory: "Footwere",
             productimg: "lehenga.png",
-            name: "Premium Lehenga",
-            price: "$120",
+            name: "Shoes",
+            price: "$140",
             rating: "4.5",
-            stock:"Low Stock",
+            stock: "Low Stock",
         },
         {
             id: 6,
-            category: "Women",
-            subcategory: "Indian Wear",
+            category: "Beauty & Health",
+            subcategory: "Skin Care",
             productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$120",
+            name: "Face Wash",
+            price: "$220",
             rating: "4.5",
-            stock:"Out of Stock",
+            stock: "Out of Stock",
         },
-        {   
+        {
             id: 7,
             category: "Women",
             subcategory: "Indian Wear",
             productimg: "saree.png",
             name: "Premium Saree",
-            price: "$120",
+            price: "$300",
             rating: "4.5",
-            stock:"In Stock",
+            stock: "In Stock",
         },
         {
             id: 8,
@@ -88,9 +88,9 @@ const Product = (props) => {
             subcategory: "Indian Wear",
             productimg: "lehenga.png",
             name: "Premium Lehenga",
-            price: "$120",
+            price: "$250",
             rating: "4.5",
-            stock:"Low Stock",
+            stock: "Low Stock",
         },
         {
             id: 9,
@@ -98,9 +98,9 @@ const Product = (props) => {
             subcategory: "Indian Wear",
             productimg: "saree.png",
             name: "Premium Saree",
-            price: "$120",
+            price: "$280",
             rating: "4.5",
-            stock:"Out of Stock",
+            stock: "Out of Stock",
         },
         {
             id: 10,
@@ -108,11 +108,11 @@ const Product = (props) => {
             subcategory: "Indian Wear",
             productimg: "saree.png",
             name: "Premium Saree",
-            price: "$120",
+            price: "$80",
             rating: "4.5",
-            stock:"Out of Stock",
+            stock: "Out of Stock",
         },
-        {   
+        {
             id: 11,
             category: "Women",
             subcategory: "Indian Wear",
@@ -120,7 +120,7 @@ const Product = (props) => {
             name: "Premium Saree",
             price: "$120",
             rating: "4.5",
-            stock:"In Stock",
+            stock: "In Stock",
         },
     ];
 
@@ -128,9 +128,104 @@ const Product = (props) => {
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState(data);
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedMainCategory, setSelectedMainCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedStockStatus, setSelectedStockStatus] = useState('');
+    const [priceRange, setPriceRange] = useState([0, 300]);
+
+    // Apply filters
+    const applyFilters = () => {
+        let filtered = data;
+
+        // Search filter
+        if (searchQuery) {
+            filtered = filtered.filter(item =>
+                item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.price.includes(searchQuery)
+            );
+        }
+
+        // Main Category filter
+        if (selectedMainCategory) {
+            filtered = filtered.filter(item => 
+                item.category.toLowerCase() === selectedMainCategory.toLowerCase()
+            );
+        }
+
+        // Category filter
+        if (selectedCategory) {
+            filtered = filtered.filter(item => 
+                item.subcategory.toLowerCase() === selectedCategory.toLowerCase()
+            );
+        }
+
+        // Stock Status filter
+        if (selectedStockStatus) {
+            filtered = filtered.filter(item => 
+                item.stock === selectedStockStatus
+            );
+        }
+
+        // Price Range filter
+        filtered = filtered.filter(item => {
+            const price = parseFloat(item.price.replace('$', ''));
+            return price >= priceRange[0] && price <= priceRange[1];
+        });
+
+        setFilteredData(filtered);
+        setCurrentPage(1); // Reset to first page when filters change
+    };
+
+    // Handle search input
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    // Handle filter changes
+    const handleMainCategoryChange = (e) => {
+        setSelectedMainCategory(e.target.value);
+    };
+
+    const handleCategoryChange = (e) => {
+        setSelectedCategory(e.target.value);
+    };
+
+    const handleStockStatusChange = (e) => {
+        setSelectedStockStatus(e.target.value);
+    };
+
+    const handleSliderChange = (newRange) => {
+        setPriceRange(newRange);
+    };
+
+    // Apply filters when filter values change
+    useEffect(() => {
+        applyFilters();
+    }, [searchQuery]); // Immediate search filter
+
+    // Handle filter apply button
+    const handleApplyFilters = () => {
+        applyFilters();
+        handleClose();
+    };
+
+    // Handle filter reset
+    const handleResetFilters = () => {
+        setSelectedMainCategory('');
+        setSelectedCategory('');
+        setSelectedStockStatus('');
+        setPriceRange([0, 300]);
+        setSearchQuery('');
+        setFilteredData(data);
+        setCurrentPage(1);
+    };
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    console.log("totalpage", totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -141,10 +236,10 @@ const Product = (props) => {
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-        
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-        
+
         // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
@@ -177,7 +272,6 @@ const Product = (props) => {
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
-    const [modalShow3, setModalShow3] = React.useState(false);
 
     // offcanvas
     const [show, setShow] = useState(false);
@@ -186,11 +280,27 @@ const Product = (props) => {
     const handleShow = () => setShow(true);
 
     // offcanvas price
-    const [priceRange, setPriceRange] = useState([0, 300]);
-    const handleSliderChange = (newRange) => {
-        setPriceRange(newRange);
-    };
+    // const [priceRange, setPriceRange] = useState([0, 300]);
+    // const handleSliderChange = (newRange) => {
+    //     setPriceRange(newRange);
+    // };
 
+    // No Results Found Component
+    const NoResultsFound = () => (
+        <div style={{ transform: 'translateY(50%)' }}>
+            <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                    <img src={require('../Photos/notfind.png')}></img>
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
+                </div>
+                <div>
+                    <p className="text-gray-500">Whoops... No matching data found</p>
+                </div>
+            </div>
+        </div>
+    );
     return (
         <>
             <div id='mv_container_fluid'>
@@ -210,9 +320,9 @@ const Product = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            value={searchQuery}
+                                            onChange={handleSearch}
                                         />
                                     </InputGroup>
                                 </div>
@@ -230,25 +340,36 @@ const Product = (props) => {
                                                 <Offcanvas.Body className=''>
                                                     <div>
                                                         <div className="mv_input_content mt-3">
-                                                            <label className='mv_offcanvas_filter_category'>Category</label>
-                                                            <Form.Select className="mb-4" aria-label="Default select example">
+                                                            <label className='mv_offcanvas_filter_category'>Main Category</label>
+                                                            <Form.Select className="mb-4" 
+                                                              value={selectedMainCategory}
+                                                              onChange={handleMainCategoryChange}>
                                                                 <option>Select</option>
-                                                                <option value="1">Vegetable</option>
-                                                                <option value="2">Fruit</option>
+                                                                <option value="Women">Women</option>
+                                                                <option value="Men">Men</option>
+                                                                <option value="Baby & Kids">Baby & Kids</option>
+                                                                <option value="Beauty & Health">Beauty & Health</option>
                                                             </Form.Select>
                                                         </div>
                                                         <div className="mv_input_content mt-3">
-                                                            <label className='mv_offcanvas_filter_category'>Subcategory</label>
-                                                            <Form.Select className="mb-4" aria-label="Default select example">
+                                                            <label className='mv_offcanvas_filter_category'>Category</label>
+                                                            <Form.Select className="mb-4"
+                                                             value={selectedCategory}
+                                                                onChange={handleCategoryChange}>
                                                                 <option>Select</option>
-                                                                <option value="1">One</option>
-                                                                <option value="2">Two</option>
-                                                                <option value="3">Three</option>
+                                                                <option value="Indian Wear">Indian Wear</option>
+                                                                <option value="Western Wear">Western Wear</option>
+                                                                <option value="Baby Care">Baby Care</option>
+                                                                <option value="Treditional Wear">Treditional Wear</option>
+                                                                <option value="Footwere">Footwere</option>
+                                                                <option value="Skin Care">Skin Care</option>
                                                             </Form.Select>
                                                         </div>
                                                         <div className="mv_input_content">
                                                             <label className='mv_offcanvas_filter_category'>Stock Status</label>
-                                                            <Form.Select className="mb-4" aria-label="Default select example">
+                                                            <Form.Select className="mb-4"
+                                                                value={selectedStockStatus}
+                                                                onChange={handleStockStatusChange}>
                                                                 <option>Select</option>
                                                                 <option value="In Stock">In Stock</option>
                                                                 <option value="Low Stock">Low Stock</option>
@@ -283,10 +404,10 @@ const Product = (props) => {
                                                     <div className='mv_offcanvas_bottom_button'>
                                                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                                                             <div className="mv_logout_cancel">
-                                                                <button type="button">Cancel</button>
+                                                                <button type="button" onClick={handleResetFilters}>Cancel</button>
                                                             </div>
                                                             <div className="mv_logout_button">
-                                                                <button type="submit">Apply</button>
+                                                                <button type="submit" onClick={handleApplyFilters}>Apply</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -299,7 +420,9 @@ const Product = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
+                            {paginatedData.length > 0 ? (
+                                <>
+                                <div className="mv_product_table_padd" style={{height:'100vh'}}>
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
@@ -315,48 +438,48 @@ const Product = (props) => {
                                     </thead>
                                     <tbody>
                                         {paginatedData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.category}</td>
-                                            <td>{item.subcategory}</td>
-                                            <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.productimg}`)}  alt="" />
-                                                {item.name}
-                                            </td>
-                                            <td>{item.price}</td>
-                                            <td>
-                                                <div className='mv_rating_img'>
-                                                <FaStar className='mv_star_yellow'/>
-                                                {item.rating}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {
-                                                    item.stock === 'In Stock' ? (
-                                                        <p className='m-0 mv_delivered_padd'>{item.stock}</p>
-                                                    ) : item.stock === 'Low Stock' ? (
-                                                        <p className='m-0 mv_pending_padd'>{item.stock}</p>
-                                                    ) : item.stock === 'Out of Stock' ? (
-                                                        <p className='m-0 mv_cancelled_padd'>{item.stock}</p>
-                                                    ) : null
-                                                }
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon">
-                                                    <Link>
-                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon">
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
+                                            <tr key={index}>
+                                                <td>{item.id}</td>
+                                                <td>{item.category}</td>
+                                                <td>{item.subcategory}</td>
+                                                <td>
+                                                    <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.productimg}`)} alt="" />
+                                                    {item.name}
+                                                </td>
+                                                <td>{item.price}</td>
+                                                <td>
+                                                    <div className='mv_rating_img'>
+                                                        <FaStar className='mv_star_yellow' />
+                                                        {item.rating}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {
+                                                        item.stock === 'In Stock' ? (
+                                                            <p className='m-0 mv_delivered_padd'>{item.stock}</p>
+                                                        ) : item.stock === 'Low Stock' ? (
+                                                            <p className='m-0 mv_pending_padd'>{item.stock}</p>
+                                                        ) : item.stock === 'Out of Stock' ? (
+                                                            <p className='m-0 mv_cancelled_padd'>{item.stock}</p>
+                                                        ) : null
+                                                    }
+                                                </td>
+                                                <td className='d-flex align-items-center justify-content-end'>
+                                                    <div className="mv_pencil_icon">
+                                                        <Link to={'/viewProduct'}>
+                                                            <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="mv_pencil_icon">
+                                                        <Link>
+                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -377,6 +500,11 @@ const Product = (props) => {
                                     </p>
                                 </div>
                             )}
+                                </>
+                            ) : (
+                                <NoResultsFound />
+                            )}
+                            
                         </div>
                     </div>
                 </div>
