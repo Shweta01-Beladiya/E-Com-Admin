@@ -2,44 +2,46 @@ import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { useLocation } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const Addoffer = () => {
     // State variables
     let [isedit, setisedit] = useState(false);
-    let [name, setname] = useState('');
-    let [mainCategory, setMainCategory] = useState("");
-    let [category, setCategory] = useState("");
-    let [subCategory, setSubCategory] = useState("");
-    let [offerType, setOfferType] = useState("");
-    let [offerName, setOfferName] = useState("");
-    let [buttonText, setButtonText] = useState("");
-    let [startDate, setStartDate] = useState("");
-    let [endDate, setEndDate] = useState("");
-    let [description, setDescription] = useState("");
+    // let [name, setname] = useState('');
+    // let [mainCategory, setMainCategory] = useState("");
+    // let [category, setCategory] = useState("");
+    // let [subCategory, setSubCategory] = useState("");
+    // let [offerType, setOfferType] = useState("");
+    // let [offerName, setOfferName] = useState("");
+    // let [buttonText, setButtonText] = useState("");
+    // let [startDate, setStartDate] = useState("");
+    // let [endDate, setEndDate] = useState("");
+    // let [description, setDescription] = useState("");
 
     let change_edit = () => {
         setisedit(!isedit);
     };
 
-    let handlesubmit = (event) => {
-        event.preventDefault();
+    // let handlesubmit = (event) => {
+    //     event.preventDefault();
     
-        const formData = {
-            name,
-            mainCategory,
-            category,
-            subCategory,
-            offerType,
-            offerName,
-            buttonText,
-            startDate,
-            endDate,
-            description,
-        };
+    //     const formData = {
+    //         name,
+    //         mainCategory,
+    //         category,
+    //         subCategory,
+    //         offerType,
+    //         offerName,
+    //         buttonText,
+    //         startDate,
+    //         endDate,
+    //         description,
+    //     };
     
-        console.log("Form Submitted:", formData);
-        setisedit(false);
-    };
+    //     console.log("Form Submitted:", formData);
+    //     setisedit(false);
+    // };
 
     // Edit Offer
     const location = useLocation();
@@ -64,6 +66,43 @@ const Addoffer = () => {
     // Select img
     let [img, setimg] = useState("");
 
+
+    // ******************************* Validation *******************************
+    const addofferInit = {
+        mainCategory: "",
+        category: "",
+        subCategory: "",
+        offerType: "",
+        offerName: "",
+        buttonText: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+    }
+
+    const addofferValidate = Yup.object().shape({
+        mainCategory: Yup.string().required("Main Category is required"),
+        category: Yup.string().required("Category is required"),
+        subCategory: Yup.string().required("Sub Category is required"),
+        offerType: Yup.string().required("Product is required"),
+        offerName: Yup.string().required("Offer Name is required"),
+        offerName: Yup.string().required("Code is required"),
+        buttonText: Yup.string().required("Discount Price is required"),
+        startDate: Yup.string().required("Start Date is required"),
+        endDate: Yup.string().required("End Date is required"),
+        description: Yup.string().required("Description is required"),
+    });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+        initialValues: addofferInit,
+        validationSchema: addofferValidate,
+        onsubmit: (values) => {
+            console.log(values);
+            // addproductoffer(values)
+        }
+    })
+    // **************************************************************************
+
     return (
         <>
             <div>
@@ -83,15 +122,16 @@ const Addoffer = () => {
                     <div className="tab-content">
                         <div className="mv_view_edit_profile">
                             <div className='mv_profile_type'>
-                                <form onSubmit={handlesubmit}>
+                                <form onSubmit={handleSubmit}>
                                     <div className="row">
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Main Category</label>
                                                 <Form.Select
-                                                    value={mainCategory}
-                                                    onChange={(e) => setMainCategory(e.target.value)}
-                                                    aria-label="Default select example"
+                                                    name="mainCategory"
+                                                    value={values.mainCategory}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
                                                     className='mv_form_select mb-3'>
                                                     <option>Select</option>
                                                     <option value="Women">Women</option>
@@ -107,9 +147,10 @@ const Addoffer = () => {
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
-                                                    value={category}
-                                                    onChange={(e) => setCategory(e.target.value)}
-                                                    aria-label="Default select example"
+                                                    name="category"
+                                                    value={values.category}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
                                                     className='mv_form_select mb-3'>
                                                     <option>Select</option>
                                                     <option value="Jewelry">Jewelry</option>
@@ -127,9 +168,10 @@ const Addoffer = () => {
                                             <div className="mv_input_content">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
-                                                    value={subCategory}
-                                                    onChange={(e) => setSubCategory(e.target.value)}
-                                                    aria-label="Default select example"
+                                                    name="subCategory"
+                                                    value={values.subCategory}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
                                                     className='mv_form_select mb-3'>
                                                     <option>Select</option>
                                                     <option value="Necklace">Necklace</option>
@@ -148,8 +190,10 @@ const Addoffer = () => {
                                                 <label className='mv_label_input'>Offer Type</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={offerType}
-                                                        onChange={(e) => setOfferType(e.target.value)}
+                                                        name="offerType"
+                                                        value={values.offerType}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
                                                         placeholder="Enter Offer Type"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
@@ -162,8 +206,10 @@ const Addoffer = () => {
                                                 <label className='mv_label_input'>Offer Name</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={offerName}
-                                                        onChange={(e) => setOfferName(e.target.value)}
+                                                        name="offerName"
+                                                        value={values.offerName}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
                                                         placeholder="Enter Offer Name"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
@@ -193,8 +239,10 @@ const Addoffer = () => {
                                                 <label className='mv_label_input'>Button Text</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={buttonText}
-                                                        onChange={(e) => setButtonText(e.target.value)}
+                                                        name="buttonText"
+                                                        value={values.buttonText}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
                                                         placeholder="Enter Button Text"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
@@ -206,14 +254,26 @@ const Addoffer = () => {
                                             <label className='mv_offcanvas_filter_category'>Start Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled">
                                                 <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                                <Form.Control className='mb-3' type="date" 
+                                                    name="startDate"
+                                                    value={values.startDate}
+                                                    // onChange={handleChange}
+                                                    onChange={(e) => handleDateChange(e, 'start')} 
+                                                    onBlur={handleBlur}
+                                                 />
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>End Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled">
                                                 <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                <Form.Control className='mb-3' type="date" 
+                                                    name="endDate"
+                                                    value={values.endDate}
+                                                    // onChange={handleChange}
+                                                    onChange={(e) => handleDateChange(e, 'end')} 
+                                                    onBlur={handleBlur}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -221,8 +281,10 @@ const Addoffer = () => {
                                                 <label className='mv_label_input'>Description</label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
-                                                        value={description}
-                                                        onChange={(e) => setDescription(e.target.value)}
+                                                        name="description"
+                                                        value={values.description}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
                                                         placeholder="Enter Description"
                                                         as="textarea" 
                                                         aria-label="With textarea"
