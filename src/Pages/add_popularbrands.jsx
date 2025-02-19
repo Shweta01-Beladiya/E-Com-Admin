@@ -2,30 +2,32 @@ import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { useLocation } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const Addpopularbrands = () => {
     // State variables
     let [isedit, setisedit] = useState(false);
-    let [brandName, setBrandName] = useState("");
-    let [offer, setOffer] = useState("");
-    let [title, setTitle] = useState("");
+    // let [brandName, setBrandName] = useState("");
+    // let [offer, setOffer] = useState("");
+    // let [title, setTitle] = useState("");
 
     let change_edit = () => {
         setisedit(!isedit);
     };
 
-    let handlesubmit = (event) => {
-        event.preventDefault();
+    // let handlesubmit = (event) => {
+    //     event.preventDefault();
     
-        const formData = {
-            brandName,
-            offer,
-            title,
-        };
+    //     const formData = {
+    //         brandName,
+    //         offer,
+    //         title,
+    //     };
     
-        console.log("Form Submitted:", formData);
-        setisedit(false);
-    };
+    //     console.log("Form Submitted:", formData);
+    //     setisedit(false);
+    // };
 
     // Edit Popularbrands
     const location = useLocation();
@@ -34,7 +36,34 @@ const Addpopularbrands = () => {
 
     // Select img
     let [brandimg, setbrandimg] = useState("");
-    let [img, setimg] = useState("");
+    let [addimg, setaddimg] = useState("");
+
+    // ******************************* Validation *******************************
+    const addpopularbrandInit = {
+        brandname: "",
+        offer: "",
+        title: "",
+        barndLogo: "",
+        addpopularbrandimage: "",
+    }
+
+    const addpopularbrandValidate = Yup.object().shape({
+        brandname: Yup.string().required("Brand name is required"),
+        offer: Yup.string().required("Offer is required"),
+        title: Yup.string().required("Title is required"),
+        barndLogo: Yup.string().required("Brand logo is required"),
+        addpopularbrandimage: Yup.string().required("Image is required"),
+    });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
+        initialValues: addpopularbrandInit,
+        validationSchema: addpopularbrandValidate,
+        onsubmit: (values) => {
+            console.log(values);
+            // addpopularbrand(values)
+        }
+    })
+    // **************************************************************************
 
     return (
         <>
@@ -55,84 +84,120 @@ const Addpopularbrands = () => {
                     <div className="tab-content">
                         <div className="mv_view_edit_profile">
                             <div className='mv_profile_type'>
-                                <form onSubmit={handlesubmit}>
+                                <form onSubmit={handleSubmit}>
                                     <div className="row">
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Brand Name</label>
                                                 <Form.Select
-                                                    value={brandName}
-                                                    onChange={(e) => setBrandName(e.target.value)}
-                                                    aria-label="Default select example"
-                                                    className='mv_form_select mb-3'>
+                                                    name="brandname"
+                                                    value={values.brandname}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className='mv_form_select'>
                                                     <option>Select</option>
                                                     <option value="Apple">Apple</option>
                                                     <option value="Noise">Noise</option>
                                                     <option value="Asus">Asus</option>
                                                     <option value="JBL">JBL</option>
                                                 </Form.Select>
+                                                {errors.brandname && touched.brandname && <div className="text-danger small">{errors.brandname}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Offer</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
-                                                        value={offer}
-                                                        onChange={(e) => setOffer(e.target.value)}
+                                                        name="offer"
+                                                        value={values.offer}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
                                                         placeholder="Enter offer"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
+                                                {errors.offer && touched.offer && <div className="text-danger small">{errors.offer}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Title</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
-                                                        value={title}
-                                                        onChange={(e) => setTitle(e.target.value)}
+                                                        name="title"
+                                                        value={values.title}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
                                                         placeholder="Enter Title"
                                                         aria-label="name"
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
+                                                {errors.title && touched.title && <div className="text-danger small">{errors.title}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Brand Logo</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         placeholder="Choose Image"
                                                         aria-label=""
                                                         readOnly
                                                         value={brandimg}
+                                                        name="barndLogo"
+                                                        onBlur={handleBlur}
                                                     />
                                                     <label className="mv_browse_button">
-                                                    Browse
-                                                    <input type="file" hidden onChange={(e) => { setbrandimg(e.currentTarget.files[0].name) }} />
+                                                        Browse
+                                                        <input 
+                                                            type="file" 
+                                                            hidden 
+                                                            accept="image/jpeg, image/png, image/jpg"
+                                                            onChange={(e) => {
+                                                                const file = e.currentTarget.files[0];
+                                                                if (file) {
+                                                                    setbrandimg(file.name);
+                                                                    setFieldValue("barndLogo", file);
+                                                                }
+                                                            }}
+                                                        />
                                                     </label>
                                                 </InputGroup>
+                                                {errors.barndLogo && touched.barndLogo && <div className="text-danger small">{errors.barndLogo}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
-                                                <label className='mv_label_input'>Description Image</label>
-                                                <InputGroup className="mb-3">
+                                            <div className="mv_input_content mb-3">
+                                                <label className='mv_label_input'>Image</label>
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         placeholder="Choose Image"
                                                         aria-label=""
                                                         readOnly
-                                                        value={img}
+                                                        value={addimg}
+                                                        name="addpopularbrandimage"
+                                                        onBlur={handleBlur}
                                                     />
                                                     <label className="mv_browse_button">
-                                                    Browse
-                                                    <input type="file" hidden onChange={(e) => { setimg(e.currentTarget.files[0].name) }} />
+                                                        Browse
+                                                        <input 
+                                                            type="file" 
+                                                            hidden 
+                                                            accept="image/jpeg, image/png, image/jpg"
+                                                            onChange={(e) => {
+                                                                const file = e.currentTarget.files[0];
+                                                                if (file) {
+                                                                    setaddimg(file.name);
+                                                                    setFieldValue("addpopularbrandimage", file);
+                                                                }
+                                                            }}
+                                                        />
                                                     </label>
                                                 </InputGroup>
+                                                {errors.addpopularbrandimage && touched.addpopularbrandimage && <div className="text-danger small">{errors.addpopularbrandimage}</div>}
                                             </div>
                                         </div>
                                         <div className='text-center mt-5'>
@@ -140,12 +205,13 @@ const Addpopularbrands = () => {
                                                 <button className='border-0 bg-transparent'>
                                                     Cnacel
                                                 </button>
-                                                {editPopularbrands === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
-                                                    Update
-                                                </button> : 
-                                                <button className='border-0 bg-transparent' onClick={change_edit}>
-                                                    Add
-                                                </button>
+                                                {editPopularbrands === true ? 
+                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                        Update
+                                                    </button> : 
+                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                        Add
+                                                    </button>
                                                 }
                                             </div>
                                         </div>

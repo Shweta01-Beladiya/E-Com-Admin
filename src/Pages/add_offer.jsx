@@ -66,7 +66,6 @@ const Addoffer = () => {
     // Select img
     let [img, setimg] = useState("");
 
-
     // ******************************* Validation *******************************
     const addofferInit = {
         mainCategory: "",
@@ -74,6 +73,7 @@ const Addoffer = () => {
         subCategory: "",
         offerType: "",
         offerName: "",
+        descriptionImg: "",
         buttonText: "",
         startDate: "",
         endDate: "",
@@ -86,14 +86,14 @@ const Addoffer = () => {
         subCategory: Yup.string().required("Sub Category is required"),
         offerType: Yup.string().required("Product is required"),
         offerName: Yup.string().required("Offer Name is required"),
-        offerName: Yup.string().required("Code is required"),
+        descriptionImg: Yup.string().required("Description Image is required"),
         buttonText: Yup.string().required("Discount Price is required"),
         startDate: Yup.string().required("Start Date is required"),
         endDate: Yup.string().required("End Date is required"),
         description: Yup.string().required("Description is required"),
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: addofferInit,
         validationSchema: addofferValidate,
         onsubmit: (values) => {
@@ -125,14 +125,14 @@ const Addoffer = () => {
                                 <form onSubmit={handleSubmit}>
                                     <div className="row">
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Main Category</label>
                                                 <Form.Select
                                                     name="mainCategory"
                                                     value={values.mainCategory}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    className='mv_form_select mb-3'>
+                                                    className='mv_form_select'>
                                                     <option>Select</option>
                                                     <option value="Women">Women</option>
                                                     <option value="Men">Men</option>
@@ -141,17 +141,18 @@ const Addoffer = () => {
                                                     <option value="Home & Kitchen">Home & Kitchen</option>
                                                     <option value="Mobile & Electronics">Mobile & Electronics</option>
                                                 </Form.Select>
+                                                {errors.mainCategory && touched.mainCategory && <div className="text-danger small">{errors.mainCategory}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
                                                     name="category"
                                                     value={values.category}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    className='mv_form_select mb-3'>
+                                                    className='mv_form_select'>
                                                     <option>Select</option>
                                                     <option value="Jewelry">Jewelry</option>
                                                     <option value="Western Wear">Western Wear</option>
@@ -162,17 +163,18 @@ const Addoffer = () => {
                                                     <option value="Kitchen wear">Kitchen wear</option>
                                                     <option value="Mobile">Mobile</option>
                                                 </Form.Select>
+                                                {errors.category && touched.category && <div className="text-danger small">{errors.category}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
                                                     name="subCategory"
                                                     value={values.subCategory}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    className='mv_form_select mb-3'>
+                                                    className='mv_form_select'>
                                                     <option>Select</option>
                                                     <option value="Necklace">Necklace</option>
                                                     <option value="Blazer">Blazer</option>
@@ -183,12 +185,13 @@ const Addoffer = () => {
                                                     <option value="Pressure Cooker">Pressure Cooker</option>
                                                     <option value="Smart Phone">Smart Phone</option>
                                                 </Form.Select>
+                                                {errors.subCategory && touched.subCategory && <div className="text-danger small">{errors.subCategory}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Offer Type</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         name="offerType"
                                                         value={values.offerType}
@@ -199,12 +202,13 @@ const Addoffer = () => {
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
+                                                {errors.offerType && touched.offerType && <div className="text-danger small">{errors.offerType}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Offer Name</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         name="offerName"
                                                         value={values.offerName}
@@ -215,29 +219,44 @@ const Addoffer = () => {
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
+                                                {errors.offerName && touched.offerName && <div className="text-danger small">{errors.offerName}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
-                                                <label className='mv_label_input'>Description Image</label>
-                                                <InputGroup className="mb-3">
+                                            <div className="mv_input_content mb-3">
+                                                <label className='mv_label_input'>Image</label>
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         placeholder="Choose Image"
                                                         aria-label=""
                                                         readOnly
                                                         value={img}
+                                                        name="descriptionImg"
+                                                        onBlur={handleBlur}
                                                     />
                                                     <label className="mv_browse_button">
-                                                    Browse
-                                                    <input type="file" hidden onChange={(e) => { setimg(e.currentTarget.files[0].name) }} />
+                                                        Browse
+                                                        <input 
+                                                            type="file" 
+                                                            hidden 
+                                                            accept="image/jpeg, image/png, image/jpg"
+                                                            onChange={(e) => {
+                                                                const file = e.currentTarget.files[0];
+                                                                if (file) {
+                                                                    setimg(file.name);
+                                                                    setFieldValue("descriptionImg", file);
+                                                                }
+                                                            }}
+                                                        />
                                                     </label>
                                                 </InputGroup>
+                                                {errors.descriptionImg && touched.descriptionImg && <div className="text-danger small">{errors.descriptionImg}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Button Text</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         name="buttonText"
                                                         value={values.buttonText}
@@ -248,38 +267,41 @@ const Addoffer = () => {
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
+                                                {errors.buttonText && touched.buttonText && <div className="text-danger small">{errors.buttonText}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>Start Date</label>
-                                            <div className="mv_input_content mv_add_product_date_scheduled">
+                                            <div className="mv_input_content mv_add_product_date_scheduled mb-3">
                                                 <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                <Form.Control className='mb-3' type="date" 
+                                                <Form.Control className='' type="date" 
                                                     name="startDate"
                                                     value={values.startDate}
                                                     // onChange={handleChange}
                                                     onChange={(e) => handleDateChange(e, 'start')} 
                                                     onBlur={handleBlur}
                                                  />
+                                                 {errors.startDate && touched.startDate && <div className="text-danger small">{errors.startDate}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>End Date</label>
-                                            <div className="mv_input_content mv_add_product_date_scheduled">
+                                            <div className="mv_input_content mv_add_product_date_scheduled mb-3">
                                                 <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                <Form.Control className='mb-3' type="date" 
+                                                <Form.Control className='' type="date" 
                                                     name="endDate"
                                                     value={values.endDate}
                                                     // onChange={handleChange}
                                                     onChange={(e) => handleDateChange(e, 'end')} 
                                                     onBlur={handleBlur}
                                                 />
+                                                {errors.endDate && touched.endDate && <div className="text-danger small">{errors.endDate}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12">
-                                            <div className="mv_input_content">
+                                            <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Description</label>
-                                                <InputGroup className="mb-3">
+                                                <InputGroup className="">
                                                     <Form.Control
                                                         name="description"
                                                         value={values.description}
@@ -291,6 +313,7 @@ const Addoffer = () => {
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
+                                                {errors.description && touched.description && <div className="text-danger small">{errors.description}</div>}
                                             </div>
                                         </div>
                                         <div className='text-center mt-5'>
@@ -298,12 +321,13 @@ const Addoffer = () => {
                                                 <button className='border-0 bg-transparent'>
                                                     Cnacel
                                                 </button>
-                                                {editOffer === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
-                                                    Update
-                                                </button> : 
-                                                <button className='border-0 bg-transparent' onClick={change_edit}>
-                                                    Add
-                                                </button>
+                                                {editOffer === true ? 
+                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                        Update
+                                                    </button> : 
+                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                        Add
+                                                    </button>
                                                 }
                                             </div>
                                         </div>
