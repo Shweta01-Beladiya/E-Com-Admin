@@ -57,17 +57,20 @@ const Addproductoffer = () => {
     console.log(editProductoffer)
 
     // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
+    const [date, setDate] = useState("Select Date");
+    const [date1, setDate1] = useState("Select Date");
 
     const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
+        const selectedDate = e.target.value;
+        const [year, month, day] = selectedDate.split("-");
         const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
+
+        if (dateType === "start") {
             setDate(formattedDate);
-        } else if (dateType === 'end') {
+            setFieldValue("startDate", selectedDate);
+        } else if (dateType === "end") {
             setDate1(formattedDate);
+            setFieldValue("endDate", selectedDate);
         }
     };
 
@@ -97,14 +100,14 @@ const Addproductoffer = () => {
         code: Yup.string().required("Code is required"),
         discountPrice: Yup.string().required("Discount Price is required"),
         price: Yup.string().required("Price is required"),
-        startDate: Yup.string().required("Start Date is required"),
-        endDate: Yup.string().required("End Date is required"),
+        startDate: Yup.date().required("Start Date is required"),
+        endDate: Yup.date().required("End Date is required"),
         minPurchase: Yup.string().required("Min Purchase is required"),
         maxPurchase: Yup.string().required("Max Purchase is required"),
         description: Yup.string().required("Description is required"),
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: productofferInit,
         validationSchema: productofferValidate,
         onsubmit: (values) => {
@@ -293,11 +296,12 @@ const Addproductoffer = () => {
                                             <label className='mv_offcanvas_filter_category'>Start Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
                                                 <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                <Form.Control className='' type="date" 
+                                                <Form.Control 
+                                                    className='' 
+                                                    type="date" 
                                                     name="startDate"
                                                     value={values.startDate}
-                                                    // onChange={handleChange}
-                                                    onChange={(e) => handleDateChange(e, 'start')} 
+                                                    onChange={(e) => handleDateChange(e, "start")}
                                                     onBlur={handleBlur}
                                                 />
                                                 {errors.startDate && touched.startDate && <div className="text-danger small">{errors.startDate}</div>}
@@ -307,11 +311,12 @@ const Addproductoffer = () => {
                                             <label className='mv_offcanvas_filter_category'>End Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
                                                 <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                <Form.Control className='' type="date" 
+                                                <Form.Control 
+                                                    className='' 
+                                                    type="date" 
                                                     name="endDate"
                                                     value={values.endDate}
-                                                    // onChange={handleChange}
-                                                    onChange={(e) => handleDateChange(e, 'end')} 
+                                                    onChange={(e) => handleDateChange(e, "end")}
                                                     onBlur={handleBlur}
                                                 />
                                                 {errors.endDate && touched.endDate && <div className="text-danger small">{errors.endDate}</div>}
