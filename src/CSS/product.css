@@ -292,7 +292,7 @@
         font-size: 14px !important;
     }
     .mv_offcanvas_filter{
-        max-width: 300px !important;
+        max-width: 270px !important;
     }
 }
 @media(max-width: 375px){

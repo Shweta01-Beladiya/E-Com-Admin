@@ -178,7 +178,7 @@ const Product = () => {
         });
 
         setFilteredData(filtered);
-        setCurrentPage(1); // Reset to first page when filters change
+        setCurrentPage(1); 
     };
 
     // Handle search input
@@ -203,12 +203,11 @@ const Product = () => {
         setPriceRange(newRange);
     };
 
-    // Apply filters when filter values change
     useEffect(() => {
         applyFilters();
-    }, [searchQuery]); // Immediate search filter
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchQuery]);
 
-    // Handle filter apply button
     const handleApplyFilters = () => {
         applyFilters();
         handleClose();
@@ -300,7 +299,7 @@ const Product = () => {
                 </div>
                 <div className="row mt-4">
                     <div className="col-12">
-                        <div className="mv_product_table_content" style={{height:'100vh'}}>
+                        <div className="mv_product_table_content">
                             <div className='mv_table_search'>
                                 <div className="mv_product_search">
                                     <InputGroup>
