@@ -7,8 +7,13 @@ import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from 'axios';
 
 const Popularbrands = (props) => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
 
     // Edit Offer
     const [editpopularbrands,setEditPopularbrands] = useState(false);
@@ -111,10 +116,31 @@ const Popularbrands = (props) => {
         },
     ];
 
+    // ************************************** Show Data **************************************
+    const [filteredData, setFilteredData] = useState([]);
+    
+    useEffect(()=>{
+       const fetchBrandData = async () => {
+           try{
+              const response = await axios.get(`${BaseUrl}/api/getAllBrands`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+              })
+              console.log("data" , response?.data?.popularBrand);
+              setFilteredData(response?.data?.popularBrand)
+           }catch(error){
+              
+           }
+       }
+
+       fetchBrandData()
+    },[])
+    // ***************************************************************************************
+
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
  
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     console.log("totalpage",totalPages)
@@ -228,7 +254,7 @@ const Popularbrands = (props) => {
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button">Cancel</button>
+                                                            <button type="button" onClick={handleClose}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
                                                             <button type="submit">Apply</button>
@@ -260,16 +286,16 @@ const Popularbrands = (props) => {
                                     <tbody>
                                        {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
+                                            <td>{index + 1}</td>
                                             <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.barndimg}`)}  alt="" />
-                                                {item.name}
+                                                {/* <img className='mv_product_img mv_product_radius_img' src={require(`${item?.brandImage}`)}  alt="" /> */}
+                                                {item?.brandName}
                                             </td>
                                             <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.img}`)}  alt="" />
+                                                {/* <img className='mv_product_img mv_product_radius_img' src={require(`${item?.brandLogo}`)}  alt="" /> */}
                                             </td>
-                                            <td>{item.offer}</td>
-                                            <td>{item.title}</td>
+                                            <td>{item?.offer}</td>
+                                            <td>{item?.title}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
                                                 <div className="mv_pencil_icon" onClick={handleditpopularbrands}>
                                                     <Link to='/addpopularbrands' state={{ editPopularbrands: true }}>
@@ -282,6 +308,8 @@ const Popularbrands = (props) => {
                                             </td>
                                         </tr>
                                         ))}
+
+                                        {console.log("hihi" , paginatedData)}
                                     </tbody>
                                 </table>
                             </div>

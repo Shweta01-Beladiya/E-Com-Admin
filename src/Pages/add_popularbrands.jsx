@@ -1,11 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Addpopularbrands = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+    const navigate = useNavigate()
+
     // State variables
     let [isedit, setisedit] = useState(false);
     // let [brandName, setBrandName] = useState("");
@@ -43,24 +49,52 @@ const Addpopularbrands = () => {
         brandname: "",
         offer: "",
         title: "",
-        barndLogo: "",
+        brandLogo: "",
         addpopularbrandimage: "",
     }
 
     const addpopularbrandValidate = Yup.object().shape({
         brandname: Yup.string().required("Brand name is required"),
-        offer: Yup.string().required("Offer is required"),
+        offer: Yup.string().matches(/^\d+% off$|^Buy \d+ Get \d+$/, "Offer must be like '10% off' or 'Buy 1 Get 1'").required("Offer is required"),
         title: Yup.string().required("Title is required"),
-        barndLogo: Yup.string().required("Brand logo is required"),
+        brandLogo: Yup.string(),
         addpopularbrandimage: Yup.string().required("Image is required"),
     });
 
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: addpopularbrandInit,
         validationSchema: addpopularbrandValidate,
-        onsubmit: (values) => {
-            console.log(values);
+        onSubmit: async (values) => {
+            console.log("vsdvbu" ,values);
+            
             // addpopularbrand(values)
+            const formData = new FormData();
+            formData.append("brandName", values.brandname);
+            formData.append("offer", values.offer);
+            formData.append("title", values.title);
+            formData.append("brandLogo", values.brandLogo);  
+            formData.append("brandImage", values.addpopularbrandimage);
+            
+            console.log("FormData Content:", [...formData.entries()]);  // Debugging
+            
+            
+            try {
+                const response = await axios.post(`${BaseUrl}/api/createPopularBrand`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+                console.log("Response:", response.data);
+               
+                // window.location.href = "./popularbrands"
+                navigate("/popularbrands")
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error submitting form. Please try again.");
+            }
+            
         }
     })
     // **************************************************************************
@@ -147,7 +181,7 @@ const Addpopularbrands = () => {
                                                         aria-label=""
                                                         readOnly
                                                         value={brandimg}
-                                                        name="barndLogo"
+                                                        name="brandLogo"
                                                         onBlur={handleBlur}
                                                     />
                                                     <label className="mv_browse_button">
@@ -160,13 +194,13 @@ const Addpopularbrands = () => {
                                                                 const file = e.currentTarget.files[0];
                                                                 if (file) {
                                                                     setbrandimg(file.name);
-                                                                    setFieldValue("barndLogo", file);
+                                                                    setFieldValue("brandLogo", file);  
                                                                 }
                                                             }}
                                                         />
                                                     </label>
                                                 </InputGroup>
-                                                {errors.barndLogo && touched.barndLogo && <div className="text-danger small">{errors.barndLogo}</div>}
+                                                {errors.brandLogo && touched.brandLogo && <div className="text-danger small">{errors.brandLogo}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">

@@ -251,7 +251,7 @@ const Viewstatus = (props) => {
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button">Cancel</button>
+                                                            <button type="button" onClick={handleClose}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
                                                             <button type="submit">Apply</button>
