@@ -9,6 +9,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import ReactSlider from 'react-slider';
 import { Link } from 'react-router-dom';
 import { FaStar } from "react-icons/fa";
+import NoResultsFound from '../Component/Noresult';
 
 const Product = () => {
     var data = [
@@ -285,22 +286,6 @@ const Product = () => {
     //     setPriceRange(newRange);
     // };
 
-    // No Results Found Component
-    const NoResultsFound = () => (
-        <div style={{ transform: 'translateY(50%)' }}>
-            <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                    <img src={require('../Photos/notfind.png')}></img>
-                </div>
-                <div>
-                    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
-                </div>
-                <div>
-                    <p className="text-gray-500">Whoops... No matching data found</p>
-                </div>
-            </div>
-        </div>
-    );
     return (
         <>
             <div id='mv_container_fluid'>
@@ -315,7 +300,7 @@ const Product = () => {
                 </div>
                 <div className="row mt-4">
                     <div className="col-12">
-                        <div className="mv_product_table_content">
+                        <div className="mv_product_table_content" style={{height:'100vh'}}>
                             <div className='mv_table_search'>
                                 <div className="mv_product_search">
                                     <InputGroup>
@@ -422,7 +407,7 @@ const Product = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                <div className="mv_product_table_padd" style={{height:'100vh'}}>
+                                <div className="mv_product_table_padd" >
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
@@ -511,7 +496,7 @@ const Product = () => {
             </div>
 
             {/* Delete Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete?</h5>
                     <p>Are you sure you want to delete Premium Saree ?</p>

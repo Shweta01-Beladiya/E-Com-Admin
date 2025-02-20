@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Container,
   Table,
   Form,
   InputGroup,
@@ -15,6 +14,7 @@ import { FaSearch } from 'react-icons/fa';
 import { FaFilter } from "react-icons/fa";
 import '../CSS/riya.css';
 import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
 
 const UserTable = () => {
@@ -50,7 +50,7 @@ const UserTable = () => {
       }
     }
     fetchData();
-  },[]);
+  },[BaseUrl, token]);
 
   // Filter functionality
   const filteredData = data.filter(item => {
@@ -63,22 +63,7 @@ const UserTable = () => {
     return matchesSearch && matchesGender;
   });
 
-  // No Results Found Component
-  const NoResultsFound = () => (
-    <div style={{transform: 'translateY(50%)'}}>
-      <div className="text-center">
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-        <img src={require('../Photos/notfind.png')}></img>
-      </div>
-    <div>
-    <h3 className="text-lg font-semibold mb-2">Result Not Found</h3>
-    </div>
-  <div>
-        <p className="text-gray-500">Whoops... No matching data found</p>
-  </div>
-    </div>
-    </div>
-  );
+
 
   // Sorting functionality
   const sortData = (key) => {
@@ -222,7 +207,7 @@ const UserTable = () => {
                           onClick={() => handleDelete(item._id, item.name)}
                         >
                           {/* <FaTrash /> */}
-                          <img src={require('../Photos/delet.png')} class="r_deletimg" ></img>
+                          <img src={require('../Photos/delet.png')} class="r_deletimg" alt='' ></img>
                         </button>
                       </td>
                     </tr>
