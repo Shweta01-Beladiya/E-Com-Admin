@@ -1,134 +1,204 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
-const Size = (props) => {
+const Size = () => {
 
-    // Edit Size
-    const [editsize,setEditsize] = useState(false);
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
-    const navigate = useNavigate();
+    const [data, setData] = useState([]);
+    const [mainCategory, setMainCategory] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [subCategory, setSubCategory] = useState([]);
+    const [sizeFilter, setSizeFilter] = useState('');
+    const [availableSizes, setAvailableSizes] = useState([]);
+    // Selected values states
+    const [selectedMainCategory, setSelectedMainCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
 
-    const handleditsize = () => {
-        setEditsize(true);
-        // navigate('addsize')
+    // Filtered options states
+    const [filteredCategory, setFilteredCategory] = useState([]);
+    const [filteredSubCategory, setFilteredSubCategory] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSizes`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            // console.log("response", response.data.sizes);
+            setData(response.data.sizes);
+            setFilteredData(response.data.sizes);
+        } catch (error) {
+            console.error('Data fetching failed', error);
+        }
     }
 
-    var data = [
-        {   
-            id: 1,
-            maincategory: "Women",
-            category: "Jewelry",
-            subcategory: "Necklace",
-            sizename: "Weight",
-            size: "56, 74, 70...",
-            unit: "gm",
-        },
-        {   
-            id: 2,
-            maincategory: "Men",
-            category: "Western Wear",
-            subcategory: "Blazer",
-            sizename: "Length",
-            size: "30, 32, 34..",
-            unit: "-",
-        },
-        {   
-            id: 3,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            sizename: "Weight",
-            size: "50, 75, 100...",
-            unit: "gm",
-        },
-        {   
-            id: 4,
-            maincategory: "Beauty & Health",
-            category: "Skin Care",
-            subcategory: "Facewash",
-            sizename: "Weight",
-            size: "100, 500,...",
-            unit: "gm",
-        },
-        {   
-            id: 5,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            sizename: "Weight",
-            size: "50, 75, 100...",
-            unit: "gm",
-        },
-        {   
-            id: 6,
-            maincategory: "Mobile & Electronics",
-            category: "Electronics",
-            subcategory: "Refrigerator",
-            sizename: "Weight",
-            size: "265, 280...",
-            unit: "ltr",
-        },
-        {   
-            id: 7,
-            maincategory: "Beauty & Health",
-            category: "Fragrance",
-            subcategory: "Perfume",
-            sizename: "Weight",
-            size: "50, 100...",
-            unit: "ml",
-        },
-        {   
-            id: 8,
-            maincategory: "Home & Kitchen",
-            category: "Kitchen wear",
-            subcategory: "Pressure Cooker",
-            sizename: "Capacity",
-            size: "3, 5, 6, 7...",
-            unit: "ltr",
-        },
-        {   
-            id: 9,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            sizename: "Weight",
-            size: "50,70,100...",
-            unit: "gm",
-        },
-        {   
-            id: 10,
-            maincategory: "Mobile & Electronics",
-            category: "Mobile",
-            subcategory: "Smart Phone",
-            sizename: "Storage",
-            size: "32, 64, 128...",
-            unit: "GB",
-        },
-        {   
-            id: 11,
-            maincategory: "Women",
-            category: "Jewelry",
-            subcategory: "Necklace",
-            sizename: "Weight",
-            size: "56, 74, 70...",
-            unit: "gm",
-        },
-    ];
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setMainCategory(response.data.users);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
 
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCategory(response.data.category);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSubCategory(response.data.subCategory);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+
+
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        // fetchUnit();
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [BaseUrl, token]);
+
+    // Extract available size names from data
+    useEffect(() => {
+        if (data.length > 0) {
+            const uniqueSizes = [...new Set(data.map(item => item.sizeName))];
+            setAvailableSizes(uniqueSizes);
+        }
+    }, [data]);
+
+    // Apply filters when filter states change
+    useEffect(() => {
+        if (data.length > 0) {
+            applyFilters();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, selectedMainCategory, selectedCategory, selectedSubCategory, sizeFilter]);
+
+    // Handle Main Category Change
+    const handleMainCategoryChange = (mainCategoryId) => {
+        setSelectedMainCategory(mainCategoryId);
+        setSelectedCategory('');
+        setSelectedSubCategory('');
+
+        const filtered = category.filter((cat) => cat.mainCategoryId === mainCategoryId);
+        setFilteredCategory(filtered);
+        setFilteredSubCategory([]);
+    };
+
+    // Handle Category Change
+    const handleCategoryChange = (categoryId) => {
+        setSelectedCategory(categoryId);
+        setSelectedSubCategory('');
+
+        const filtered = subCategory.filter((subCat) => subCat.categoryId === categoryId);
+        setFilteredSubCategory(filtered);
+    };
+
+    // Handle search functionality
+    const handleSearch = (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+
+        if (term.trim() === '') {
+            setFilteredData(data);
+        } else {
+            const filtered = data.filter((item) =>
+                item.sizeName.toLowerCase().includes(term.toLowerCase()) ||
+                item.size.toString().includes(term) ||
+                item.mainCategoryData[0].mainCategoryName.toLowerCase().includes(term.toLowerCase()) ||
+                item.categoryData[0].categoryName.toLowerCase().includes(term.toLowerCase()) ||
+                item.subCategoryData[0].subCategoryName.toLowerCase().includes(term.toLowerCase())
+            );
+            setFilteredData(filtered);
+        }
+        setCurrentPage(1);
+    };
+
+    const applyFilters = () => {
+        let filtered = [...data];
+
+        if (selectedMainCategory) {
+            filtered = filtered.filter(item =>
+                item.mainCategoryData &&
+                item.mainCategoryData[0] &&
+                item.mainCategoryData[0]._id === selectedMainCategory);
+        }
+
+        if (selectedCategory) {
+            filtered = filtered.filter(item =>
+                item.categoryData &&
+                item.categoryData[0] &&
+                item.categoryData[0]._id === selectedCategory);
+        }
+
+        if (selectedSubCategory) {
+            filtered = filtered.filter(item =>
+                item.subCategoryData &&
+                item.subCategoryData[0] &&
+                item.subCategoryData[0]._id === selectedSubCategory);
+        }
+
+        if (sizeFilter) {
+            filtered = filtered.filter(item => item.sizeName === sizeFilter);
+        }
+
+        setFilteredData(filtered);
+        setCurrentPage(1);
+    };
+
+    const resetFilters = () => {
+        setSelectedMainCategory('');
+        setSelectedCategory('');
+        setSelectedSubCategory('');
+        setFilteredCategory([]);
+        setFilteredSubCategory([]);
+        setSizeFilter('');
+        setFilteredData(data);
+        setCurrentPage(1);
+        handleClose();
+    };
+    const applyFiltersAndClose = () => {
+        applyFilters();
+        handleClose();
+    };
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState([]);
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -139,10 +209,10 @@ const Size = (props) => {
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-        
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-        
+
         // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
@@ -167,18 +237,44 @@ const Size = (props) => {
         return buttons;
     };
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
     // *******************************************************************************
 
     // Modal
-    const [modalShow, setModalShow] = React.useState(false);
+    const [modalShow, setModalShow] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+
+    const handleDeleteClick = (item) => {
+        setItemToDelete(item);
+        setModalShow(true);
+    };
+
+    const handleDelete = async () => {
+        if (!itemToDelete) return;
+
+        try {
+            // Implement your delete API call here
+            // await axios.delete(`${BaseUrl}/api/deleteSize/${itemToDelete._id}`, {
+            //     headers: { Authorization: `Bearer ${token}` }
+            // });
+
+            // Update the local state after successful delete
+            const updatedData = data.filter(item => item._id !== itemToDelete._id);
+            setData(updatedData);
+            setFilteredData(updatedData);
+
+            setModalShow(false);
+            setItemToDelete(null);
+        } catch (error) {
+            console.error('Delete operation failed', error);
+        }
+    };
 
     // Offcanvas
     const [show, setShow] = useState(false);
-
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
@@ -201,9 +297,10 @@ const Size = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            aria-label="Search"
+                                            value={searchTerm}
+                                            onChange={handleSearch}
                                         />
                                     </InputGroup>
                                 </div>
@@ -221,62 +318,65 @@ const Size = (props) => {
                                                 <div>
                                                     <div className="mv_input_content mt-3">
                                                         <label className='mv_offcanvas_filter_category'>Main Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Women">Women</option>
-                                                            <option value="Men">Men</option>
-                                                            <option value="Baby & Kids">Baby & Kids</option>
-                                                            <option value="Beauty & Health">Beauty & Health</option>
-                                                            <option value="Home & Kitchen">Home & Kitchen</option>
-                                                            <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            value={selectedMainCategory}
+                                                            onChange={(e) => handleMainCategoryChange(e.target.value)}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {mainCategory.map((mainCat) => (
+                                                                <option value={mainCat._id} key={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Jewelry">Jewelry</option>
-                                                            <option value="Western Wear">Western Wear</option>
-                                                            <option value="Baby Care">Baby Care</option>
-                                                            <option value="Skin Care">Skin Care</option>
-                                                            <option value="Electronics">Electronics</option>
-                                                            <option value="Fragrance">Fragrance</option>
-                                                            <option value="Kitchen wear">Kitchen wear</option>
-                                                            <option value="Mobile">Mobile</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            value={selectedCategory}
+                                                            onChange={(e) => handleCategoryChange(e.target.value)}
+                                                            disabled={!selectedMainCategory}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {filteredCategory.map((cat) => (
+                                                                <option value={cat._id} key={cat._id}>
+                                                                    {cat.categoryName}
+                                                                </option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Sub Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Necklace">Necklace</option>
-                                                            <option value="Blazer">Blazer</option>
-                                                            <option value="Baby Soap">Baby Soap</option>
-                                                            <option value="Facewash">Facewash</option>
-                                                            <option value="Refrigerator">Refrigerator</option>
-                                                            <option value="Perfume">Perfume</option>
-                                                            <option value="Pressure Cooker">Pressure Cooker</option>
-                                                            <option value="Smart Phone">Smart Phone</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            value={selectedSubCategory}
+                                                            onChange={(e) => setSelectedSubCategory(e.target.value)}
+                                                            disabled={!selectedCategory}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {filteredSubCategory.map((subCat) => (
+                                                                <option value={subCat._id} key={subCat._id}>{subCat.subCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Size Name</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
+                                                        <Form.Select className="mb-3" value={sizeFilter}
+                                                            onChange={(e) => setSizeFilter(e.target.value)}>
                                                             <option>Select</option>
-                                                            <option value="Weight">Weight</option>
-                                                            <option value="Length">Length</option>
-                                                            <option value="Capacity">Capacity</option>
-                                                            <option value="Storage">Storage</option>
+                                                            {availableSizes.map((size, index) => (
+                                                                <option value={size} key={index}>{size}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                 </div>
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleClose}>Cancel</button>
+                                                            <button type="button" onClick={resetFilters}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="button" onClick={applyFiltersAndClose}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -290,77 +390,83 @@ const Size = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                        <th className=''>ID</th>
-                                        <th className=''>Main Category</th>
-                                        <th className=''>Category</th>
-                                        <th className=''>Sub Category</th>
-                                        <th className=''>Size Name</th>
-                                        <th className=''>Size</th>
-                                        <th className=''>Unit</th>
-                                        <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.maincategory}</td>
-                                            <td>{item.category}</td>
-                                            <td>{item.subcategory}</td>
-                                            <td>{item.sizename}</td>
-                                            <td>{item.size}</td>
-                                            <td>{item.unit}</td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={handleditsize}>
-                                                    <Link to='/addSize' state={{ editSize: true }}>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
-                                        </p>
-                                    ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
+                            {paginatedData.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd" style={{ height: '65vh' }}>
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Main Category</th>
+                                                    <th className=''>Category</th>
+                                                    <th className=''>Sub Category</th>
+                                                    <th className=''>Size Name</th>
+                                                    <th className=''>Size</th>
+                                                    <th className=''>Unit</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData?.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{item.mainCategoryData[0]?.mainCategoryName}</td>
+                                                        <td>{item.categoryData[0]?.categoryName}</td>
+                                                        <td>{item.subCategoryData[0]?.subCategoryName}</td>
+                                                        <td>{item.sizeName}</td>
+                                                        <td>{item.size}</td>
+                                                        <td>{item.unitData[0]?.shortName}</td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon">
+                                                                <Link to='/addsize' state={{ id: item._id }}>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => handleDeleteClick(item)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                                    onClick={() => typeof page === 'number' ? handlePageChange(page) : null}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <NoResultsFound/>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Delete Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            {/* Delete Size Modal */}
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
-                    <p>Are you sure you want to <br /> weight?</p>
+                    <p>Are you sure you want to delete this <br /> size?</p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
@@ -369,4 +475,4 @@ const Size = (props) => {
     );
 };
 
-export default Size
+export default Size;

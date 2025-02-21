@@ -88,7 +88,7 @@ const SubCategory = () => {
                     const response = await axios.get(`${BaseUrl}/api/getSubCategory/${id}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    console.log("response", response.data.subCategory);
+                    // console.log("response", response.data.subCategory);
                     const subcategoryData = response.data.subCategory;
                     setInitialValues({
                         mainCategoryId: subcategoryData.mainCategoryId,
@@ -312,7 +312,7 @@ const SubCategory = () => {
                 </Row>
                 {paginatedData.length > 0 ? (
                     <>
-                        <div className="mv_product_table_padd">
+                        <div className="mv_product_table_padd"  style={{height:'65vh'}} >
                             <table className='mv_product_table justify-content-between'>
                                 <thead>
                                     <tr>
@@ -345,14 +345,14 @@ const SubCategory = () => {
                                                     setId(sub._id);
                                                     setShowAddEditModal(true);
                                                 }}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                 </div>
                                                 <div className="mv_pencil_icon" onClick={() => {
                                                     setId(sub._id);
                                                     setShowDeleteModal(true);
                                                     setSubCatToDelete(sub.subCategoryName);
                                                 }}>
-                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
                                         </tr>
@@ -461,10 +461,9 @@ const SubCategory = () => {
                                 <FormikForm onSubmit={handleSubmit} className="r_form">
                                     <Form.Group className="mb-3">
                                         <Form.Label>Main Category</Form.Label>
-                                        <Field
-                                            as="select"
+                                        <Form.Select
                                             name="mainCategoryId"
-                                            className="form-control"
+                                            className="form-select"
                                             onChange={(e) => {
                                                 setFieldValue('mainCategoryId', e.target.value);
                                                 setFieldValue('categoryId', ''); // Reset category when main category changes
@@ -480,7 +479,7 @@ const SubCategory = () => {
                                                     {main.mainCategoryName}
                                                 </option>
                                             ))}
-                                        </Field>
+                                        </Form.Select>
                                         <ErrorMessage name="mainCategoryId" component="div" className="text-danger" />
                                     </Form.Group>
 
@@ -489,7 +488,7 @@ const SubCategory = () => {
                                         <Field
                                             as="select"
                                             name="categoryId"
-                                            className="form-control"
+                                            className="form-select"
                                         // disabled={!initialValues.mainCategoryId} 
                                         >
                                             <option value="">Select</option>

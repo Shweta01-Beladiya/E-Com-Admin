@@ -406,7 +406,7 @@ const Product = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                <div className="mv_product_table_padd" >
+                                <div className="mv_product_table_padd" style={{height:'73vh'}} >
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>

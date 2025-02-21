@@ -1,90 +1,219 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { InputGroup, Form } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Addsize = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const navigate = useNavigate();
+
     // State variables
     let [isedit, setisedit] = useState(false);
-    // let [mainCategory, setMainCategory] = useState("");
-    // let [category, setCategory] = useState("");
-    // let [subCategory, setSubCategory] = useState("");
-    // let [sizeName, setSizeName] = useState("");
-    // let [size, setSize] = useState("");
-    // let [unit, setUnit] = useState("");
+    const [unit, setUnit] = useState([]);
+    const [mainCategory, setMainCategory] = useState([]);
+    const [allCategories, setAllCategories] = useState([]);
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [allSubCategories, setAllSubCategories] = useState([]);
+    const [filteredSubCategories, setFilteredSubCategories] = useState([]);
 
     let change_edit = () => {
         setisedit(!isedit);
     };
 
-    // let handlesubmit = (event) => {
-    //     event.preventDefault();
-
-    //     const formData = {
-    //         mainCategory,
-    //         category,
-    //         subCategory,
-    //         sizeName,
-    //         size,
-    //         unit,
-    //     };
-
-    //     console.log('Form Submitted:', formData);
-    //     setisedit(false);
-    // };
-
     // Edit Size
     const location = useLocation();
-    const editSize = location.state?.editSize;
-    console.log(editSize)
+    const id = location.state?.id;
+
+    // console.log("location",location.state);
+    // console.log(id);
 
     // ******************************* Validation *******************************
     const sizeInit = {
         mainCategory: "",
-        category: "",
-        subCategory: "",
+        categoryId: "",
+        subCategoryId: "",
         sizeName: "",
         size: "",
         unit: ""
     };
-    
+
     const sizeValidate = Yup.object().shape({
         mainCategory: Yup.string().required("Main Category is required"),
-        category: Yup.string().required("Category is required"),
-        subCategory: Yup.string().required("Sub Category is required"),
+        categoryId: Yup.string().required("Category is required"),
+        subCategoryId: Yup.string().required("Sub Category is required"),
         sizeName: Yup.string().required("Size Name is required"),
         size: Yup.string().required("Size is required"),
         unit: Yup.string().required("Unit is required")
     });
-    
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: sizeInit,
         validationSchema: sizeValidate,
-        onSubmit: (values) => {
-            console.log(values);
-            // addsize(values)
+        onSubmit: async (values) => {
+            let response;
+
+            if (id) {
+                response = await axios.put(`${BaseUrl}/api/updateSize/${id}`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            } else {
+                response = await axios.post(`${BaseUrl}/api/createSize`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            }
+
+            if (response.data.status === 200 || response.data.status === 201) {
+                navigate('/size');
+            }
         }
     });
-    // **************************************************************************
+
+    // Custom handler for main category change
+    const handleMainCategoryChange = (e) => {
+        const mainCatId = e.target.value;
+        setFieldValue("mainCategory", mainCatId);
+        setFieldValue("categoryId", "");
+        setFieldValue("subCategoryId", "");
+
+        // Filter categories based on selected main category
+        if (mainCatId) {
+            const relatedCategories = allCategories.filter(cat => cat.mainCategoryId === mainCatId);
+            setFilteredCategories(relatedCategories);
+        } else {
+            setFilteredCategories([]);
+        }
+
+        // Reset sub-categories when main category changes
+        setFilteredSubCategories([]);
+    };
+
+    // Custom handler for category change
+    const handleCategoryChange = (e) => {
+        const catId = e.target.value;
+        setFieldValue("categoryId", catId);
+        setFieldValue("subCategoryId", "");
+
+        // Filter sub-categories based on selected category
+        if (catId) {
+            const relatedSubCategories = allSubCategories.filter(subCat => subCat.categoryId === catId);
+            setFilteredSubCategories(relatedSubCategories);
+        } else {
+            setFilteredSubCategories([]);
+        }
+    };
+
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data.users);
+            setMainCategory(response.data.users);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("categoryRe", response.data.category);
+            setAllCategories(response.data.category);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("subcategoryRe", response.data.subCategory);
+            setAllSubCategories(response.data.subCategory);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchUnit = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allUnits`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response>>>>>>>>>",response.data.unit);
+            setUnit(response.data.unit);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchSingleData = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getSizeData/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("Resposnse",response.data.size);
+
+            const sizeData = response.data.size[0];
+
+            setFieldValue("mainCategory", sizeData.mainCategory);
+            setFieldValue("categoryId", sizeData.categoryId);
+            setFieldValue("subCategoryId", sizeData.subCategoryId);
+            setFieldValue("sizeName", sizeData.sizeName);
+            setFieldValue("size", sizeData.size);
+            setFieldValue("unit", sizeData.unit);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        fetchUnit();
+        if (id) {
+            fetchSingleData();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [BaseUrl, token]);
+
+
+    useEffect(() => {
+        if (id && allCategories.length > 0 && allSubCategories.length > 0 && values.mainCategory) {
+            const relatedCategories = allCategories.filter(cat => cat.mainCategoryId === values.mainCategory);
+            setFilteredCategories(relatedCategories);
+            
+            if (values.categoryId) {
+                const relatedSubCategories = allSubCategories.filter(subCat => subCat.categoryId === values.categoryId);
+                setFilteredSubCategories(relatedSubCategories);
+            }
+        }
+    }, [allCategories, allSubCategories, id, values.mainCategory, values.categoryId]);
 
     return (
         <>
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editSize ? 'Edit Size' : 'Add Size'}</p>
+                        <p className='mb-1'>{id ? 'Edit Size' : 'Add Size'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editSize ? 'Edit Size' : 'Add Size'}
+                                {id ? 'Edit Size' : 'Add Size'}
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="mv_main_profile_change h-auto">
-                    {/* Tabs Content */}
+                <div className="mv_main_profile_change h-auto">
                     <div className="tab-content">
                         <div className="mv_view_edit_profile">
                             <div className='mv_profile_type'>
@@ -96,62 +225,54 @@ const Addsize = () => {
                                                 <Form.Select
                                                     name="mainCategory"
                                                     value={values.mainCategory}
-                                                    onChange={handleChange}
+                                                    onChange={handleMainCategoryChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option value="">Select</option>
-                                                    <option value="Women">Women</option>
-                                                    <option value="Men">Men</option>
-                                                    <option value="Baby & Kids">Baby & Kids</option>
-                                                    <option value="Beauty & Health">Beauty & Health</option>
-                                                    <option value="Home & Kitchen">Home & Kitchen</option>
-                                                    <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                    {mainCategory.map((mainCat) => (
+                                                        <option value={mainCat._id} key={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.mainCategory && touched.mainCategory && <div className="text-danger small">{errors.mainCategory}</div>}
+                                                {errors.mainCategory && touched.mainCategory &&
+                                                    <div className="text-danger small">{errors.mainCategory}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
-                                                    name="category"
-                                                    value={values.category}
-                                                    onChange={handleChange}
+                                                    name="categoryId"
+                                                    value={values.categoryId}
+                                                    onChange={handleCategoryChange}
                                                     onBlur={handleBlur}
-                                                    className='mv_form_select'>
+                                                    className='mv_form_select'
+                                                    disabled={!values.mainCategory}>
                                                     <option value="">Select</option>
-                                                    <option value="Jewelry">Jewelry</option>
-                                                    <option value="Western Wear">Western Wear</option>
-                                                    <option value="Baby Care">Baby Care</option>
-                                                    <option value="Skin Care">Skin Care</option>
-                                                    <option value="Electronics">Electronics</option>
-                                                    <option value="Fragrance">Fragrance</option>
-                                                    <option value="Kitchen wear">Kitchen wear</option>
-                                                    <option value="Mobile">Mobile</option>
+                                                    {filteredCategories.map((cat) => (
+                                                        <option value={cat._id} key={cat._id}>{cat.categoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.category && touched.category && <div className="text-danger small">{errors.category}</div>}
+                                                {errors.categoryId && touched.categoryId &&
+                                                    <div className="text-danger small">{errors.categoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
-                                                    name="subCategory"
-                                                    value={values.subCategory}
+                                                    name="subCategoryId"
+                                                    value={values.subCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    className='mv_form_select'>
+                                                    className='mv_form_select'
+                                                    disabled={!values.categoryId}>
                                                     <option value="">Select</option>
-                                                    <option value="Necklace">Necklace</option>
-                                                    <option value="Blazer">Blazer</option>
-                                                    <option value="Baby Soap">Baby Soap</option>
-                                                    <option value="Facewash">Facewash</option>
-                                                    <option value="Refrigerator">Refrigerator</option>
-                                                    <option value="Perfume">Perfume</option>
-                                                    <option value="Pressure Cooker">Pressure Cooker</option>
-                                                    <option value="Smart Phone">Smart Phone</option>
+                                                    {filteredSubCategories.map((subCat) => (
+                                                        <option value={subCat._id} key={subCat._id}>{subCat.subCategoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.subCategory && touched.subCategory && <div className="text-danger small">{errors.subCategory}</div>}
+                                                {errors.subCategoryId && touched.subCategoryId &&
+                                                    <div className="text-danger small">{errors.subCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -164,7 +285,8 @@ const Addsize = () => {
                                                     onBlur={handleBlur}
                                                     placeholder="Enter size name"
                                                 />
-                                                {errors.sizeName && touched.sizeName && <div className="text-danger small">{errors.sizeName}</div>}
+                                                {errors.sizeName && touched.sizeName &&
+                                                    <div className="text-danger small">{errors.sizeName}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -177,7 +299,8 @@ const Addsize = () => {
                                                     onBlur={handleBlur}
                                                     placeholder="Enter size"
                                                 />
-                                                {errors.size && touched.size && <div className="text-danger small">{errors.size}</div>}
+                                                {errors.size && touched.size &&
+                                                    <div className="text-danger small">{errors.size}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -190,31 +313,30 @@ const Addsize = () => {
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option value="">Select</option>
-                                                    <option value="gm">gm</option>
-                                                    <option value="ltr">ltr</option>
-                                                    <option value="ml">ml</option>
-                                                    <option value="GB">GB</option>
+                                                    {unit.map((unit) => (
+                                                        <option value={unit._id} key={unit._id}>{unit.shortName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.unit && touched.unit && <div className="text-danger small">{errors.unit}</div>}
+                                                {errors.unit && touched.unit &&
+                                                    <div className="text-danger small">{errors.unit}</div>}
                                             </div>
                                         </div>
                                     </div>
                                     <div className='text-center mt-5'>
                                         <div className="mv_edit_profile">
                                             <button type="button" className='border-0 bg-transparent'>
-                                                Cnacel
+                                                Cancel
                                             </button>
-                                            {editSize === true ? 
+                                            {id ?
                                                 <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
                                                     Update
-                                                </button> : 
+                                                </button> :
                                                 <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
                                                     Add
                                                 </button>
                                             }
                                         </div>
                                     </div>
-
                                 </form>
                             </div>
                         </div>

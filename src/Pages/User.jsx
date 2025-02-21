@@ -226,7 +226,7 @@ const UserTable = () => {
               </div>
               {paginatedData.length > 0 ? (
                 <>
-                  <div className="mv_product_table_padd">
+                  <div className="mv_product_table_padd" style={{height:'65vh'}}>
                     <table className='mv_product_table justify-content-between'>
                       <thead>
                         <tr>
