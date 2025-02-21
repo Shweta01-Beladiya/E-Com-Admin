@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form, Table, Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
+import { Button, Modal, Form,  Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
 import { FaFilter } from "react-icons/fa6";
 import "../CSS/riya.css";
 import { FaSearch } from 'react-icons/fa';
@@ -176,6 +176,7 @@ const SubCategory = () => {
         const filtered = getFilteredData();
         setFilteredData(filtered);
         setCurrentPage(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, filters, subCategories]);
 
     useEffect(() => {
@@ -264,18 +265,23 @@ const SubCategory = () => {
     };
 
     const handleClearFilters = () => {
+        setShowFilter(false);
         setFilters({ category: '', mainCategory: '', status: '' });
         setSearchQuery('');
     };
 
     return (
         <div>
-            <h5 className="mb-0 fw-bold">Sub Category</h5>
-            <div className='d-flex'>
-                <p class="text-muted">Dashboard /</p>
-                <p className='ms-1'>Sub Category</p>
+            <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <p className='mb-1'>Sub Category</p>
+                    <div className='d-flex align-items-center'>
+                        <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
+                        <p className='mv_category_heading mv_subcategory_heading mb-0'>Sub Category</p>
+                    </div>
+                </div>
             </div>
-            <div style={{ backgroundColor: 'white', padding: '20px', height:'80vh' }}>
+            <div style={{ backgroundColor: 'white', padding: '20px' }}>
                 <Row className="mb-4 align-items-center">
                     <Col xs={12} md={6} lg={4}>
                         <InputGroup className="mb-3 search-input-group r_inputgroup">
@@ -306,58 +312,54 @@ const SubCategory = () => {
                 </Row>
                 {paginatedData.length > 0 ? (
                     <>
-                        <Table responsive borderless>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Main Category</th>
-                                    <th>Category</th>
-                                    <th>Name</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {paginatedData.map((sub, index) => (
-                                    <tr key={index}>
-                                        {/* {console.log("sub?????????",sub)} */}
-                                        <td>{index + 1}</td>
-                                        <td>{mainCategory.find((main) => main._id === sub.mainCategoryId)?.mainCategoryName || ''}</td>
-                                        <td>{category.find((main) => main._id === sub.categoryId)?.categoryName || ''}</td>
-                                        <td>{sub.subCategoryName}</td>
-                                        <td>
-                                            <Form.Check
-                                                type="switch"
-                                                checked={sub.status}
-                                                onChange={() => handleStatusChange(sub._id, sub.status)}
-                                                className="status-switch"
-                                            />
-                                        </td>
-                                        <td>
-                                            <Button
-                                                className="r_deleticon me-2"
-                                                onClick={() => {
+                        <div className="mv_product_table_padd">
+                            <table className='mv_product_table justify-content-between'>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Main Category</th>
+                                        <th>Category</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th className='d-md-flex align-items-center justify-content-end'>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paginatedData.map((sub, index) => (
+                                        <tr key={index}>
+                                            {/* {console.log("sub?????????",sub)} */}
+                                            <td>{index + 1}</td>
+                                            <td>{mainCategory.find((main) => main._id === sub.mainCategoryId)?.mainCategoryName || ''}</td>
+                                            <td>{category.find((main) => main._id === sub.categoryId)?.categoryName || ''}</td>
+                                            <td>{sub.subCategoryName}</td>
+                                            <td>
+                                                <Form.Check
+                                                    type="switch"
+                                                    checked={sub.status}
+                                                    onChange={() => handleStatusChange(sub._id, sub.status)}
+                                                    className="status-switch"
+                                                />
+                                            </td>
+                                            <td className='d-flex align-items-center justify-content-end'>
+                                                <div className="mv_pencil_icon" onClick={() => {
                                                     setId(sub._id);
                                                     setShowAddEditModal(true);
-                                                }}
-                                            >
-                                                <img src={require('../Photos/edit.png')} className="r_deletimg" alt="edit" />
-                                            </Button>
-                                            <Button
-                                                className="r_deleticon"
-                                                onClick={() => {
+                                                }}>
+                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                </div>
+                                                <div className="mv_pencil_icon" onClick={() => {
                                                     setId(sub._id);
                                                     setShowDeleteModal(true);
                                                     setSubCatToDelete(sub.subCategoryName);
-                                                }}
-                                            >
-                                                <img src={require('../Photos/delet.png')} className="r_deletimg" alt="delete" />
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                                                }}>
+                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         {/* Enhanced Pagination */}
                         {totalPages > 1 && (

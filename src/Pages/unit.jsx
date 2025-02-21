@@ -1,91 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
-const Unit = (props) => {
-   
-    var data = [
-        {   
-            id: 1,
-            name: "Gram",
-            shortname: "Gm",
-            status: true,
-        },
-        {   
-            id: 2,
-            name: "Liter",
-            shortname: "Ltr",
-            status: false,
-        },
-        {   
-            id: 3,
-            name: "Mili Liter",
-            shortname: "ml",
-            status: true,
-        },
-        {   
-            id: 4,
-            name: "Giga Byte",
-            shortname: "GB",
-            status: true,
-        },
-        {   
-            id: 5,
-            name: "Inch",
-            shortname: "In",
-            status: true,
-        },
-        {   
-            id: 6,
-            name: "Genration",
-            shortname: "Gen",
-            status: true,
-        },
-        {   
-            id: 7,
-            name: "Ton",
-            shortname: "Ton",
-            status: true,
-        },
-        {   
-            id: 8,
-            name: "Centi Meter",
-            shortname: "cm",
-            status: true,
-        },
-        {   
-            id: 9,
-            name: "Meter",
-            shortname: "mtr",
-            status: true,
-        },
-        {   
-            id: 10,
-            name: "Gram",
-            shortname: "Gm",
-            status: true,
-        },
-        {   
-            id: 11,
-            name: "Liter",
-            shortname: "Ltr",
-            status: true,
-        },
-    ];
+const Unit = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const itemsPerPage = 10;
+    const [data, setData] = useState([]);
+    const [id, setId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredData, setFilteredData] = useState([]);
+    const [deleteUnit, setDeleteUnit] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    // Modal
+    const [modalShow, setModalShow] = React.useState(false);
+    const [modalShow1, setModalShow1] = React.useState(false);
+    const [selectedUnit, setSelectedUnit] = useState({ name: '', shortName: '' });
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const resposne = await axios.get(`${BaseUrl}/api/allUnits`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("resposne",resposne.data.unit);
+                setData(resposne.data.unit);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchData();
+    }, [BaseUrl, token]);
+
+    const handleEdit = (unit) => {
+        setId(unit._id);
+        setSelectedUnit({ name: unit.name, shortName: unit.shortName });
+        setModalShow1(true);
+    };
 
     // ************************************** Pagination **************************************
-    const itemsPerPage = 10;
-    const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -96,27 +63,23 @@ const Unit = (props) => {
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-        
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-        
-        // Adjust startPage if we're near the end
+
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
 
-        // Add first page if not included
         if (startPage > 1) {
             buttons.push(1);
             if (startPage > 2) buttons.push('...');
         }
 
-        // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
 
-        // Add last page if not included
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) buttons.push('...');
             buttons.push(totalPages);
@@ -128,50 +91,120 @@ const Unit = (props) => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    useEffect(() => {
+        setFilteredData(data);
+    }, [data]);
     // *******************************************************************************
-    
-    // Modal
-    const [modalShow, setModalShow] = React.useState(false);
-    const [modalShow1, setModalShow1] = React.useState(false);
-
-    // const [values, setValues] = useState({
-    //     name: "",
-    //     name1: ""
-    // });
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setValues({ ...values, [name]: value });
-    // };
-
 
     // ******************************* Validation *******************************
-    const [id, setId] = useState(null);
-
-    const init = {
-        name:"",
-        shortname:""
-    }
 
     const validate = Yup.object().shape({
-        name:Yup.string().required("Unit Name is required"),
-        shortname:Yup.string().required("Short Name is required")
+        name: Yup.string().required("Unit Name is required"),
+        shortName: Yup.string().required("Short Name is required")
     })
 
-    const {values, handleBlur, handleChange, handleSubmit,errors,touched} = useFormik({
-        initialValues:init,
-        validationSchema:validate,
-        onSubmit: (values) => {
-            console.log(values);   
-            // addunit(values)
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm } = useFormik({
+        initialValues: { name: selectedUnit.name, shortName: selectedUnit.shortName },
+        validationSchema: validate,
+        enableReinitialize: true,
+        onSubmit: async (values) => {
+            try {
+                if (id) {
+                    const response = await axios.put(`${BaseUrl}/api/updateUnit/${id}`, {
+                        name: values.name,
+                        shortName: values.shortName
+                    }, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (response.data.status === 200) {
+                        setData(prevData =>
+                            prevData.map(unit =>
+                                unit._id === id ? { ...unit, name: values.name, shortName: values.shortName } : unit
+                            )
+                        );
+                        setSelectedUnit({ name: '', shortName: '' });
+                        setModalShow1(false);
+                        resetForm();
+                        setId(null);
+                    }
+                    // console.log("Repasonse", response.data);
+                } else {
+                    const response = await axios.post(`${BaseUrl}/api/createUnit`, {
+                        name: values.name,
+                        shortName: values.shortName
+                    }, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+
+                    if (response.data.status === 201) {
+                        setData(prevData => [...prevData, response.data.unit]);
+                        setModalShow1(false);
+                        resetForm();
+                    }
+                }
+            } catch (error) {
+                console.error('Data Add and Upadte Error:', error);
+            }
         }
     })
-    
-    // const addunit = () => {
-
-    // }
     // *******************************************************************************
+    const handleDelete = async (id, name) => {
+        setModalShow(true);
+        setId(id);
+        setDeleteUnit(name)
+    }
 
+    const handleConfirmDelete = async () => {
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteUnit/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("resposnse",response.data);
+            if (response.data.status === 200) {
+                setId(null);
+                setModalShow(false);
+                setData(prevData => prevData.filter(unit => unit._id !== id));
+            }
+        } catch (error) {
+            console.error('Data Delete Error:', error);
+        }
+    }
+
+    const handleStatusChange = async (id, status) => {
+        try {
+
+            const updatedStatus = !status
+
+            const response = await axios.put(`${BaseUrl}/api/updateUnit/${id}`, { status: updatedStatus }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.status === 200) {
+                setData((prevData) =>
+                    prevData.map((unit) =>
+                        unit._id === id ? { ...unit, status: updatedStatus } : unit
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Status Upadte error', error);
+        }
+    }
+
+    const handleSearch = (e) => {
+        const query = e.target.value.toLowerCase();
+        setSearchQuery(query);
+
+        if (query === '') {
+            setFilteredData(data);
+        } else {
+            const filtered = data.filter(item =>
+                item.name.toLowerCase().includes(query) ||
+                item.shortName.toLowerCase().includes(query)
+            );
+            setFilteredData(filtered);
+        }
+    };
 
     return (
         <>
@@ -192,9 +225,9 @@ const Unit = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            value={searchQuery}
+                                            onChange={handleSearch}
                                         />
                                     </InputGroup>
                                 </div>
@@ -206,80 +239,82 @@ const Unit = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Name</th>
-                                            <th className=''>Short Name</th>
-                                            <th className=''>Status</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.shortname}</td>
-                                            <td>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id={`custom-switch-${item.id}`}
-                                                    label=""
-                                                    checked={item.status}
-                                                    className=''
-                                                    />
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
-                                        </p>
-                                    ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
+                            {paginatedData.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Name</th>
+                                                    <th className=''>Short Name</th>
+                                                    <th className=''>Status</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData?.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{item.name}</td>
+                                                        <td>{item.shortName}</td>
+                                                        <td>
+                                                            <Form.Check
+                                                                type="switch"
+                                                                label=""
+                                                                checked={item.status}
+                                                                onChange={() => handleStatusChange(item._id, item.status)}
+                                                            />
+                                                        </td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => handleDelete(item._id, item.name)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                                    onClick={() => handlePageChange(page)}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                              <NoResultsFound/>  
                             )}
                         </div>
                     </div>
                 </div>
             </div>
 
-
             {/* Delete Unit Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
-                    <p>Are you sure you want to delete <br /> Generation ?</p>
+                    <p>Are you sure you want to delete <br /> {deleteUnit} ?</p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleConfirmDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
@@ -288,7 +323,7 @@ const Unit = (props) => {
             {/* Add Edit Unit Model */}
             <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
-                    
+
                 </Modal.Header>
                 <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
                     {id ? 'Edit Unit' : 'Add Unit'}
@@ -313,17 +348,18 @@ const Unit = (props) => {
                             <InputGroup className="">
                                 <Form.Control
                                     placeholder="Enter short name"
-                                    name='shortname'
-                                    value={values.shortname}
+                                    name='shortName'
+                                    value={values.shortName}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {errors.shortname && touched.shortname && <div className="text-danger small">{errors.shortname}</div>}
+                            {errors.shortName && touched.shortName && <div className="text-danger small">{errors.shortName}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={() => { setModalShow1(false); setSelectedUnit({ name: '', shortName: '' }); }}>
+                                    Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">
@@ -334,225 +370,8 @@ const Unit = (props) => {
                     </form>
                 </Modal.Body>
             </Modal>
-
         </>
     );
 };
 
 export default Unit
-
-
-
-
-// import React, { useEffect, useState } from 'react';
-// import '../CSS/product.css';
-// import Form from 'react-bootstrap/Form';
-// import { InputGroup } from 'react-bootstrap';
-// import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
-// import Modal from 'react-bootstrap/Modal';
-// import * as Yup from 'yup'
-// import { useFormik } from 'formik';
-// import { Link } from 'react-router-dom';
-
-// const Unit = () => {
-//     const [data, setData] = useState([]);
-//     const [currentPage, setCurrentPage] = useState(1);
-//     const itemsPerPage = 10;
-
-//     // Fetch data from localStorage on mount
-//     useEffect(() => {
-//         const storedData = JSON.parse(localStorage.getItem('units')) || [];
-//         setData(storedData);
-//     }, []);
-
-//     // Save data to localStorage
-//     const saveData = (newData) => {
-//         localStorage.setItem('units', JSON.stringify(newData));
-//         setData(newData);
-//     };
-
-//     // Handle Add Data
-//     const addUnit = (unit) => {
-//         unit.id = data.length ? data[data.length - 1].id + 1 : 1; // Auto-increment ID
-//         const newData = [...data, unit];
-//         saveData(newData);
-//         setModalShow1(false);
-//     };
-
-//     // Handle Edit Data
-//     const [editUnit, setEditUnit] = useState(null);
-
-//     const updateUnit = (updatedUnit) => {
-//         const updatedData = data.map((item) =>
-//             item.id === updatedUnit.id ? updatedUnit : item
-//         );
-//         saveData(updatedData);
-//         setModalShow2(false);
-//     };
-
-//     // Handle Delete Data
-//     const deleteUnit = (id) => {
-//         const updatedData = data.filter((item) => item.id !== id);
-//         saveData(updatedData);
-//         setModalShow(false);
-//     };
-
-//     // Pagination Logic
-//     const totalPages = Math.ceil(data.length / itemsPerPage);
-//     const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-//     const handlePageChange = (newPage) => {
-//         if (newPage < 1 || newPage > totalPages) return;
-//         setCurrentPage(newPage);
-//     };
-
-//     const [modalShow, setModalShow] = useState(false);
-//     const [modalShow1, setModalShow1] = useState(false);
-//     const [modalShow2, setModalShow2] = useState(false);
-
-//     const validationSchema = Yup.object({
-//         name: Yup.string().min(2, "Minimum 2 characters").required("Required"),
-//         shortname: Yup.string().min(1, "Required").required("Required"),
-//     });
-
-//     const formik = useFormik({
-//         initialValues: { name: "", shortname: "", status: true },
-//         validationSchema,
-//         onSubmit: (values) => {
-//             if (editUnit) {
-//                 updateUnit({ ...editUnit, ...values });
-//             } else {
-//                 addUnit(values);
-//             }
-//             formik.resetForm();
-//         },
-//     });
-
-//     return (
-//         <>
-//             <div id='mv_container_fluid'>
-//                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
-//                     <div>
-//                         <p className='mb-1'>Unit</p>
-//                         <p className='mv_dashboard_heading mb-0'>Dashboard / Unit</p>
-//                     </div>
-//                     <button className="mv_add_category" onClick={() => { setModalShow1(true); formik.resetForm(); }}>
-//                         + Add Unit
-//                     </button>
-//                 </div>
-
-//                 <div className="mv_product_table_content">
-//                     <table className='mv_product_table'>
-//                         <thead>
-//                             <tr>
-//                                 <th>ID</th>
-//                                 <th>Name</th>
-//                                 <th>Short Name</th>
-//                                 <th>Status</th>
-//                                 <th>Action</th>
-//                             </tr>
-//                         </thead>
-//                         <tbody>
-//                             {paginatedData.map((item, index) => (
-//                                 <tr key={index}>
-//                                     <td>{item.id}</td>
-//                                     <td>{item.name}</td>
-//                                     <td>{item.shortname}</td>
-//                                     <td>
-//                                         <Form.Check
-//                                             type="switch"
-//                                             checked={item.status}
-//                                             onChange={() => {
-//                                                 const updatedData = data.map((unit) =>
-//                                                     unit.id === item.id ? { ...unit, status: !unit.status } : unit
-//                                                 );
-//                                                 saveData(updatedData);
-//                                             }}
-//                                         />
-//                                     </td>
-//                                     <td>
-//                                         <button onClick={() => { setEditUnit(item); setModalShow2(true); formik.setValues(item); }}>
-//                                             Edit
-//                                         </button>
-//                                         <button onClick={() => { setEditUnit(item); setModalShow(true); }}>
-//                                             Delete
-//                                         </button>
-//                                     </td>
-//                                 </tr>
-//                             ))}
-//                         </tbody>
-//                     </table>
-//                 </div>
-
-//                 {totalPages > 1 && (
-//                     <div className='pagination'>
-//                         <button onClick={() => handlePageChange(currentPage - 1)}>
-//                             <MdOutlineKeyboardArrowLeft />
-//                         </button>
-//                         {Array.from({ length: totalPages }, (_, i) => (
-//                             <button key={i} className={currentPage === i + 1 ? 'active' : ''} onClick={() => handlePageChange(i + 1)}>
-//                                 {i + 1}
-//                             </button>
-//                         ))}
-//                         <button onClick={() => handlePageChange(currentPage + 1)}>
-//                             <MdOutlineKeyboardArrowRight />
-//                         </button>
-//                     </div>
-//                 )}
-//             </div>
-
-//             {/* Add/Edit Modal */}
-//             <Modal show={modalShow1 || modalShow2} onHide={() => { setModalShow1(false); setModalShow2(false); formik.resetForm(); }} centered>
-//                 <Modal.Header closeButton>
-//                     <Modal.Title>{editUnit ? "Edit Unit" : "Add Unit"}</Modal.Title>
-//                 </Modal.Header>
-//                 <Modal.Body>
-//                     <form onSubmit={formik.handleSubmit}>
-//                         <div>
-//                             <label>Name</label>
-//                             <InputGroup>
-//                                 <Form.Control
-//                                     name="name"
-//                                     value={formik.values.name}
-//                                     onChange={formik.handleChange}
-//                                     onBlur={formik.handleBlur}
-//                                     placeholder="Enter unit name"
-//                                 />
-//                             </InputGroup>
-//                             {formik.touched.name && formik.errors.name && <div className="error">{formik.errors.name}</div>}
-//                         </div>
-//                         <div>
-//                             <label>Short Name</label>
-//                             <InputGroup>
-//                                 <Form.Control
-//                                     name="shortname"
-//                                     value={formik.values.shortname}
-//                                     onChange={formik.handleChange}
-//                                     onBlur={formik.handleBlur}
-//                                     placeholder="Enter short name"
-//                                 />
-//                             </InputGroup>
-//                             {formik.touched.shortname && formik.errors.shortname && <div className="error">{formik.errors.shortname}</div>}
-//                         </div>
-//                         <div className="modal-footer">
-//                             <button type="button" onClick={() => { setModalShow1(false); setModalShow2(false); }}>Cancel</button>
-//                             <button type="submit">{editUnit ? "Update" : "Add"}</button>
-//                         </div>
-//                     </form>
-//                 </Modal.Body>
-//             </Modal>
-
-//             {/* Delete Confirmation Modal */}
-//             <Modal show={modalShow} onHide={() => setModalShow(false)} centered>
-//                 <Modal.Body className="text-center">
-//                     <h5>Delete?</h5>
-//                     <p>Are you sure you want to delete this unit?</p>
-//                     <button onClick={() => setModalShow(false)}>Cancel</button>
-//                     <button onClick={() => { deleteUnit(editUnit.id); setModalShow(false); }}>Delete</button>
-//                 </Modal.Body>
-//             </Modal>
-//         </>
-//     );
-// };
-
-// export default Unit;

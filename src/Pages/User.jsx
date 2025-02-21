@@ -1,40 +1,32 @@
+
 import React, { useEffect, useState } from 'react';
-import {
-  Table,
-  Form,
-  InputGroup,
-  Button,
-  Row,
-  Col,
-  Pagination,
-  Offcanvas,
-  Modal
-} from 'react-bootstrap';
-import { FaSearch } from 'react-icons/fa';
-import { FaFilter } from "react-icons/fa";
-import '../CSS/riya.css';
+import '../CSS/product.css';
+import Form from 'react-bootstrap/Form';
+import { InputGroup } from 'react-bootstrap';
+import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 import NoResultsFound from '../Component/Noresult';
-
 
 const UserTable = () => {
 
   const BaseUrl = process.env.REACT_APP_BASEURL;
   const token = localStorage.getItem('token');
 
-   // States
-   const [data, setData] = useState([]);
-   const [currentPage, setCurrentPage] = useState(1);
-   const [searchTerm, setSearchTerm] = useState("");
-   const [itemsPerPage] = useState(10);
-   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-   const [showFilter, setShowFilter] = useState(false);
-   const [selectedGenders, setSelectedGenders] = useState([]);
-   const [showDeleteModal, setShowDeleteModal] = useState(false);
-   const [userToDelete, setUserToDelete] = useState(null);
+  const [data, setData] = useState([]);
+  const [modalShow, setModalShow] = React.useState(false);  // Modal
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [show, setShow] = useState(false);   // Offcanvas
+  const [searchTerm, setSearchTerm] = useState('');
+  // Add these state variables after your existing useState declarations
+  const [filters, setFilters] = useState({
+    gender: '',
+  });
 
   useEffect(() => {
-    const fetchData = async() => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(`${BaseUrl}/api/getAllUsers`, {
           headers: {
@@ -43,265 +35,270 @@ const UserTable = () => {
         });
         const filteredData = response.data.user.filter(user => user.role === 'user');
         setData(filteredData);
-        // console.log("response",response.data.user);
-        
+        // console.log("response", response.data.user);
+
       } catch (error) {
-        console.error('Data fetching Error:',error);
+        console.error('Data fetching Error:', error);
       }
     }
     fetchData();
-  },[BaseUrl, token]);
+  }, [BaseUrl, token]);
 
-  // Filter functionality
-  const filteredData = data.filter(item => {
-    const matchesSearch = Object.values(item).some(value =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const matchesGender = selectedGenders.length === 0 || selectedGenders.includes(item.gender);
-
-    return matchesSearch && matchesGender;
-  });
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
 
 
+  useEffect(() => {
+    let result = data;
 
-  // Sorting functionality
-  const sortData = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+
+    if (filters.gender) {
+      result = result.filter(user => user.gender === filters.gender);
     }
-    setSortConfig({ key, direction });
+
+    if (searchTerm) {
+      result = result.filter(user =>
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.mobileNo.includes(searchTerm)
+      );
+    }
+
+    setFilteredData(result);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [data, filters, searchTerm]);
+
+  // Add these handler functions
+  const handleFilterChange = (field, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const getSortedData = (data) => {
-    if (!sortConfig.key) return data;
+  const applyFilters = () => {
+    handleClose(); // Close the offcanvas
+  };
 
-    return [...data].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? 1 : -1;
-      }
-      return 0;
+  const resetFilters = () => {
+    setFilters({
+      gender: '',
+      name: '',
+      email: ''
     });
+    handleClose();
   };
+  const handeleDelete = (id, name) => {
+    setModalShow(true);
+    setUserToDelete({ id, name });
+  }
+  const confirmDelete = async() => {
+    try {
+      const response = await axios.delete(`${BaseUrl}/api/deleteUser/${userToDelete.id}`, {
+        headers: {Authorization: `Bearer ${token}`}
+      });
+      if(response.data.status === 200) {
+        setData(prevData => prevData.filter(user => user._id !== userToDelete.id));
+        setModalShow(false);
+      }
+      
+    } catch (error) {
+      console.error('Data Deleting error:',error);
+    }
+  }
+  // ************************************** Pagination **************************************
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(data);
 
-  // Pagination calculations
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = getSortedData(filteredData).slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // Handle delete
-  const handleDelete = (id, name) => {
-    setUserToDelete({ id, name });
-    setShowDeleteModal(true);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
   };
 
-  const confirmDelete = () => {
-    setData(data.filter(item => item.id !== userToDelete.id));
-    setShowDeleteModal(false);
-    setUserToDelete(null);
+  const getPaginationButtons = () => {
+    const buttons = [];
+    const maxButtonsToShow = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+
+    // Adjust startPage if we're near the end
+    if (endPage - startPage + 1 < maxButtonsToShow) {
+      startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+    }
+
+    // Add first page if not included
+    if (startPage > 1) {
+      buttons.push(1);
+      if (startPage > 2) buttons.push('...');
+    }
+
+    // Add main page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(i);
+    }
+
+    // Add last page if not included
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) buttons.push('...');
+      buttons.push(totalPages);
+    }
+    return buttons;
   };
 
-  // Handle filter actions
-  const handleGenderChange = (gender) => {
-    setSelectedGenders([gender]); // Allow only one selection
-  };
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  // *******************************************************************************
 
-  const handleApplyFilter = () => {
-    setShowFilter(false);
-  };
 
-  const handleClearFilter = () => {
-    setSelectedGenders([]);
-    setShowFilter(false)
-  };
-
-  // Custom styles
-  const styles = {
-    card: {
-      backgroundColor: '#ffffff',
-      borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      padding: '20px',
-      marginTop: '20px',
-      height: '750px'
-    },
-    tableHeader: {
-      backgroundColor: '#FFF9F6',
-      cursor: 'pointer'
-    },
-  };
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   return (
-
-    <div fluid className="py-3" style={{ backgroundColor: '#F7F7F7', height: '100vh' }}>
-      <h5 className="mb-0 fw-bold">User</h5>
-      <div className='d-flex'>
-        <p class="text-muted">Dashboard /</p>
-        <p className='ms-1'>User</p>
-      </div>
-      <div style={styles.card}>
-        {/* Search and Filter Section */}
-        <Row className="mb-4 align-items-center">
-          <Col xs={12} md={6} lg={4}>
-            <InputGroup className="mb-3 search-input-group r_inputgroup">
-              <InputGroup.Text className="search-icon-container">
-                <FaSearch className="search-icon" />
-              </InputGroup.Text >
-              <Form.Control
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </InputGroup>
-          </Col>
-
-          <Col xs={12} md={6} lg={8} className="text-end mt-3 mt-md-0">
-            <Button
-              className="r_filterbtn"
-              onClick={() => setShowFilter(true)}
-
-            >
-              <FaFilter className="me-2" />
-              Filter {selectedGenders.length > 0 && `(${selectedGenders.length})`}
-            </Button>
-          </Col>
-        </Row>
-
-        {/* Conditional rendering based on filtered results */}
-        {filteredData.length > 0 ? (
-          <>
-            {/* Table Section */}
-            <div className="table-responsive">
-              <Table borderless>
-                <thead>
-                  <tr>
-                    {['ID', 'Name', 'Mobile No.', 'DOB', 'Gender', 'Email', 'Action'].map((header, index) => (
-                      <th
-                        key={index}
-                        style={styles.tableHeader}
-                        onClick={() => sortData(header.toLowerCase())}
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((item, index) => (
-                    <tr key={item.id}>
-                      <td>0{index +1}</td>
-                      <td>{item.name}</td>
-                      <td>{item.mobileNo}</td>
-                      <td>{item.dateOfBirth}</td>
-                      <td>{item.gender}</td>
-                      <td>{item.email}</td>
-                      <td>
-                        <button
-                          className="r_deleticon"
-                          onClick={() => handleDelete(item._id, item.name)}
-                        >
-                          {/* <FaTrash /> */}
-                          <img src={require('../Photos/delet.png')} class="r_deletimg" alt='' ></img>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-
-            {/* Pagination Section */}
-            <div className="d-flex justify-content-end mt-4">
-              <Pagination>
-                <Pagination.Prev
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                />
-                {[...Array(totalPages)].map((_, index) => (
-                  <Pagination.Item
-                    key={index + 1}
-                    active={currentPage === index + 1}
-                    onClick={() => setCurrentPage(index + 1)}
-                  >
-                    {index + 1}
-                  </Pagination.Item>
-                ))}
-                <Pagination.Next
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                />
-              </Pagination>
-            </div>
-          </>
-        ) : (
-          <NoResultsFound />
-        )}
-
-        {/* Filter Offcanvas */}
-        <Offcanvas
-          show={showFilter}
-          onHide={() => setShowFilter(false)}
-          placement="end"
-          style={{ zIndex: 9999 }}
-        >
-          <Offcanvas.Header closeButton className="border-bottom">
-            <Offcanvas.Title className="r_filtertitle">Filter</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Form.Group >
-              <Form.Label>Gender</Form.Label>
-              <Form.Select
-                value={selectedGenders.length > 0 ? selectedGenders[0] : ""}
-                onChange={(e) => handleGenderChange(e.target.value)}
-              >
-                <option value="">Select</option>
-                {['Male', 'Female', 'Other'].map((gender) => (
-                  <option key={gender} value={gender}>{gender}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Offcanvas.Body>
-          <div className="p-3 mt-auto">
-            <div className="d-flex gap-5">
-              <Button
-                onClick={handleClearFilter}
-                className="flex-grow-1 r_outlinebtn"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleApplyFilter}
-                className="flex-grow-1 r_bgbtn"
-              >
-                Apply
-              </Button>
+    <>
+      <div id='mv_container_fluid'>
+        <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
+          <div>
+            <p className='mb-1'>User</p>
+            <div className='d-flex align-items-center'>
+              <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
+              <p className='mv_category_heading mv_subcategory_heading mb-0'>User</p>
             </div>
           </div>
-        </Offcanvas>
-
-        {/* Delete Confirmation Modal */}
-        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-          <Modal.Body className='p-5'>
-            <h5 className='font-weight-bold text-center mb-3'>Delete</h5>
-            <p className='text-center text-muted mb-4'> Are you sure you want to delete {userToDelete?.name}?</p>
-            <div className='d-flex justify-content-center gap-3'>
-              <Button onClick={() => setShowDeleteModal(false)} className="r_cancel" >
-                Cancel
-              </Button>
-              <Button onClick={confirmDelete} className="r_delete">
-                Delete
-              </Button>
+        </div>
+        <div className="row mt-4">
+          <div className="col-12">
+            <div className="mv_product_table_content">
+              <div className='mv_table_search'>
+                <div className="mv_product_search">
+                  <InputGroup>
+                    <Form.Control
+                      placeholder="Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </InputGroup>
+                </div>
+                <div className='d-flex'>
+                  <div className="mv_column_button mv_column_padd">
+                    <Button variant="primary" onClick={handleShow}>
+                      <img src={require('../mv_img/filter.png')} alt="" />
+                      Filters
+                    </Button>
+                    <Offcanvas show={show} onHide={handleClose} placement='end' className="mv_offcanvas_filter">
+                      <Offcanvas.Header closeButton className='mv_offcanvas_filter_heading'>
+                        <Offcanvas.Title className='mv_offcanvas_filter_title'>Filters</Offcanvas.Title>
+                      </Offcanvas.Header>
+                      <Offcanvas.Body className=''>
+                        <div>
+                          <div className="mv_input_content">
+                            <label className='mv_offcanvas_filter_category'>Gender</label>
+                            <Form.Select className="mb-3" value={filters.gender}
+                              onChange={(e) => handleFilterChange('gender', e.target.value)}>
+                              <option>Select Status</option>
+                              <option value="Female">Female</option>
+                              <option value="Male">Male</option>
+                              <option value="Others">Others</option>
+                            </Form.Select>
+                          </div>
+                        </div>
+                        <div className='mv_offcanvas_bottom_button'>
+                          <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
+                            <div className="mv_logout_cancel">
+                              <button type="button" onClick={resetFilters}>Cancel</button>
+                            </div>
+                            <div className="mv_logout_button">
+                              <button type="submit" onClick={applyFilters}>Apply</button>
+                            </div>
+                          </div>
+                        </div>
+                      </Offcanvas.Body>
+                    </Offcanvas>
+                  </div>
+                </div>
+              </div>
+              {paginatedData.length > 0 ? (
+                <>
+                  <div className="mv_product_table_padd">
+                    <table className='mv_product_table justify-content-between'>
+                      <thead>
+                        <tr>
+                          <th className=''>ID</th>
+                          <th className=''>Name</th>
+                          <th className=''>Mobile No.</th>
+                          <th className=''>DOB</th>
+                          <th className=''>Gender</th>
+                          <th className=''>Email</th>
+                          <th className='d-flex align-items-center justify-content-end'>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedData.map((item, index) => (
+                          <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{item.name}</td>
+                            <td>{item.mobileNo}</td>
+                            <td>{item.dateOfBirth}</td>
+                            <td>{item.gender}</td>
+                            <td>{item.email}</td>
+                            <td className='d-flex align-items-center justify-content-end'>
+                              <div className="mv_pencil_icon" onClick={() => handeleDelete(item._id, item.name)}>
+                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {totalPages > 1 && (
+                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                      <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                        <MdOutlineKeyboardArrowLeft />
+                      </p>
+                      {getPaginationButtons().map((page, index) => (
+                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                          onClick={() => handlePageChange(page)}>
+                          {page}
+                        </p>
+                      ))}
+                      <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                        <MdOutlineKeyboardArrowRight />
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <NoResultsFound/>
+              )}
             </div>
-          </Modal.Body>
-        </Modal>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Delete Product Model */}
+      <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
+        <Modal.Body className='text-center mv_logout'>
+          <h5 className='mb-2'>Delete</h5>
+          <p>Are you sure you want to delete <br /> {userToDelete?.name}?</p>
+          <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
+            <div className="mv_logout_cancel">
+              <button onClick={() => setModalShow(false)}>Cancel</button>
+            </div>
+            <div className="mv_logout_button">
+              <button onClick={confirmDelete}>Delete</button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 

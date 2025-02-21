@@ -3,8 +3,6 @@ import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import * as Yup from 'yup'
-import { useFormik } from 'formik';
 
 const DeactivatedAccount = () => {
 
@@ -79,22 +77,6 @@ const DeactivatedAccount = () => {
 
     localStorage.setItem('data3', JSON.stringify(data1))
 
-    const store_data = (value) => {
-        let data = JSON.parse(localStorage.getItem('data2')) || [];
-
-        let id = data.length
-
-        value.id = id + 1;
-
-        value.image = "pencil_icon.png";
-
-        data.push(value);
-
-        localStorage.setItem('data2', JSON.stringify(data));
-
-        local_data()
-
-    };
 
     const itemsPerPage = 10;
     const [data, setData] = useState([]);
@@ -144,24 +126,6 @@ const DeactivatedAccount = () => {
     useEffect(() => {
         local_data();
     }, [currentPage, filteredData]);
-
-    const init = {
-        name: "",
-        status: ""
-    };
-
-    const validation = Yup.object({
-        name: Yup.string().min(2, "Enter At least 2 characters").max(15, "Too Long For Category").required("Category Must Be required"),
-    });
-
-    let { handleBlur, handleChange, handleSubmit, handleReset, touched, errors, values } = useFormik({
-        initialValues: init,
-        validationSchema: validation,
-        onSubmit: (value) => {
-            store_data(value)
-            handleReset();
-        }
-    });
 
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > totalPages) return;

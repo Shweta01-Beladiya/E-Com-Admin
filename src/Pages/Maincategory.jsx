@@ -1,12 +1,12 @@
 
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Table, InputGroup, Col, Row } from "react-bootstrap";
+import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import '../CSS/riya.css';
-import { FaSearch } from 'react-icons/fa';
 import axios from "axios";
 import { Formik, ErrorMessage, Field } from "formik";
 import * as Yup from 'yup';
 import NoResultsFound from "../Component/Noresult";
+import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 const MainCategory = () => {
   const BaseUrl = process.env.REACT_APP_BASEURL;
@@ -20,6 +20,7 @@ const MainCategory = () => {
   const [id, setId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
 
   const categorySchema = Yup.object().shape({
     mainCategoryName: Yup.string()
@@ -46,7 +47,7 @@ const MainCategory = () => {
     fetchData();
   }, [BaseUrl, token]);
 
-  const handleSubmit = async (value, { resetForm }) => {
+  const handleSubmit = async (value, { resetForm,setFieldError  }) => {
     try {
       if (id) {
         // console.log("id",id);
@@ -69,7 +70,7 @@ const MainCategory = () => {
         const response = await axios.post(`${BaseUrl}/api/createMaincategory`, value, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        // console.log("Response", response.data);
+        console.log("Response", response.data);
         if (response.data.status === 201) {
           setCategories((prevCategories) => [...prevCategories, response.data.maincategory]);
           setShowAddModal(false);
@@ -78,6 +79,9 @@ const MainCategory = () => {
       }
     } catch (error) {
       console.error('Data create and update Error:', error);
+      if (error.response && error.response.status === 409) {
+        setFieldError('mainCategoryName', 'This category name already exists');
+      }
     }
   };
 
@@ -120,84 +124,155 @@ const MainCategory = () => {
   const filteredCategories = categories.filter((cat) =>
     cat?.mainCategoryName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  // ************************************** Pagination **************************************
+  const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const getPaginationButtons = () => {
+    const buttons = [];
+    const maxButtonsToShow = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+
+    // Adjust startPage if we're near the end
+    if (endPage - startPage + 1 < maxButtonsToShow) {
+      startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+    }
+
+    // Add first page if not included
+    if (startPage > 1) {
+      buttons.push(1);
+      if (startPage > 2) buttons.push('...');
+    }
+
+    // Add main page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(i);
+    }
+
+    // Add last page if not included
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) buttons.push('...');
+      buttons.push(totalPages);
+    }
+    return buttons;
+  };
+
+  useEffect(() => {
+    setFilteredData(filteredCategories);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories, searchTerm]);
+
+  // *******************************************************************************
   return (
-    <div >
-      <h5 className="mb-0 fw-bold">Main Category</h5>
-      <div className='d-flex'>
-        <p class="text-muted">Dashboard /</p>
-        <p className='ms-1'>Main Category</p>
-      </div>
-      <div style={{ backgroundColor: 'white', padding: '20px',height:'80vh' }}>
-        <Row className="mb-4 align-items-center">
-          <Col xs={12} md={6} lg={4}>
-            <InputGroup className="mb-3 search-input-group r_inputgroup">
-              <InputGroup.Text className="search-icon-container">
-                <FaSearch className="search-icon" />
-              </InputGroup.Text >
-              <Form.Control
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </InputGroup>
-          </Col>
-          <Col xs={12} md={6} lg={8} className="text-end mt-3 mt-md-0">
-            <Button className="r_add" onClick={() => setShowAddModal(true)}>
-              + Add
-            </Button>
-          </Col>
-        </Row>
-        {filteredCategories.length > 0 ? (
-          <Table responsive borderless>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCategories.map((cat, index) => (
-                <tr key={cat.id}>
-                  <td>{index + 1}</td>
-                  <td>{cat.mainCategoryName}</td>
-                  <td>
-                    <Form.Check
-                      type="switch"
-                      checked={cat.status}
-                      onChange={() => handleStatusChange(cat._id, cat.status)}
-
+    <>
+      <div id='mv_container_fluid'>
+        <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
+          <div>
+            <p className='mb-1'>Main Category</p>
+            <div className='d-flex align-items-center'>
+              <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
+              <p className='mv_category_heading mv_subcategory_heading mb-0'>Main Category</p>
+            </div>
+          </div>
+        </div>
+        <div className="row mt-4">
+          <div className="col-12">
+            <div className="mv_product_table_content">
+              <div className='mv_table_search'>
+                <div className="mv_product_search">
+                  <InputGroup>
+                    <Form.Control
+                      placeholder="Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                  </td>
-                  <td>
-                    <Button
-                      className="r_deleticon me-2"
-                      onClick={() => {
-                        setId(cat._id);
-                        setSelectedCategory(cat);
-                        setShowEditModal(true);
-                      }}
-                    >
-                      <img src={require('../Photos/edit.png')} alt="" class="r_deletimg" ></img>
-                    </Button>
-                    <Button
-                      className="r_deleticon"
-                      onClick={() => { setId(cat._id); setShowDeleteModal(true); setCategoryToDelete(cat); }}
-                    >
-                      <img src={require('../Photos/delet.png')} alt="" class="r_deletimg" ></img>
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+                  </InputGroup>
+                </div>
+                <div>
+                  <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
+                    <div className="mv_add_category mv_add_subcategory mv_add_product">
+                      <button onClick={() => setShowAddModal(true)}>+ Add</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {paginatedData.length > 0 ? (
+                <>
+                  <div className="mv_product_table_padd">
+                    <table className='mv_product_table justify-content-between'>
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Name</th>
+                          <th>Status</th>
+                          <th className='d-flex align-items-center justify-content-end'>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedData.map((cat, index) => (
+                          <tr key={cat.id}>
+                            <td>{index + 1}</td>
+                            <td>{cat.mainCategoryName}</td>
+                            <td >
+                              <Form.Check
+                                type="switch"
+                                checked={cat.status}
+                                onChange={() => handleStatusChange(cat._id, cat.status)}
 
-        ) : (
-          <NoResultsFound />
-        )}
+                              />
+                            </td>
+                            <td className='d-flex align-items-center justify-content-end'>
+                              <div className="mv_pencil_icon" onClick={() => { setId(cat._id); setShowDeleteModal(true); setCategoryToDelete(cat); }}>
+                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                              </div>
+                              <div className="mv_pencil_icon" onClick={() => {
+                                setId(cat._id);
+                                setSelectedCategory(cat);
+                                setShowEditModal(true);
+                              }}>
+                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {totalPages > 1 && (
+                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                      <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                        <MdOutlineKeyboardArrowLeft />
+                      </p>
+                      {getPaginationButtons().map((page, index) => (
+                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                          onClick={() => handlePageChange(page)}>
+                          {page}
+                        </p>
+                      ))}
+                      <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                        <MdOutlineKeyboardArrowRight />
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (<NoResultsFound />)}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Add Modal */}
@@ -216,17 +291,10 @@ const MainCategory = () => {
             onSubmit={handleSubmit}
             initialValues={initialValues}
           >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
+            {({ handleChange, handleSubmit, values, setFieldError , touched }) => (
               <Form className="r_form" onSubmit={handleSubmit}>
                 <Form.Group>
                   <Form.Label>Main Category</Form.Label>
-                  {/* <Form.Control
-                    type="text"
-                    name="mainCategoryName"
-                    placeholder="Enter main category"
-                    value={values.mainCategoryName}
-                    onChange={handleChange}
-                  /> */}
                   <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category " value={values.mainCategoryName}
                     onChange={handleChange} />
                   <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
@@ -306,7 +374,7 @@ const MainCategory = () => {
           </div>
         </Modal.Body>
       </Modal>
-    </div>
+    </>
   );
 };
 

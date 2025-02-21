@@ -55,19 +55,21 @@ const ContactUs = () => {
     }, [currentPage]);
 
     useEffect(() => {
-        const fetchdata = async () => {
-            try {
-                const response = await axios.get(`${BaseUrl}/api/getContactUs/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                // console.log("response", response.data.contactUs);
-                setViewData(response.data.contactUs);
-
-            } catch (error) {
-                console.error('Data Fetching Error:', error);
+        if(id) {
+            const fetchdata = async () => {
+                try {
+                    const response = await axios.get(`${BaseUrl}/api/getContactUs/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    // console.log("response", response.data.contactUs);
+                    setViewData(response.data.contactUs);
+    
+                } catch (error) {
+                    console.error('Data Fetching Error:', error);
+                }
             }
+            fetchdata();
         }
-        fetchdata();
     }, [id]);
 
     const handleSearch = (event) => {

@@ -285,6 +285,9 @@
      .illustration-container svg {
         width: 370px;
      }
+     .offcanvas{
+      --bs-offcanvas-width:270px;
+     }
   }
 
   @media (max-width:320px) {

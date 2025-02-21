@@ -167,6 +167,10 @@ const Sidebar = ({ open, handleDrawerClose, theme }) => {
 
   const handleNavigation = (path) => {
     navigate(path);
+    // Check if screen is small and close sidebar if it is
+    if (window.innerWidth < theme.breakpoints.values.sm) {
+      handleDrawerClose();
+    }
   };
 
   const toggleOffersDropdown = () => {

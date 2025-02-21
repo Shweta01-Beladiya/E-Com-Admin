@@ -262,16 +262,17 @@ const Category = () => {
 
     return (
         <div>
-            {/* Header with title and buttons */}
-            <h5 className="mb-0 fw-bold">Category</h5>
-            <div className='d-flex'>
-                <p class="text-muted">Dashboard /</p>
-                <p className='ms-1'>Category</p>
+            <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <p className='mb-1'>Category</p>
+                    <div className='d-flex align-items-center'>
+                        <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
+                        <p className='mv_category_heading mv_subcategory_heading mb-0'>Category</p>
+                    </div>
+                </div>
             </div>
-
-
             {/* Main Table */}
-            <div className="bg-white rounded shadow-sm" style={{ padding: '20px',height:'80vh'  }}>
+            <div className="bg-white rounded shadow-sm" style={{ padding: '20px' }}>
                 <Row className="mb-4 align-items-center">
                     <Col xs={12} md={6} lg={4}>
                         <InputGroup className="mb-3 search-input-group r_inputgroup">
@@ -300,17 +301,19 @@ const Category = () => {
                         </div>
                     </Col>
                 </Row>
+
                 {/* Table component */}
                 {getCurrentPageData().length > 0 ? (
                     <>
-                        <Table responsive borderless className="mb-0">
+                      <div className="mv_product_table_padd">
+                      <table className='mv_product_table justify-content-between'>
                             <thead className="bg-light">
                                 <tr>
                                     <th>ID</th>
                                     <th>Main Category</th>
                                     <th> Name</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
+                                    <th className='d-md-flex align-items-center justify-content-end'>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -326,32 +329,26 @@ const Category = () => {
                                                 onChange={() => handleStatusChange(category._id, category.status)}
                                             />
                                         </td>
-                                        <td>
-                                            <Button
-                                                className="r_deleticon me-2"
-                                                onClick={() => {
-                                                    setShowAddModal(true);
-                                                    setId(category._id);
-                                                }}
-                                            >
-                                                <img src={require('../Photos/edit.png')} class="r_deletimg" alt=''></img>
-                                                {/* <FiEdit size={18} /> */}
-                                            </Button>
-                                            <Button
-                                                className="r_deleticon"
-                                                onClick={() => {
-                                                    setShowDeleteModal(true);
-                                                    setId(category._id);
-                                                    setCategoryToDelete(category);
-                                                }}
-                                            >
-                                                <img src={require('../Photos/delet.png')} class="r_deletimg" alt=''></img>
-                                            </Button>
+                                        <td className='d-flex align-items-center justify-content-end'>
+                                            <div className="mv_pencil_icon" onClick={() => {
+                                                setShowAddModal(true);
+                                                setId(category._id);
+                                            }}>
+                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                            </div>
+                                            <div className="mv_pencil_icon" onClick={() => {
+                                                setShowDeleteModal(true);
+                                                setId(category._id);
+                                                setCategoryToDelete(category);
+                                            }}>
+                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
-                        </Table>
+                        </table>
+                        </div>
                         {totalPages > 1 && (
                             <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
                                 <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
@@ -440,14 +437,14 @@ const Category = () => {
                             <FormikForm className="r_form">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Main Category</Form.Label>
-                                    <Field as="select" name="mainCategoryId" className="form-control">
+                                    <Form.Select name="mainCategoryId" className="form-control">
                                         <option value="">Select Main Category</option>
                                         {mainCategory.map((category) => (
                                             <option key={category._id} value={category._id}>
                                                 {category.mainCategoryName}
                                             </option>
                                         ))}
-                                    </Field>
+                                    </Form.Select>
                                     <ErrorMessage name="mainCategoryId" component="div" className="text-danger small" />
                                 </Form.Group>
 
@@ -469,7 +466,7 @@ const Category = () => {
                         )}
                     </Formik>
                 </Modal.Body>
-            </Modal>;
+            </Modal>
 
 
             {/* Delete Confirmation Modal */}
