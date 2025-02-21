@@ -5,6 +5,8 @@ import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const Faqs = (props) => {
    
@@ -120,17 +122,39 @@ const Faqs = (props) => {
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
-    const [modalShow2, setModalShow2] = React.useState(false);
 
-    const [values, setValues] = useState({
-        name: "",
-        name1: ""
-    });
+    // const [values, setValues] = useState({
+    //     name: "",
+    //     name1: ""
+    // });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setValues({ ...values, [name]: value });
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setValues({ ...values, [name]: value });
+    // };
+
+    // ******************************* Validation *******************************
+    const [id, setId] = useState(null);
+
+    const init = {
+        faqquestion: "",
+        answer: "",
     };
+    
+    const validate = Yup.object().shape({
+        faqquestion: Yup.string().required("FAQ question is required"),
+        answer: Yup.string().required("Answer is required")
+    });
+    
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+        initialValues: init,
+        validationSchema: validate,
+        onSubmit: (values) => {
+            console.log(values);
+            // faqs(values)
+        }
+    });
+    // ***************************************************************************
     
     // State variables
     let [description, setDescription] = useState("");
@@ -185,7 +209,7 @@ const Faqs = (props) => {
                                             <td>{item.faqquestion}</td>
                                             <td>{item.answer}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow2(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
                                                     <Link>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
@@ -220,7 +244,6 @@ const Faqs = (props) => {
                 </div>
             </div>
 
-
             {/* Delete FAQ’s Model */}
             <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
@@ -237,97 +260,59 @@ const Faqs = (props) => {
                 </Modal.Body>
             </Modal>
 
-            {/* Add FAQ’s Model */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            {/* Add Edit FAQ’s Model */}
+            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
                 <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
-                    Add FAQ’s
+                    {id ? 'Edit FAQ’s' : 'Add FAQ’s'}
                 </Modal.Title>
                 <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form>
-                        <div className="mv_input_content">
+                    <form onSubmit={handleSubmit}>
+                        <div className="mv_input_content mb-3">
                             <label className='mv_label_input'>FAQ Question</label>
-                            <InputGroup className="mb-3">
+                            <InputGroup className="">
                                 <Form.Control
                                     placeholder="Enter FAQ question"
-                                    name='name'
-                                    value={values.name}
+                                    name="faqquestion"
+                                    value={values.faqquestion}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                 />
                             </InputGroup>
+                            {errors.faqquestion && touched.faqquestion && <div className="text-danger small">{errors.faqquestion}</div>}
                         </div>
-                        <div className="mv_input_content">
+                        <div className="mv_input_content mb-5">
                             <label className='mv_label_input'>Answer</label>
-                            <InputGroup className="mb-5">
+                            <InputGroup className="">
                                 <Form.Control
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    name="answer"
+                                    value={values.answer}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
                                     placeholder="Enter answer"
                                     as="textarea" 
                                     aria-label="With textarea"
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
+                            {errors.answer && touched.answer && <div className="text-danger small">{errors.answer}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
                                 <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
-                                <button type="submit">Add</button>
+                                <button type="submit">
+                                    {id ? 'Update' : 'Add'}
+                                </button>
                             </div>
                         </div>
                     </form>
                 </Modal.Body>
             </Modal>
 
-            {/* Edit FAQ’s Model */}
-            <Modal show={modalShow2} onHide={() => { setModalShow2(false);  }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
-                <Modal.Header className='mv_edit_profile_header' closeButton>
-                    
-                </Modal.Header>
-                <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
-                    Edit FAQ’s
-                </Modal.Title>
-                <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form>
-                        <div className="mv_input_content">
-                            <label className='mv_label_input'>FAQ Question</label>
-                            <InputGroup className="mb-3">
-                                <Form.Control
-                                    placeholder="Enter FAQ question"
-                                    name='name'
-                                    value={values.name}
-                                    onChange={handleChange}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="mv_input_content">
-                            <label className='mv_label_input'>Answer</label>
-                            <InputGroup className="mb-5">
-                                <Form.Control
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Enter answer"
-                                    as="textarea" 
-                                    aria-label="With textarea"
-                                    aria-describedby="basic-addon1"
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
-                            <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow2(false)}>Cancel</button>
-                            </div>
-                            <div className="mv_logout_button">
-                                <button type="submit">Update</button>
-                            </div>
-                        </div>
-                    </form>
-                </Modal.Body>
-            </Modal>
         </>
     );
 };
