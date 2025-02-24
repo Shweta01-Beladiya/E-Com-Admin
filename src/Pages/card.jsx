@@ -7,76 +7,80 @@ import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
-const Cards = (props) => {
+const Cards = ({ editData }) => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
    
     var data = [
-        {   
-            id: 1,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 2,
-            img: "watch.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 3,
-            img: "book.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 4,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 5,
-            img: "book.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 6,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 7,
-            img: "book.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 8,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 9,
-            img: "book.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 10,
-            img: "watch.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
-        {   
-            id: 11,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            subtitle: "Lorem ipsum",
-        },
+    //     {   
+    //         id: 1,
+    //         img: "mobile.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 2,
+    //         img: "watch.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 3,
+    //         img: "book.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 4,
+    //         img: "mobile.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 5,
+    //         img: "book.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 6,
+    //         img: "mobile.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 7,
+    //         img: "book.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 8,
+    //         img: "mobile.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 9,
+    //         img: "book.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 10,
+    //         img: "watch.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
+    //     {   
+    //         id: 11,
+    //         img: "mobile.png",
+    //         title: "lorem ipsum",
+    //         subtitle: "Lorem ipsum",
+    //     },
     ];
 
     // ************************************** Pagination **************************************
@@ -86,6 +90,8 @@ const Cards = (props) => {
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     console.log("totalpage",totalPages)
+    const [toggle, setToggle] = useState(false)
+
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -147,30 +153,108 @@ const Cards = (props) => {
     // Select img
     let [addimg, setaddimg] = useState("");
 
+    const [brandLogoPreview, setBrandLogoPreview] = useState(null);
+    const [brandImagePreview, setBrandImagePreview] = useState(null);
+
+    useEffect(() => {
+        if (editData) {
+            setBrandImagePreview(editData.cardImage);
+        }
+    }, [editData]);
+
     // ******************************* Validation *******************************
     const [id, setId] = useState(null);
 
     const init = {
         title: "",
-        subtitle: "",
-        addcartimage: "",
+        subTitle: "",
+        addcardimage: "",
     };
     
     const validate = Yup.object().shape({
         title: Yup.string().required("Title is required"),
-        subtitle: Yup.string().required("Subtitle is required"),
-        addcartimage: Yup.string().required("Image is required")
+        subTitle: Yup.string().required("subTitle is required"),
+        addcardimage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
     });
     
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
             // card(values)
+
+            // addpopularbrand(values)
+            const formData = new FormData();
+            formData.append("title", values.title);
+            formData.append("subTitle", values.subTitle);
+            // formData.append("brandImage", values.addcardimage);
+
+            if (values.addcardimage) {
+                formData.append("cardImage", values.addcardimage);
+            }
+
+            //************************************** Edit and Add **************************************
+            if (editData) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateCard/${editData._id}`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+
+                    // window.location.href = "./popularbrands"
+                    // navigate("/popularbrands")
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createCard`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+
+                    // window.location.href = "./popularbrands"
+                    // navigate("/popularbrands")
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
-    });
+    })
     // *******************************************************************************
+
+    // ************************************** Show Data **************************************
+    useEffect(()=>{
+       const fetchBrandData = async () => {
+           try{
+              const response = await axios.get(`${BaseUrl}/api/allCards`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+              })
+            //   console.log("data" , response?.data?.popularBrand);
+            //   setFilteredData(response?.data?.popularBrand)
+            //   setData(response?.data?.popularBrand)/
+           }catch(error){
+              
+           }
+       }
+
+       fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
 
     return (
         <>
@@ -187,7 +271,7 @@ const Cards = (props) => {
                 <div className="row mt-4">
                     <div className="col-12">
                         <div className="mv_product_table_content">
-                            <div className='mv_table_search'>
+                            <div className='mv_table_search mv_table_no_flex'>
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
@@ -286,7 +370,7 @@ const Cards = (props) => {
                     {id ? 'Edit Cards' : 'Add Cards'}
                 </Modal.Title>
                 <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} enctype="multipart/form-data">
                         <div className="mv_input_content mb-3">
                             <label className='mv_label_input'>Title</label>
                             <InputGroup className="">
@@ -305,13 +389,13 @@ const Cards = (props) => {
                             <InputGroup className="">
                                 <Form.Control
                                     placeholder="Enter Subtitle"
-                                    name="subtitle"
-                                    value={values.subtitle}
+                                    name="subTitle"
+                                    value={values.subTitle}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {errors.subtitle && touched.subtitle && <div className="text-danger small">{errors.subtitle}</div>}
+                            {errors.subTitle && touched.subTitle && <div className="text-danger small">{errors.subTitle}</div>}
                         </div>
                         <div className="mv_input_content mb-5">
                             <label className='mv_label_input'>Image</label>
@@ -321,25 +405,45 @@ const Cards = (props) => {
                                     aria-label=""
                                     readOnly
                                     value={addimg}
-                                    name="addcartimage"
+                                    name="addcardimage"
                                     onBlur={handleBlur}
                                 />
                                 <label className="mv_browse_button">
                                     Browse
-                                    <input type="file" 
-                                        hidden 
+                                    <input
+                                        type="file"
+                                        hidden
                                         accept="image/jpeg, image/png, image/jpg"
                                         onChange={(e) => {
-                                            const file = e.currentTarget.files[0];
+                                        const file = e.currentTarget.files[0];
                                             if (file) {
                                                 setaddimg(file.name);
-                                                setFieldValue("addcartimage", file);
+                                                setFieldValue("addcardimage", file);
+                                                setBrandImagePreview(URL.createObjectURL(file));
                                             }
+                                            setToggle(true)
                                         }}
                                     />
                                 </label>
                             </InputGroup>
-                            {errors.addcartimage && touched.addcartimage && <div className="text-danger small">{errors.addcartimage}</div>}
+                            {errors.addcardimage && touched.addcardimage && <div className="text-danger small">{errors.addcardimage}</div>}
+                            {brandImagePreview && (
+                                <div className="mt-2">
+                                    <img
+                                        className='mv_update_img'
+                                        src={`${toggle ? `${brandImagePreview}` : `${BaseUrl}/${brandLogoPreview}`}`}
+                                        alt="Brand Image Preview"
+                                        style={{
+                                            maxWidth: '20px',
+                                            maxHeight: '20px',
+                                            objectFit: 'contain',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px',
+                                            padding: '2px'
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">

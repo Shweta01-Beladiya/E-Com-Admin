@@ -49,6 +49,13 @@ const Addpopularbrands = ({ editData }) => {
     const [brandLogoPreview, setBrandLogoPreview] = useState(null);
     const [brandImagePreview, setBrandImagePreview] = useState(null);
 
+    useEffect(() => {
+        if (editData) {
+            setBrandLogoPreview(editData.brandLogo);
+            setBrandImagePreview(editData.brandImage);
+        }
+    }, [editData]);
+
     // ******************************* Validation *******************************
     const addpopularbrandInit = {
         brandname: editData?.brandName || "",
@@ -74,7 +81,7 @@ const Addpopularbrands = ({ editData }) => {
 
             // addpopularbrand(values)
             const formData = new FormData();
-            formData.append("brandName", values.brandname);
+            formData.append("brandName", values.brandName);
             formData.append("offer", values.offer);
             formData.append("title", values.title);
             // formData.append("brandLogo", values.brandLogo);  
@@ -87,8 +94,8 @@ const Addpopularbrands = ({ editData }) => {
                 formData.append("brandImage", values.addpopularbrandimage);
             }
 
+            //************************************** Edit and Add **************************************
             if (editData) {
-                debugger
                 try {
                     const response = await axios.put(`${BaseUrl}/api/updateBrand/${editData._id}`, formData, {
                         headers: {
@@ -98,15 +105,14 @@ const Addpopularbrands = ({ editData }) => {
                     });
                     console.log("Response:", response?.data);
 
-                    // window.location.href = "./popularbrands"
-                    navigate("/popularbrands")
+                    window.location.href = "./popularbrands"
+                    // navigate("/popularbrands")
 
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");
                 }
             }
-            // console.log("FormData Content:", [...formData.entries()]);  // Debugging
             else {
                 try {
                     const response = await axios.post(`${BaseUrl}/api/createPopularBrand`, formData, {
@@ -117,8 +123,8 @@ const Addpopularbrands = ({ editData }) => {
                     });
                     console.log("Response:", response?.data);
 
-                    // window.location.href = "./popularbrands"
-                    navigate("/popularbrands")
+                    window.location.href = "./popularbrands"
+                    // navigate("/popularbrands")
 
                 } catch (error) {
                     console.error("Error:", error);
@@ -128,13 +134,6 @@ const Addpopularbrands = ({ editData }) => {
         }
     })
     // **************************************************************************
-
-    useEffect(() => {
-        if (editData) {
-            setBrandLogoPreview(editData.brandLogo);
-            setBrandImagePreview(editData.brandImage);
-        }
-    }, [editData]);
 
     return (
         <>
@@ -311,7 +310,7 @@ const Addpopularbrands = ({ editData }) => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button className='border-0 bg-transparent'>
+                                                <button onClick={()=> window.location.href = "/popularbrands"} className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
                                                 {editData ?
