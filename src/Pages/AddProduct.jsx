@@ -1,14 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import { SketchPicker } from 'react-color';
 import { IoMdClose } from "react-icons/io";
-import { Formik, ErrorMessage } from "formik";
+import { Formik, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const AddProduct = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
     // State variables
     let [isedit, setisedit] = useState(false);
     const [colors, setColors] = useState([]);
@@ -16,179 +20,127 @@ const AddProduct = () => {
     const [pickerPosition, setPickerPosition] = useState({ x: 0, y: 0 });
     const [displayColorPicker, setDisplayColorPicker] = useState(false);
     const [selectedImages, setSelectedImages] = useState([]);
-    const [mainCategory, setMainCategory] = useState('');
+    const [mainCategories, setMainCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [filteredSubCategories, setFilteredSubCategories] = useState([]);
     const fileInputRef = useRef(null);
-    const getValidationSchema = (mainCategory) => {
-        // Base validation schema that applies to all categories
-        const baseSchema = {
-            mainCategoryId: Yup.string()
-                .required('Main category is required'),
-            categoryId: Yup.string()
-                .required('Category is required'),
-            subCategoryId: Yup.string()
-                .required('Sub category is required'),
-            product: Yup.string()
-                .required('Product name is required'),
-            sizeName: Yup.string()
-                .required('Size name is required'),
-            size: Yup.string()
-                .required('Size is required'),
-            unit: Yup.string()
-                .required('Unit is required'),
-            shortDescription: Yup.string()
-                .required('Short description is required'),
-            stockStatus: Yup.string()
-                .required('Stock status is required'),
-            price: Yup.number()
-                .required('Price is required'),
-            discountPrice: Yup.number()
-                .min(0, 'Discount price must be greater than or equal to 0'),
-            productOffer: Yup.string()
-                .required('Product offer is required'),
-            colors: Yup.array()
-                .min(1, "At least one color is required"),
-            quantity: Yup.number()
-                .required('Quantity is required')
-                .min(0, 'Quantity must be greater than or equal to 0'),
-            brand: Yup.string()
-                .required('Brand is required'),
-            description: Yup.string()
-                .required('Description is required'),
-            warning: Yup.string()
-                .required('Warning is required'),
-            productImage: Yup.array()
-                .min(1, "At least one image is required")
-                .test("fileType", "Only image files are allowed", (value) => {
-                    return value.every(file => file.type.startsWith("image/"));
-                }),
-            shipping: Yup.string().required('Shipping is required'),
-            returnExchangePolicy: Yup.string().required('Return/ Exchange Policy is required'),
-        };
+    const [editSize, setEditSize] = useState(false);
+    const [selectedOffers, setSelectedOffers] = useState([]);
+    const [size, setSize] = useState([]);
+    const [filteredSizes, setFilteredSizes] = useState([]);
+    const [details, setDetails] = useState([
+        { key: '', value: '' }
+    ]);
 
-        // Additional fields for Mobile & Electronics category
-        const mobileElectronicsSchema = {
-            ...baseSchema,
-            frontCamera: Yup.string()
-                .required('Front Camera is required'),
-            browseType: Yup.string()
-                .required('Browse Type is required'),
-            modalName: Yup.string()
-                .required('Modal Name is required'),
-            operatingSystem: Yup.string()
-                .required('Operating System is required'),
-            cameraVideo: Yup.string()
-                .required('Camera Video is required'),
-            screenSize: Yup.string()
-                .required('Screen Size is required')
-        };
-
-        // Additional fields for other categories
-        const otherCategoriesSchema = {
-            ...baseSchema,
-            pattern: Yup.string()
-                .required('Pattern is required'),
-            style: Yup.string()
-                .required('Style is required'),
-            febric: Yup.string()
-                .required('Febric is required'),
-            washCase: Yup.string()
-                .required('Wash case is required'),
-            work: Yup.string()
-                .required('Work is required'),
-            occasion: Yup.string()
-                .required('Occasion is required'),
-            countryOrigin: Yup.string()
-                .required('Country Origin is required'),
-            gender: Yup.string()
-                .required('Gender is required'),
-            sleeveType: Yup.string()
-                .required('Sleeve Type is required'),
-            manufacturingDetails: Yup.string()
-                .required('Manufaturing Details is required'),
-        };
-
-        return mainCategory === 'Mobile & Electronics'
-            ? Yup.object().shape(mobileElectronicsSchema)
-            : Yup.object().shape(otherCategoriesSchema);
-    };
-    // Use the validation schema based on mainCategory
-    const [validationSchema, setValidationSchema] = useState(getValidationSchema(mainCategory));
-
-    // Update validation schema when mainCategory changes
-    useEffect(() => {
-        setValidationSchema(getValidationSchema(mainCategory));
-    }, [mainCategory]);
-
-    const [initialValues, setInitialValues] = useState({
-        mainCategoryId: '',
-        categoryId: '',
-        subCategoryId: '',
-        product: '',
-        sizeName: '',
-        size: '',
-        unit: '',
-        shortDescription: '',
-        stockStatus: '',
-        price: '',
-        discountPrice: '',
-        productOffer: '',
-        colors: [],
-        quantity: '',
-        brand: '',
-        pattern: '',
-        style: '',
-        warning: '',
-        febric: '',
-        description: '',
-        washCase: '',
-        work: '',
-        occasion: '',
-        countryOrigin: '',
-        gender: '',
-        sleeveType: '',
-        frontCamera: '',
-        browseType: '',
-        modalName: '',
-        operatingSystem: '',
-        cameraVideo: '',
-        screenSize: '',
-        productImage: [],
-        manufacturingDetails: '',
-        shipping:'',
-        returnExchangePolicy:''
-    });
-    const handleSubmit = (values, { setSubmitting }) => {
-        console.log('Form values:', values);
-        // Add your form submission logic here
-        setSubmitting(false);
-    };
     const options = [
         { value: 'New100', label: 'NEW100' },
         { value: 'New200', label: 'NEW200' },
         { value: 'New300', label: 'NEW300' }
     ]
-
-    let change_edit = (e) => {
-        e.preventDefault();
+    const change_edit = () => {
         setisedit(!isedit);
+        setEditSize(!editSize);
     };
 
-    let handlesubmit = (event) => {
-        event.preventDefault();
+    // Validation Schema
+    const validationSchema = Yup.object().shape({
+        mainCategoryId: Yup.string()
+            .required('Main category is required'),
+        categoryId: Yup.string()
+            .required('Category is required'),
+        subCategoryId: Yup.string()
+            .required('Sub category is required'),
+        productName: Yup.string()
+            .required('Product name is required')
+            .min(3, 'Product name must be at least 3 characters'),
+        sizeName: Yup.string()
+            .required('Size name is required'),
+        size: Yup.string()
+            .required('Size is required'),
+        unitId: Yup.string()
+            .required('Unit is required'),
+        shortDescription: Yup.string()
+            .required('Short description is required')
+            .max(200, 'Short description must not exceed 200 characters'),
+        stockStatus: Yup.string()
+            .required('Stock status is required'),
+        originalPrice: Yup.number()
+            .required('Price is required')
+            .positive('Price must be positive')
+            .min(0, 'Price must be greater than or equal to 0'),
+        discountPrice: Yup.number()
+            .nullable()
+            .transform((value, originalValue) => originalValue.trim() === '' ? null : value)
+            .lessThan(Yup.ref('originalPrice'), 'Discount price must be less than regular price'),
+        productOfferId: Yup.array()
+            .nullable()
+            .min(0, 'Select at least one offer'),
+        description: Yup.string()
+            .required('Description is required')
+            .min(20, 'Description must be at least 20 characters'),
+        manufacturingDetails: Yup.string()
+            .required('Manufacturing details are required'),
+        shipping: Yup.string()
+            .required('Shipping details are required'),
+        returnPolicy: Yup.string()
+            .required('Return/Exchange policy is required'),
+        colorName: Yup.array()
+            .min(1, 'At least one color must be selected'),
+        images: Yup.array()
+            .min(1, 'At least one image must be uploaded')
+            .max(5, 'Maximum 5 images allowed'),
+        details: Yup.array().of(
+            Yup.object().shape({
+                key: Yup.string().required('Key is required'),
+                value: Yup.string().required('Value is required')
+            })
+        )
+    });
+
+    // Initial form values
+    const initialValues = {
+        mainCategoryId: '',
+        categoryId: '',
+        subCategoryId: '',
+        productName: '',
+        sizeNameId: '',
+        size: '',
+        unitId: '',
+        shortDescription: '',
+        stockStatus: '',
+        originalPrice: '',
+        discountPrice: '',
+        productOfferId: [],
+        description: '',
+        manufacturingDetails: '',
+        shipping: '',
+        returnPolicy: '',
+        details: [{ key: '', value: '' }]
+    };
+
+    // Form submission handler
+    const handleSubmit = (values, { setSubmitting }) => {
+        const formData = {
+            ...values,
+            colors,
+            images: selectedImages
+        };
+        console.log('Form submitted with:', formData);
+        setSubmitting(false);
         setisedit(false);
     };
 
-    // Edit Size
-    const location = useLocation();
-    const editSize = location.state?.editSize;
-    // console.log(editSize)
+    const handleOfferChange = (selectedOptions) => {
+        setSelectedOffers(selectedOptions);
+    };
 
-    // Function to handle color selection
+    // Color picker handlers
     const handleColorChange = (color) => {
         setCurrentColor(color.hex);
     };
 
-    // Function to handle click on Add Color button
     const handleAddColorClick = (event) => {
         const buttonRect = event.currentTarget.getBoundingClientRect();
         setPickerPosition({
@@ -198,7 +150,6 @@ const AddProduct = () => {
         setDisplayColorPicker(!displayColorPicker);
     };
 
-    // Function to add color
     const addColor = () => {
         if (!colors.includes(currentColor)) {
             setColors([...colors, currentColor]);
@@ -206,35 +157,133 @@ const AddProduct = () => {
         setDisplayColorPicker(false);
     };
 
-    // Function to remove color
     const removeColor = (colorToRemove) => {
         setColors(colors.filter(color => color !== colorToRemove));
     };
 
-    // Handle Image Selection
-    const handleImageSelect = (event, setFieldValue) => {
+    // Image handlers
+    const handleImageSelect = (event) => {
         const files = Array.from(event.target.files);
-        setSelectedImages(files);
-        setFieldValue("images", files);
+        const newImages = files.map(file => ({
+            file: file,
+            name: file.name,
+            preview: URL.createObjectURL(file)
+        }));
+        setSelectedImages(prevImages => [...prevImages, ...newImages]);
     };
 
-    // Remove Image
-    const removeImage = (index, setFieldValue) => {
-        const updatedImages = [...selectedImages];
-        updatedImages.splice(index, 1);
-        setSelectedImages(updatedImages);
-        setFieldValue("images", updatedImages);
+    const removeImage = (index) => {
+        setSelectedImages(prevImages => {
+            URL.revokeObjectURL(prevImages[index].preview);
+            return prevImages.filter((_, i) => i !== index);
+        });
     };
 
-    // Cleanup preview URLs when component unmounts
     useEffect(() => {
         return () => {
             selectedImages.forEach(image => URL.revokeObjectURL(image.preview));
         };
+          // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const handleMainCategoryChange = (e) => {
-        setMainCategory(e.target.value);
+
+    const handleAddMore = () => {
+        setDetails([...details, { key: '', value: '' }]);
     };
+
+    const handleDetailChange = (index, field, value) => {
+        const newDetails = [...details];
+        newDetails[index][field] = value;
+        setDetails(newDetails);
+    };
+
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("MainCategoryREsposnse",response.data);
+            setMainCategories(response.data.users || []);
+        } catch (error) {
+            console.error('Data fetching error:', error);
+        }
+    }
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("CategoryRepsone",response.data);
+            setCategories(response.data.category || []);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("subCateresponse",response);
+            setSubCategories(response.data.subCategory)
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const handleMainCategoryChange = (event, setFieldValue) => {
+        const mainCategoryId = event.target.value;
+        setFieldValue('mainCategoryId', mainCategoryId);
+        setFieldValue('categoryId', '');
+        setFieldValue('subCategoryId', '');
+        setFieldValue('sizeNameId', '');
+
+        const relatedCategories = categories.filter(
+            category => category.mainCategoryId === mainCategoryId
+        );
+        setFilteredCategories(relatedCategories);
+        setFilteredSubCategories([]);
+    };
+
+    const handleCategoryChange = (event, setFieldValue) => {
+        const categoryId = event.target.value;
+        setFieldValue('categoryId', categoryId);
+        setFieldValue('subCategoryId', '');
+        setFieldValue('sizeNameId', '');
+
+        const relatedSubCategories = subCategories.filter(
+            subCategory => subCategory.categoryId === categoryId
+        );
+        setFilteredSubCategories(relatedSubCategories);
+    };
+    const handleSubCategoryChange = (event, setFieldValue) => {
+        const subCategoryId = event.target.value;
+        setFieldValue('subCategoryId', subCategoryId);
+        setFieldValue('sizeNameId', '');
+
+
+        const subCategorySpecificSizes = size.filter(
+            sizeItem => sizeItem.subCategoryId === subCategoryId
+        );
+        setFilteredSizes(subCategorySpecificSizes);
+    };
+    const fetchSize = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSizes`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("REsponse",response.data.sizes);
+            setSize(response.data.sizes);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        fetchSize();
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
@@ -259,146 +308,130 @@ const AddProduct = () => {
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
                                     onSubmit={handleSubmit}
-                                    enableReinitialize={true}
                                 >
-                                    {({ handleChange, handleSubmit, values, errors, touched, setFieldValue }) => (
-                                        <Form onSubmit={handleSubmit}>
+                                    {({ handleSubmit, handleChange, values, setFieldValue }) => (
+                                        <form onSubmit={handleSubmit}>
                                             <div className="row">
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Main Category</label>
                                                         <Form.Select
-                                                            className='mv_form_select mb-3'
-                                                            name="mainCategoryId"
+                                                            className='mv_form_select '
+                                                            name='mainCategoryId'
                                                             value={values.mainCategoryId}
-                                                            onChange={(e) => {
-                                                                setFieldValue("mainCategoryId", e.target.value);
-                                                                handleMainCategoryChange(e);
-                                                            }}>
+                                                            onChange={(e) => handleMainCategoryChange(e, setFieldValue)}>
                                                             <option>Select</option>
-                                                            <option value="Women">Women</option>
-                                                            <option value="Men">Men</option>
-                                                            <option value="Baby & Kids">Baby & Kids</option>
-                                                            <option value="Beauty & Health">Beauty & Health</option>
-                                                            <option value="Home & Kitchen">Home & Kitchen</option>
-                                                            <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                            {mainCategories.map((mainCat) => (
+                                                                <option value={mainCat._id} key={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                         <ErrorMessage name="mainCategoryId" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Category</label>
                                                         <Form.Select
+                                                            className='mv_form_select'
                                                             name='categoryId'
                                                             value={values.categoryId}
-                                                            onChange={handleChange}
-                                                            className='mv_form_select mb-3'>
+                                                            onChange={(e) => handleCategoryChange(e, setFieldValue)}
+                                                            disabled={!values.mainCategoryId}>
                                                             <option>Select</option>
-                                                            <option value="Jewelry">Jewelry</option>
-                                                            <option value="Western Wear">Western Wear</option>
-                                                            <option value="Baby Care">Baby Care</option>
-                                                            <option value="Skin Care">Skin Care</option>
-                                                            <option value="Electronics">Electronics</option>
-                                                            <option value="Fragrance">Fragrance</option>
-                                                            <option value="Kitchen wear">Kitchen wear</option>
-                                                            <option value="Mobile">Mobile</option>
+                                                            {filteredCategories.map((cat) => (
+                                                                <option value={cat._id} key={cat._id}>{cat.categoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                         <ErrorMessage name="categoryId" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Sub Category</label>
                                                         <Form.Select
+                                                            className='mv_form_select'
                                                             name='subCategoryId'
                                                             value={values.subCategoryId}
-                                                            onChange={handleChange}
-                                                            className='mv_form_select mb-3'
-                                                        >
+                                                            onChange={(e) => handleSubCategoryChange(e, setFieldValue)}
+                                                            disabled={!values.categoryId}>
                                                             <option>Select</option>
-                                                            <option value="Necklace">Necklace</option>
-                                                            <option value="Blazer">Blazer</option>
-                                                            <option value="Baby Soap">Baby Soap</option>
-                                                            <option value="Facewash">Facewash</option>
-                                                            <option value="Refrigerator">Refrigerator</option>
-                                                            <option value="Perfume">Perfume</option>
-                                                            <option value="Pressure Cooker">Pressure Cooker</option>
-                                                            <option value="Smart Phone">Smart Phone</option>
+                                                            {filteredSubCategories.map((subCat) => (
+                                                                <option value={subCat._id} key={subCat._id}>{subCat.subCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                         <ErrorMessage name="subCategoryId" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Product</label>
-                                                        <InputGroup className="mb-3">
+                                                        <InputGroup className="">
                                                             <Form.Control
-                                                                type="text"
-                                                                name="product"
-                                                                value={values.product}
-                                                                onChange={handleChange}
                                                                 placeholder="Enter product name"
+                                                                name='productName'
+                                                                onChange={handleChange}
                                                             />
                                                         </InputGroup>
-                                                        <ErrorMessage name="product" component="small" className="text-danger" />
+                                                        <ErrorMessage name="productName" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Size Name</label>
                                                         <Form.Select
-                                                            className='mv_form_select mb-3'
-                                                            name='sizeName'
-                                                            value={values.sizeName}
-                                                            onChange={handleChange}>
+                                                            name='sizeNameId'
+                                                            className='mv_form_select'>
                                                             <option>Select</option>
-                                                            <option value="Women">Women</option>
-                                                            <option value="Men">Men</option>
-                                                            <option value="Baby & Kids">Baby & Kids</option>
-                                                            <option value="Beauty & Health">Beauty & Health</option>
-                                                            <option value="Home & Kitchen">Home & Kitchen</option>
-                                                            <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                            {console.log("filteredSizes",filteredSizes)}
+                                                            
+                                                            {filteredSizes.map((item) => (
+                                                                <option value={item._id} key={item._id}>{item.sizeName}</option>
+                                                            ))}
                                                         </Form.Select>
-                                                        <ErrorMessage name="sizeName" component="small" className="text-danger" />
+                                                        <ErrorMessage name="sizeNameId" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Size</label>
-                                                        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                                        <Form.Group className="" controlId="exampleForm.ControlInput1">
                                                             <Form.Control
                                                                 name='size'
                                                                 value={values.size}
                                                                 onChange={handleChange}
-                                                                placeholder="Enter size" />
+                                                                placeholder="Enter size"
+                                                                 />
+                                                                 {filteredSizes.map((item) => (
+                                                                    <option value={item._id} key={item._id}>{item.size}</option>
+                                                                ))}
                                                         </Form.Group>
                                                         <ErrorMessage name="size" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6  col-12">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Unit</label>
                                                         <Form.Select
-                                                            name='unit'
-                                                            value={values.unit}
+                                                            name='unitId'
+                                                            value={values.unitId}
                                                             onChange={handleChange}
-                                                            className='mv_form_select mb-3'>
+                                                            aria-label="Default select example"
+                                                            className='mv_form_select'>
                                                             <option value="">Select</option>
                                                             <option value="gm">gm</option>
                                                             <option value="ltr">ltr</option>
                                                             <option value="ml">ml</option>
                                                             <option value="GB">GB</option>
                                                         </Form.Select>
-                                                        <ErrorMessage name="unit" component="small" className="text-danger" />
+                                                        <ErrorMessage name="unitId" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6 col-12">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Short Description</label>
-                                                        <Form.Group className="mb-3">
+                                                        <Form.Group className="">
                                                             <Form.Control
-                                                                type="text"
+                                                                type=""
                                                                 name='shortDescription'
                                                                 value={values.shortDescription}
                                                                 onChange={handleChange}
@@ -408,13 +441,14 @@ const AddProduct = () => {
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Stock Status</label>
                                                         <Form.Select
+                                                            aria-label="Default select example"
+                                                            className='mv_form_select '
                                                             name='stockStatus'
                                                             value={values.stockStatus}
-                                                            onChange={handleChange}
-                                                            className='mv_form_select mb-3'>
+                                                            onChange={handleChange}>
                                                             <option>Select</option>
                                                             <option value="In Stock">In Stock</option>
                                                             <option value="Low Stock">Low Stock</option>
@@ -424,44 +458,53 @@ const AddProduct = () => {
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Price</label>
-                                                        <InputGroup className="mb-3">
+                                                        <InputGroup className="">
                                                             <Form.Control
-                                                                name='price'
-                                                                value={values.price}
-                                                                onChange={handleChange}
                                                                 placeholder="Enter price"
+                                                                name='originalPrice'
+                                                                value={values.originalPrice}
+                                                                onChange={handleChange}
                                                             />
                                                         </InputGroup>
-                                                        <ErrorMessage name="price" component="small" className="text-danger" />
+                                                        <ErrorMessage name="originalPrice" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Discount Price</label>
-                                                        <Form.Group className="mb-3">
+                                                        <Form.Group className="">
                                                             <Form.Control
                                                                 name='discountPrice'
                                                                 value={values.discountPrice}
                                                                 onChange={handleChange}
                                                                 placeholder="Enter discount price" />
+                                                            <ErrorMessage name="discountPrice" component="small" className="text-danger" />
                                                         </Form.Group>
-                                                        <ErrorMessage name="discountPrice" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Product Offer</label>
-                                                        <Select options={options} value={values.productOffer} onChange={(option) => setFieldValue('productOffer', option)} />
+                                                        <Select
+                                                            isMulti
+                                                            name="productOfferId"
+                                                            options={options}
+                                                            className="basic-multi-select"
+                                                            classNamePrefix="select"
+                                                            value={selectedOffers}
+                                                            onChange={handleOfferChange}
+                                                            placeholder="Select offers..."
+                                                        />
                                                     </div>
-                                                    <ErrorMessage name="productOffer" component="small" className="text-danger" />
+                                                    <ErrorMessage name="productOfferId" component="small" className="text-danger" />
                                                 </div>
                                                 <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Colors</label>
                                                         <div className="color-box border rounded p-2 d-flex align-items-center flex-wrap">
-                                                            {values.colors.map((color, index) => (
+                                                            {colors.map((color, index) => (
                                                                 <div key={index} className="color-circle me-2">
                                                                     <div
                                                                         style={{ backgroundColor: '#EAEAEA' }}
@@ -491,7 +534,7 @@ const AddProduct = () => {
                                                                 <img src={require('../mv_img/colorPicker.png')} alt="" />
                                                             </button>
                                                         </div>
-                                                        <ErrorMessage name="colors" component="small" className="text-danger" />
+
                                                         {displayColorPicker && (
                                                             <div
                                                                 className="position-absolute"
@@ -517,310 +560,8 @@ const AddProduct = () => {
                                                             </div>
                                                         )}
                                                     </div>
+                                                    <ErrorMessage name="colorName" component="small" className="text-danger" />
                                                 </div>
-                                                {mainCategory !== 'Mobile & Electronics' ? (
-                                                    <>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Pattern</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='pattern'
-                                                                        value={values.pattern}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter pattern" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="pattern" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Style</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='style'
-                                                                        value={values.style}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter style" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="style" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Quanity</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        name='quantity'
-                                                                        value={values.quantity}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter quantity" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="quantity" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Brand</label>
-                                                                <Form.Select
-                                                                    name='brand'
-                                                                    value={values.brand}
-                                                                    onChange={handleChange}
-                                                                    className='mv_form_select mb-3'>
-                                                                    <option>Select</option>
-                                                                    <option value="Zara">Zara</option>
-                                                                    <option value="Levi's">Levi's</option>
-                                                                    <option value="Van Heusen">Van Heusen</option>
-                                                                </Form.Select>
-                                                                <ErrorMessage name="brand" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Warning</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='warning'
-                                                                        value={values.warning}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter warning" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="warning" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Febric</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='febric'
-                                                                        value={values.febric}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter Febric" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="febric" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Wash case</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='washCase'
-                                                                        value={values.washCase}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter wash case" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="washCase" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Work</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='work'
-                                                                        value={values.work}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter work details" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="work" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Occasion</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='occasion'
-                                                                        value={values.occasion}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter occasion" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="occasion" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Country Origin</label>
-                                                                <Form.Select
-                                                                    name='countryOrigin'
-                                                                    value={values.countryOrigin}
-                                                                    onChange={handleChange}
-                                                                    className='mv_form_select mb-3'>
-                                                                    <option>Select</option>
-                                                                    <option value="India">India</option>
-                                                                    <option value="China">China</option>
-                                                                    <option value="Nepal">Nepal</option>
-                                                                </Form.Select>
-                                                                <ErrorMessage name="countryOrigin" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Gender</label>
-                                                                <Form.Select
-                                                                    name='gender'
-                                                                    value={values.gender}
-                                                                    onChange={handleChange}
-                                                                    className='mv_form_select mb-3'>
-                                                                    <option>Select</option>
-                                                                    <option value="Female">Female</option>
-                                                                    <option value="Male">Male</option>
-                                                                    <option value="Others">Others</option>
-                                                                </Form.Select>
-                                                                <ErrorMessage name="gender" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Sleeve Type</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='sleeveType'
-                                                                        value={values.sleeveType}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter sleeve type" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="sleeveType" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Front camera</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='frontCamera'
-                                                                        value={values.frontCamera}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter style" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="frontCamera" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Browse Type</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='browseType'
-                                                                        value={values.browseType}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter browse type" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="browseType" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Quantity</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        name='quantity'
-                                                                        value={values.quantity}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter quantity" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="quantity" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Brand</label>
-                                                                <Form.Select
-                                                                    name='brand'
-                                                                    value={values.brand}
-                                                                    onChange={handleChange}
-                                                                    className='mv_form_select mb-3'>
-                                                                    <option>Select</option>
-                                                                    <option value="Dell">Dell</option>
-                                                                    <option value="HP">HP</option>
-                                                                    <option value="Godrej">Godrej</option>
-                                                                </Form.Select>
-                                                                <ErrorMessage name="brand" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Warning</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='warning'
-                                                                        value={values.warning}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter warning" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="warning" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Modal Name</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control name='modalName' value={values.modalName} onChange={handleChange} placeholder="Enter modal name" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="modalName" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Operating System</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        name='operatingSystem'
-                                                                        value={values.operatingSystem}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter Operating System" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="operatingSystem" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Camera & Video</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='cameraVideo'
-                                                                        value={values.cameraVideo}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter Camera & Video details" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="cameraVideo" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                            <div className="mv_input_content">
-                                                                <label className='mv_label_input'>Screen Size</label>
-                                                                <Form.Group className="mb-3">
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        name='screenSize'
-                                                                        value={values.screenSize}
-                                                                        onChange={handleChange}
-                                                                        placeholder="Enter screen size" />
-                                                                </Form.Group>
-                                                                <ErrorMessage name="screenSize" component="small" className="text-danger" />
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                )}
-
-
                                                 <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Product Image</label>
@@ -832,7 +573,7 @@ const AddProduct = () => {
                                                                         <div className="text-truncate " style={{ maxWidth: '100px' }}>
                                                                             {image.name}
                                                                         </div>
-                                                                        <IoMdClose size={16} style={{ color: '#ff0000' }} onClick={() => removeImage(index, setFieldValue)} />
+                                                                        <IoMdClose style={{ color: '#ff0000' }} onClick={() => removeImage(index)} />
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -843,7 +584,7 @@ const AddProduct = () => {
                                                                     className="d-none"
                                                                     multiple
                                                                     accept="image/*"
-                                                                    onChange={(event) => handleImageSelect(event, setFieldValue)}
+                                                                    onChange={handleImageSelect}
                                                                 />
                                                                 <button
                                                                     className="btn btn-sm ms-auto"
@@ -854,64 +595,105 @@ const AddProduct = () => {
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <ErrorMessage name="images" component="small" className="text-danger mt-1" />
                                                     </div>
+                                                    <ErrorMessage name="images" component="small" className="text-danger" />
+                                                </div>
+                                                <div className="col-12 mb-3">
+                                                    <div className="d-flex">
+                                                        <label className='mv_label_input'>More Details</label>
+                                                        <button className='border-0 bg-transparent sb_btn ms-auto' onClick={handleAddMore}>
+                                                            Add More
+                                                        </button>
+                                                    </div>
+                                                    {details.map((detail, index) => (
+                                                        <>
+                                                            <div className="row" key={index} >
+                                                                <div className="col-md-6 col-12">
+                                                                    <div className="mv_input_content mb-3">
+                                                                        <label className='mv_label_input'>Key</label>
+                                                                        <Form.Group className="">
+                                                                            <Form.Control
+                                                                                type="text"
+                                                                                placeholder="Key"
+                                                                                value={detail.key}
+                                                                                onChange={(e) => handleDetailChange(index, 'key', e.target.value)} />
+                                                                        </Form.Group>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-6 col-12">
+                                                                    <div className="mv_input_content mb-3">
+                                                                        <label className='mv_label_input'>Value</label>
+                                                                        <Form.Group className="">
+                                                                            <Form.Control
+                                                                                type="text"
+                                                                                placeholder="Value"
+                                                                                value={detail.value}
+                                                                                onChange={(e) => handleDetailChange(index, 'value', e.target.value)} />
+                                                                        </Form.Group>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            {/* { index > 0 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemove(index)}
+                                                                className="ml-2 p-1 text-red-500 hover:text-red-700"
+                                                            >
+                                                                <IoMdClose />
+                                                            </button>
+                                                        )} */}
+                                                        </>
+                                                    ))}
+
                                                 </div>
                                                 <div className="col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Description</label>
-                                                        <Form.Group className="mb-3">
+                                                        <Form.Group className="">
                                                             <Form.Control
-                                                                type="text"
-                                                                name="description"
+                                                                name='description'
                                                                 value={values.description}
                                                                 onChange={handleChange}
                                                                 placeholder="Enter Description" />
                                                         </Form.Group>
-                                                        <ErrorMessage name="description" component="small" className="text-danger mt-1" />
+                                                        <ErrorMessage name="description" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
-                                                {mainCategory !== 'Mobile & Electronics' ? (
-                                                    <div className="col-md-6 col-sm-6">
-                                                        <div className="mv_input_content">
-                                                            <label className='mv_label_input'>Manufacturing Details</label>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Control
-                                                                    name='manufacturingDetails'
-                                                                    value={values.manufacturingDetails}
-                                                                    onChange={handleChange}
-                                                                    placeholder="Enter Manufacturing Details" />
-                                                            </Form.Group>
-                                                            <ErrorMessage name="manufacturingDetails" component="small" className="text-danger mt-1" />
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <></>
-                                                )}
+
                                                 <div className="col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
+                                                        <label className='mv_label_input'>Manufacturing Details</label>
+                                                        <Form.Group className="">
+                                                            <Form.Control
+                                                                type=""
+                                                                placeholder="Enter Manufacturing Details" />
+                                                        </Form.Group>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6 col-sm-6">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Shipping</label>
-                                                        <Form.Group className="mb-3">
+                                                        <Form.Group className="">
                                                             <Form.Control
                                                                 name='shipping'
                                                                 value={values.shipping}
                                                                 onChange={handleChange}
                                                                 placeholder="Enter Shipping details" />
                                                         </Form.Group>
-                                                        <ErrorMessage name="shipping" component="small" className="text-danger mt-1" />
+                                                        <ErrorMessage name="shipping" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6 col-sm-6">
-                                                    <div className="mv_input_content">
+                                                    <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Return/ Exchange Policy</label>
-                                                        <Form.Group className="mb-3">
+                                                        <Form.Group className="">
                                                             <Form.Control
-                                                                name='returnExchangePolicy'
-                                                                value={values.returnExchangePolicy}
+                                                                name='returnPolicy'
+                                                                value={values.returnPolicy}
                                                                 onChange={handleChange}
                                                                 placeholder="Enter Return/ Exchange Policy" />
                                                         </Form.Group>
-                                                        <ErrorMessage name="returnExchangePolicy" component="small" className="text-danger mt-1" />
+                                                        <ErrorMessage name="returnPolicy" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className='text-center mt-5'>
@@ -919,17 +701,17 @@ const AddProduct = () => {
                                                         <button className='border-0 bg-transparent'>
                                                             Cancel
                                                         </button>
-                                                        {editSize === true ? <button className='border-0 bg-transparent'>
+                                                        {editSize === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
                                                             Update
                                                         </button> :
-                                                            <button className='border-0 bg-transparent'>
+                                                            <button className='border-0 bg-transparent' onClick={change_edit}>
                                                                 Add
                                                             </button>
                                                         }
                                                     </div>
                                                 </div>
                                             </div>
-                                        </Form>
+                                        </form>
                                     )}
                                 </Formik>
                             </div>

@@ -312,7 +312,7 @@ const SubCategory = () => {
                 </Row>
                 {paginatedData.length > 0 ? (
                     <>
-                        <div className="mv_product_table_padd"  style={{height:'65vh'}} >
+                        <div className="mv_product_table_padd" >
                             <table className='mv_product_table justify-content-between'>
                                 <thead>
                                     <tr>
@@ -480,7 +480,7 @@ const SubCategory = () => {
                                                 </option>
                                             ))}
                                         </Form.Select>
-                                        <ErrorMessage name="mainCategoryId" component="div" className="text-danger" />
+                                        <ErrorMessage name="mainCategoryId" component="small" className="text-danger" />
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
@@ -498,7 +498,7 @@ const SubCategory = () => {
                                                 </option>
                                             ))}
                                         </Field>
-                                        <ErrorMessage name="categoryId" component="div" className="text-danger" />
+                                        <ErrorMessage name="categoryId" component="small" className="text-danger" />
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
@@ -509,7 +509,7 @@ const SubCategory = () => {
                                             placeholder="Enter Sub Category"
                                             className="form-control"
                                         />
-                                        <ErrorMessage name="subCategoryName" component="div" className="text-danger" />
+                                        <ErrorMessage name="subCategoryName" component="small" className="text-danger" />
                                     </Form.Group>
 
                                     <div className="d-flex justify-content-center gap-2 mt-4">

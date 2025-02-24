@@ -209,6 +209,18 @@
    font-weight: 600;
    text-align: left;
  }
+ .sb_btn  {
+   /* width: 180px; */
+   font-size: 12px;
+   font-weight: 500;
+   line-height: 21.78px;
+   padding: 7px 0px;
+   border-radius: 4px;
+   padding: 4px 12px;
+   background-color: #2B221E !important;
+   /* margin: 0px 14px; */
+   color: #fff;
+}
   @media (min-width:1990px) {
      .illustration-container svg {
         left: 26%;

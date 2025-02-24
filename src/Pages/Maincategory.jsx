@@ -212,7 +212,7 @@ const MainCategory = () => {
               </div>
               {paginatedData.length > 0 ? (
                 <>
-                  <div className="mv_product_table_padd" style={{height:'66vh'}}>
+                  <div className="mv_product_table_padd" >
                     <table className='mv_product_table justify-content-between'>
                       <thead>
                         <tr>
@@ -297,7 +297,7 @@ const MainCategory = () => {
                   <Form.Label>Main Category</Form.Label>
                   <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category " value={values.mainCategoryName}
                     onChange={handleChange} />
-                  <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
+                  <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
                 </Form.Group>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button
