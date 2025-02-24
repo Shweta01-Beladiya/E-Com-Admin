@@ -8,15 +8,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
+import Addpopularbrands from './add_popularbrands';
 
 const Popularbrands = (props) => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [toggle, seToggle] = useState(false)
+
 
 
     // Edit Offer
     const [editpopularbrands,setEditPopularbrands] = useState(false);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [selectedBrand, setSelectedBrand] = useState(null);
+
 
     const navigate = useNavigate();
 
@@ -127,7 +134,7 @@ const Popularbrands = (props) => {
                     Authorization: `Bearer ${token}`,
                 }
               })
-              console.log("data" , response?.data?.popularBrand);
+            //   console.log("data" , response?.data?.popularBrand);
               setFilteredData(response?.data?.popularBrand)
            }catch(error){
               
@@ -135,7 +142,7 @@ const Popularbrands = (props) => {
        }
 
        fetchBrandData()
-    },[])
+    },[toggle])
     // ***************************************************************************************
 
     // ************************************** Pagination **************************************
@@ -203,6 +210,42 @@ const Popularbrands = (props) => {
         setPriceRange(newRange);
     };
 
+    const handleEditClick = (brand) => {
+        setSelectedBrand(brand);
+        setShowAddForm(true);
+    };
+
+    console.log("bran",selectedBrand)
+
+    if (showAddForm) {
+        return (
+            <Addpopularbrands 
+                editData={selectedBrand}
+            />
+        );
+    }
+
+    // ********** Delete Item *********
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+
+    const handleDelete = async () => {
+        try{
+           const response = await axios.delete(`${BaseUrl}/api/deleteBrand/${deleteToggle}`,{
+               headers: {
+                   Authorization: `Bearer ${token}`,
+               }
+           })
+           console.log("delete response " , response);
+           setModalShow(false)
+           seToggle((count)=> count + 1)
+        }catch(error){
+            alert(error)
+        }
+    }
+
     return (
         <>
             <div id='mv_container_fluid'>
@@ -266,7 +309,8 @@ const Popularbrands = (props) => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <Link to='/addpopularbrands'><button>+ Add</button></Link>
+                                            {/* <Link to='/addpopularbrands'><button>+ Add</button></Link> */}
+                                            <button onClick={() => setShowAddForm(true)}>+ Add</button>
                                         </div>
                                     </div>
                                 </div>
@@ -284,32 +328,31 @@ const Popularbrands = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       {paginatedData.map((item, index) => (
+                                       {paginatedData.map((item, index) => {
+                                        // console.log(`${BaseUrl}/${item?.brandImage}`);
+                                        return(
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>
-                                                {/* <img className='mv_product_img mv_product_radius_img' src={require(`${item?.brandImage}`)}  alt="" /> */}
+                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandLogo }`}  alt="" />
                                                 {item?.brandName}
                                             </td>
                                             <td>
-                                                {/* <img className='mv_product_img mv_product_radius_img' src={require(`${item?.brandLogo}`)}  alt="" /> */}
+                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandImage}`}  alt="" />
                                             </td>
                                             <td>{item?.offer}</td>
                                             <td>{item?.title}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={handleditpopularbrands}>
-                                                    <Link to='/addpopularbrands' state={{ editPopularbrands: true }}>
+                                                <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
+                                                    
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
                                         </tr>
-                                        ))}
-
-                                        {console.log("hihi" , paginatedData)}
+                                        )})}
                                     </tbody>
                                 </table>
                             </div>
@@ -344,7 +387,7 @@ const Popularbrands = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
