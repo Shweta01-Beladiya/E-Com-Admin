@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Table, Button, Offcanvas, Modal, Form, Row,
-    Col, InputGroup,
-} from 'react-bootstrap';
+import {Button, Offcanvas, Modal, Form, Row,  Col, InputGroup } from 'react-bootstrap';
 import { FiFilter } from 'react-icons/fi';
 import { FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
@@ -305,49 +302,49 @@ const Category = () => {
                 {/* Table component */}
                 {getCurrentPageData().length > 0 ? (
                     <>
-                      <div className="mv_product_table_padd">
-                      <table className='mv_product_table justify-content-between'>
-                            <thead className="bg-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Main Category</th>
-                                    <th> Name</th>
-                                    <th>Status</th>
-                                    <th className='d-md-flex align-items-center justify-content-end'>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {getCurrentPageData().map((category, index) => (
-                                    <tr key={category.id}>
-                                        <td>{index + 1}</td>
-                                        <td> {mainCategory.find(cat => cat._id === category.mainCategoryId)?.mainCategoryName || ''}</td>
-                                        <td>{category.categoryName}</td>
-                                        <td>
-                                            <Form.Check
-                                                type="switch"
-                                                checked={category.status}
-                                                onChange={() => handleStatusChange(category._id, category.status)}
-                                            />
-                                        </td>
-                                        <td className='d-flex align-items-center justify-content-end'>
-                                            <div className="mv_pencil_icon" onClick={() => {
-                                                setShowAddModal(true);
-                                                setId(category._id);
-                                            }}>
-                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                            </div>
-                                            <div className="mv_pencil_icon" onClick={() => {
-                                                setShowDeleteModal(true);
-                                                setId(category._id);
-                                                setCategoryToDelete(category);
-                                            }}>
-                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                            </div>
-                                        </td>
+                        <div className="mv_product_table_padd" style={{ height: '66vh' }}>
+                            <table className='mv_product_table justify-content-between'>
+                                <thead className="bg-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Main Category</th>
+                                        <th> Name</th>
+                                        <th>Status</th>
+                                        <th className='d-md-flex align-items-center justify-content-end'>Action</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {getCurrentPageData().map((category, index) => (
+                                        <tr key={category.id}>
+                                            <td>{index + 1}</td>
+                                            <td> {mainCategory.find(cat => cat._id === category.mainCategoryId)?.mainCategoryName || ''}</td>
+                                            <td>{category.categoryName}</td>
+                                            <td>
+                                                <Form.Check
+                                                    type="switch"
+                                                    checked={category.status}
+                                                    onChange={() => handleStatusChange(category._id, category.status)}
+                                                />
+                                            </td>
+                                            <td className='d-flex align-items-center justify-content-end'>
+                                                <div className="mv_pencil_icon" onClick={() => {
+                                                    setShowAddModal(true);
+                                                    setId(category._id);
+                                                }}>
+                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                </div>
+                                                <div className="mv_pencil_icon" onClick={() => {
+                                                    setShowDeleteModal(true);
+                                                    setId(category._id);
+                                                    setCategoryToDelete(category);
+                                                }}>
+                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                         {totalPages > 1 && (
                             <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
@@ -437,14 +434,14 @@ const Category = () => {
                             <FormikForm className="r_form">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Main Category</Form.Label>
-                                    <Form.Select name="mainCategoryId" className="form-control">
+                                    <Field as="select" name="mainCategoryId" className="form-select">
                                         <option value="">Select Main Category</option>
                                         {mainCategory.map((category) => (
                                             <option key={category._id} value={category._id}>
                                                 {category.mainCategoryName}
                                             </option>
                                         ))}
-                                    </Form.Select>
+                                    </Field>
                                     <ErrorMessage name="mainCategoryId" component="div" className="text-danger small" />
                                 </Form.Group>
 
