@@ -16,14 +16,16 @@ const Popularbrands = (props) => {
     const token = localStorage.getItem('token');
     const [deleteToggle, setDeleteToggle] = useState(null)
     const [toggle, seToggle] = useState(false)
-
-
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({
+        brandname: '',
+    });
 
     // Edit Offer
     const [editpopularbrands,setEditPopularbrands] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
-
 
     const navigate = useNavigate();
 
@@ -32,96 +34,124 @@ const Popularbrands = (props) => {
         // navigate('addsize')
     }
 
-    var data = [
-        {   
-            id: 1,
-            barndimg: "apple.png",
-            name: "Apple",
-            img: "mobile.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 2,
-            barndimg: "noise.png",
-            name: "Noise",
-            img: "watch.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 3,
-            barndimg: "asus.png",
-            name: "Asus",
-            img: "book.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 4,
-            barndimg: "apple.png",
-            name: "Apple",
-            img: "mobile.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 5,
-            barndimg: "asus.png",
-            name: "Asus",
-            img: "book.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 6,
-            barndimg: "apple.png",
-            name: "Apple",
-            img: "mobile.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 7,
-            barndimg: "asus.png",
-            name: "Asus",
-            img: "book.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 8,
-            barndimg: "apple.png",
-            name: "Apple",
-            img: "mobile.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 9,
-            barndimg: "asus.png",
-            name: "Asus",
-            img: "book.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 10,
-            barndimg: "noise.png",
-            name: "Noise",
-            img: "watch.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-        {   
-            id: 11,
-            barndimg: "apple.png",
-            name: "Apple",
-            img: "mobile.png",
-            offer: "Upto 20% OFF",
-            title: "lorem ipsum",
-        },
-    ];
+    // var data = [
+    //     {   
+    //         id: 1,
+    //         barndimg: "apple.png",
+    //         name: "Apple",
+    //         img: "mobile.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 2,
+    //         barndimg: "noise.png",
+    //         name: "Noise",
+    //         img: "watch.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 3,
+    //         barndimg: "asus.png",
+    //         name: "Asus",
+    //         img: "book.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 4,
+    //         barndimg: "apple.png",
+    //         name: "Apple",
+    //         img: "mobile.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 5,
+    //         barndimg: "asus.png",
+    //         name: "Asus",
+    //         img: "book.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 6,
+    //         barndimg: "apple.png",
+    //         name: "Apple",
+    //         img: "mobile.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 7,
+    //         barndimg: "asus.png",
+    //         name: "Asus",
+    //         img: "book.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 8,
+    //         barndimg: "apple.png",
+    //         name: "Apple",
+    //         img: "mobile.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 9,
+    //         barndimg: "asus.png",
+    //         name: "Asus",
+    //         img: "book.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 10,
+    //         barndimg: "noise.png",
+    //         name: "Noise",
+    //         img: "watch.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    //     {   
+    //         id: 11,
+    //         barndimg: "apple.png",
+    //         name: "Apple",
+    //         img: "mobile.png",
+    //         offer: "Upto 20% OFF",
+    //         title: "lorem ipsum",
+    //     },
+    // ];
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("hihi" , result);
+        if (filters.brandName) {
+          result = result.filter(user => user.brandName === filters.brandName);
+        }
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.brandName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.offer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.title?.includes(searchTerm)
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1); // Reset to first page when filters change
+    }, [data, filters, searchTerm]);
+
+    // Offcanvas Filter
+    const handleFilterChange = (field, value) => {
+        setFilters(prev => ({
+          ...prev,
+          [field]: value
+        }));
+    };
 
     // ************************************** Show Data **************************************
     const [filteredData, setFilteredData] = useState([]);
@@ -136,6 +166,7 @@ const Popularbrands = (props) => {
               })
             //   console.log("data" , response?.data?.popularBrand);
               setFilteredData(response?.data?.popularBrand)
+              setData(response?.data?.popularBrand)
            }catch(error){
               
            }
@@ -143,6 +174,28 @@ const Popularbrands = (props) => {
 
        fetchBrandData()
     },[toggle])
+    // ***************************************************************************************
+
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+
+    const handleDelete = async () => {
+        try{
+           const response = await axios.delete(`${BaseUrl}/api/deleteBrand/${deleteToggle}`,{
+               headers: {
+                   Authorization: `Bearer ${token}`,
+               }
+           })
+           console.log("delete response " , response);
+           setModalShow(false)
+           seToggle((count)=> count + 1)
+        }catch(error){
+            alert(error)
+        }
+    }
     // ***************************************************************************************
 
     // ************************************** Pagination **************************************
@@ -209,7 +262,8 @@ const Popularbrands = (props) => {
     const handleSliderChange = (newRange) => {
         setPriceRange(newRange);
     };
-
+    
+    // Edit data
     const handleEditClick = (brand) => {
         setSelectedBrand(brand);
         setShowAddForm(true);
@@ -223,27 +277,6 @@ const Popularbrands = (props) => {
                 editData={selectedBrand}
             />
         );
-    }
-
-    // ********** Delete Item *********
-    const handleManage = (id) =>{
-        setModalShow(true)
-        setDeleteToggle(id)
-    }
-
-    const handleDelete = async () => {
-        try{
-           const response = await axios.delete(`${BaseUrl}/api/deleteBrand/${deleteToggle}`,{
-               headers: {
-                   Authorization: `Bearer ${token}`,
-               }
-           })
-           console.log("delete response " , response);
-           setModalShow(false)
-           seToggle((count)=> count + 1)
-        }catch(error){
-            alert(error)
-        }
     }
 
     return (
@@ -266,8 +299,8 @@ const Popularbrands = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -285,7 +318,8 @@ const Popularbrands = (props) => {
                                                 <div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Brand Name</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
+                                                        <Form.Select className="mb-3" aria-label="Default select example" value={filters.brandname}
+                                                            onChange={(e) => handleFilterChange('brandName', e.target.value)}>
                                                             <option>Select</option>
                                                             <option value="Apple">Apple</option>
                                                             <option value="Noise">Noise</option>

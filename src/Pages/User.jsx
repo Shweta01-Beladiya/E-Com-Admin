@@ -176,7 +176,7 @@ const UserTable = () => {
         <div className="row mt-4">
           <div className="col-12">
             <div className="mv_product_table_content">
-              <div className='mv_table_search'>
+              <div className='mv_table_search mv_table_no_flex'>
                 <div className="mv_product_search">
                   <InputGroup>
                     <Form.Control
@@ -188,7 +188,7 @@ const UserTable = () => {
                 </div>
                 <div className='d-flex'>
                   <div className="mv_column_button mv_column_padd">
-                    <Button variant="primary" onClick={handleShow}>
+                    <Button className='me-0' variant="primary" onClick={handleShow}>
                       <img src={require('../mv_img/filter.png')} alt="" />
                       Filters
                     </Button>

@@ -214,7 +214,7 @@ const Returnorder = (props) => {
                 <div className="row mt-4">
                     <div className="col-12">
                         <div className="mv_product_table_content">
-                            <div className='mv_table_search'>
+                            <div className='mv_table_search mv_table_no_flex'>
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
@@ -226,7 +226,7 @@ const Returnorder = (props) => {
                                 </div>
                                 <div className='d-flex'>
                                     <div className="mv_column_button mv_view_status_padd">
-                                        <Link to="/viewstatus"><Button>View Status</Button></Link>
+                                        <Link to="/viewstatus"><Button className='me-0'>View Status</Button></Link>
                                     </div>
                                 </div>
                             </div>

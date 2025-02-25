@@ -82,7 +82,7 @@
     line-height: 19.36px;
     border: 1px solid #95908F;
     border-radius: 4px;
-    padding: 5px 15px !important;
+    padding: 6px 15px !important;
     margin-right: 15px;
     color: #2B221E;
 }
@@ -249,18 +249,20 @@
 
 
 
-@media(max-width: 1024px){
+/* @media(max-width: 1024px){
     .mv_column_button button{
         margin-right: 15px !important;
-        /* margin-bottom: 10px; */
     }
-}
+} */
 @media(max-width: 767px){
     .mv_table_search{
         display: block;
     }
     .mv_product_search{
         margin-bottom: 10px;
+    }
+    .mv_table_no_flex{
+        display: flex !important;
     }
 }
 @media(max-width: 768px){
