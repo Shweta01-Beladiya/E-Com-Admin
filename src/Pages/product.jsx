@@ -406,7 +406,7 @@ const Product = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                <div className="mv_product_table_padd" style={{height:'73vh'}} >
+                                <div className="mv_product_table_padd" >
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
                                         <tr>
@@ -469,7 +469,7 @@ const Product = () => {
                                 </table>
                             </div>
                             {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4'>
+                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
                                     <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
                                         <MdOutlineKeyboardArrowLeft />
                                     </p>
@@ -513,4 +513,4 @@ const Product = () => {
     );
 };
 
-export default Product
+export default Product;

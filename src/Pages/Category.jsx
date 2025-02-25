@@ -302,7 +302,7 @@ const Category = () => {
                 {/* Table component */}
                 {getCurrentPageData().length > 0 ? (
                     <>
-                        <div className="mv_product_table_padd" style={{ height: '66vh' }}>
+                        <div className="mv_product_table_padd" >
                             <table className='mv_product_table justify-content-between'>
                                 <thead className="bg-light">
                                     <tr>
@@ -442,13 +442,13 @@ const Category = () => {
                                             </option>
                                         ))}
                                     </Field>
-                                    <ErrorMessage name="mainCategoryId" component="div" className="text-danger small" />
+                                    <ErrorMessage name="mainCategoryId" component="small" className="text-danger small" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-4">
                                     <Form.Label>Category Name</Form.Label>
                                     <Field type="text" name="categoryName" className="form-control" placeholder="Enter category name" />
-                                    <ErrorMessage name="categoryName" component="div" className="text-danger small" />
+                                    <ErrorMessage name="categoryName" component="small" className="text-danger small" />
                                 </Form.Group>
 
                                 <div className="d-flex justify-content-center gap-2 mt-4">

@@ -294,6 +294,12 @@
     .mv_offcanvas_filter{
         max-width: 270px !important;
     }
+    .mv_other_category p{
+        padding: 2px 7px;
+    }
+    .mv_other_category p:nth-child(2),.mv_other_category p:nth-child(3){
+        padding: 2px 9px;
+    }
 }
 @media(max-width: 375px){
     .mv_dashboard_heading{
@@ -311,6 +317,7 @@
     .mv_add_product button{
         padding: 7px 15px !important;   
     }
+  
 }
 /* ************************************************ */
 

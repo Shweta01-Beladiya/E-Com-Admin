@@ -193,6 +193,7 @@ const Size = () => {
         applyFilters();
         handleClose();
     };
+    
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -392,7 +393,7 @@ const Size = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                    <div className="mv_product_table_padd" style={{ height: '65vh' }}>
+                                    <div className="mv_product_table_padd">
                                         <table className='mv_product_table justify-content-between'>
                                             <thead>
                                                 <tr>
