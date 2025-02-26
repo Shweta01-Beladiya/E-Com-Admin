@@ -17,7 +17,6 @@ const Product = () => {
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
-
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +28,7 @@ const Product = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedStockStatus, setSelectedStockStatus] = useState('');
     const [priceRange, setPriceRange] = useState([0, 300]);
+    const [deleteToProduct, setDeleteToProduct] = useState('');
 
     // Apply filters
     const applyFilters = () => {
@@ -166,7 +166,7 @@ const Product = () => {
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
-
+    const [id,setId] = useState(null);
     // offcanvas
     const [show, setShow] = useState(false);
 
@@ -197,6 +197,27 @@ const Product = () => {
     useEffect(() => {
         setFilteredData(data); // Ensure filteredData updates when data changes
     }, [data]);
+
+    const handleDelete = (id, product) => {
+        setModalShow(true);
+        setDeleteToProduct(product);
+        setId(id);
+    }
+
+    const handleDeleteProduct = async() => {
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteProduct/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            console.log("response",response);
+            if(response.data.status === 200) {
+                setData(preData => preData.filter(product => product._id !== id));
+                setModalShow(false);
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
     return (
         <>
             <div id='mv_container_fluid'>
@@ -367,11 +388,11 @@ const Product = () => {
                                                                 </Link>
                                                             </div>
                                                             <div className="mv_pencil_icon">
-                                                                <Link>
+                                                                <Link to={`/editProduct/${item._id}?productVariantId=${item.productVariantData[0]._id}`}>
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>
-                                                            <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                            <div className="mv_pencil_icon" onClick={()=>handleDelete(item._id, item.productName)}>
                                                                 <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                             </div>
                                                         </td>
@@ -410,13 +431,13 @@ const Product = () => {
             <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete?</h5>
-                    <p>Are you sure you want to delete Premium Saree ?</p>
+                    <p>Are you sure you want to delete {deleteToProduct} ?</p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDeleteProduct}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>

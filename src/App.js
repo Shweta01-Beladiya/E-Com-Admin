@@ -75,6 +75,7 @@ function App() {
             <Route path='/view_profile' element={<Viewprofile />}></Route>
             <Route path="/product" element={<Product />}></Route>
             <Route path="/addProduct" element={<AddProduct />}></Route>
+            <Route path="/editProduct/:id" element={<AddProduct />}></Route>
             <Route path="/viewProduct" element={<ViewProduct />}></Route>
             <Route path='/unit' element={<Unit />}></Route>
             <Route path='/size' element={<Size />}></Route>
