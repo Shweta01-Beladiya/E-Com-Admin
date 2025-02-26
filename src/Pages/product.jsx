@@ -10,125 +10,19 @@ import ReactSlider from 'react-slider';
 import { Link } from 'react-router-dom';
 import { FaStar } from "react-icons/fa";
 import NoResultsFound from '../Component/Noresult';
+import axios from 'axios';
 
 const Product = () => {
-    var data = [
-        {
-            id: 1,
-            category: "Women",
-            subcategory: "Indian Wear",
-            productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$20",
-            rating: "4.5",
-            stock: "In Stock",
-        },
-        {
-            id: 2,
-            category: "men",
-            subcategory: "Western Wear",
-            productimg: "lehenga.png",
-            name: "Blazer",
-            price: "$80",
-            rating: "4.5",
-            stock: "Low Stock",
-        },
-        {
-            id: 3,
-            category: "Baby & Kids",
-            subcategory: "Baby Care",
-            productimg: "saree.png",
-            name: "Body location",
-            price: "$120",
-            rating: "4.5",
-            stock: "Out of Stock",
-        },
-        {
-            id: 4,
-            category: "Women",
-            subcategory: "Treditional Wear",
-            productimg: "saree.png",
-            name: "Premium Choli",
-            price: "$100",
-            rating: "4.5",
-            stock: "In Stock",
-        },
-        {
-            id: 5,
-            category: "men",
-            subcategory: "Footwere",
-            productimg: "lehenga.png",
-            name: "Shoes",
-            price: "$140",
-            rating: "4.5",
-            stock: "Low Stock",
-        },
-        {
-            id: 6,
-            category: "Beauty & Health",
-            subcategory: "Skin Care",
-            productimg: "saree.png",
-            name: "Face Wash",
-            price: "$220",
-            rating: "4.5",
-            stock: "Out of Stock",
-        },
-        {
-            id: 7,
-            category: "Women",
-            subcategory: "Indian Wear",
-            productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$300",
-            rating: "4.5",
-            stock: "In Stock",
-        },
-        {
-            id: 8,
-            category: "Women",
-            subcategory: "Indian Wear",
-            productimg: "lehenga.png",
-            name: "Premium Lehenga",
-            price: "$250",
-            rating: "4.5",
-            stock: "Low Stock",
-        },
-        {
-            id: 9,
-            category: "Women",
-            subcategory: "Indian Wear",
-            productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$280",
-            rating: "4.5",
-            stock: "Out of Stock",
-        },
-        {
-            id: 10,
-            category: "Women",
-            subcategory: "Indian Wear",
-            productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$80",
-            rating: "4.5",
-            stock: "Out of Stock",
-        },
-        {
-            id: 11,
-            category: "Women",
-            subcategory: "Indian Wear",
-            productimg: "saree.png",
-            name: "Premium Saree",
-            price: "$120",
-            rating: "4.5",
-            stock: "In Stock",
-        },
-    ];
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     // Filter states
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedMainCategory, setSelectedMainCategory] = useState('');
@@ -152,21 +46,21 @@ const Product = () => {
 
         // Main Category filter
         if (selectedMainCategory) {
-            filtered = filtered.filter(item => 
+            filtered = filtered.filter(item =>
                 item.category.toLowerCase() === selectedMainCategory.toLowerCase()
             );
         }
 
         // Category filter
         if (selectedCategory) {
-            filtered = filtered.filter(item => 
+            filtered = filtered.filter(item =>
                 item.subcategory.toLowerCase() === selectedCategory.toLowerCase()
             );
         }
 
         // Stock Status filter
         if (selectedStockStatus) {
-            filtered = filtered.filter(item => 
+            filtered = filtered.filter(item =>
                 item.stock === selectedStockStatus
             );
         }
@@ -178,7 +72,7 @@ const Product = () => {
         });
 
         setFilteredData(filtered);
-        setCurrentPage(1); 
+        setCurrentPage(1);
     };
 
     // Handle search input
@@ -205,7 +99,7 @@ const Product = () => {
 
     useEffect(() => {
         applyFilters();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery]);
 
     const handleApplyFilters = () => {
@@ -225,7 +119,7 @@ const Product = () => {
     };
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage", totalPages)
+    // console.log("totalpage", totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -285,6 +179,24 @@ const Product = () => {
     //     setPriceRange(newRange);
     // };
 
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allProduct`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data.product);
+            setData(response.data.product)
+
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchData();
+    }, []);
+    useEffect(() => {
+        setFilteredData(data); // Ensure filteredData updates when data changes
+    }, [data]);
     return (
         <>
             <div id='mv_container_fluid'>
@@ -325,9 +237,9 @@ const Product = () => {
                                                     <div>
                                                         <div className="mv_input_content mt-3">
                                                             <label className='mv_offcanvas_filter_category'>Main Category</label>
-                                                            <Form.Select className="mb-4" 
-                                                              value={selectedMainCategory}
-                                                              onChange={handleMainCategoryChange}>
+                                                            <Form.Select className="mb-4"
+                                                                value={selectedMainCategory}
+                                                                onChange={handleMainCategoryChange}>
                                                                 <option>Select</option>
                                                                 <option value="Women">Women</option>
                                                                 <option value="Men">Men</option>
@@ -338,7 +250,7 @@ const Product = () => {
                                                         <div className="mv_input_content mt-3">
                                                             <label className='mv_offcanvas_filter_category'>Category</label>
                                                             <Form.Select className="mb-4"
-                                                             value={selectedCategory}
+                                                                value={selectedCategory}
                                                                 onChange={handleCategoryChange}>
                                                                 <option>Select</option>
                                                                 <option value="Indian Wear">Indian Wear</option>
@@ -406,89 +318,89 @@ const Product = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                <div className="mv_product_table_padd" >
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Main Category</th>
-                                            <th className=''>Category</th>
-                                            <th className=''>Product Name</th>
-                                            <th className=''>Price</th>
-                                            <th className=''>Rating</th>
-                                            <th className=''>Stock Status</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{item.id}</td>
-                                                <td>{item.category}</td>
-                                                <td>{item.subcategory}</td>
-                                                <td>
-                                                    <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.productimg}`)} alt="" />
-                                                    {item.name}
-                                                </td>
-                                                <td>{item.price}</td>
-                                                <td>
-                                                    <div className='mv_rating_img'>
-                                                        <FaStar className='mv_star_yellow' />
-                                                        {item.rating}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    {
-                                                        item.stock === 'In Stock' ? (
-                                                            <p className='m-0 mv_delivered_padd'>{item.stock}</p>
-                                                        ) : item.stock === 'Low Stock' ? (
-                                                            <p className='m-0 mv_pending_padd'>{item.stock}</p>
-                                                        ) : item.stock === 'Out of Stock' ? (
-                                                            <p className='m-0 mv_cancelled_padd'>{item.stock}</p>
-                                                        ) : null
-                                                    }
-                                                </td>
-                                                <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon">
-                                                        <Link to={'/viewProduct'}>
-                                                            <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon">
-                                                        <Link>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
-                                        </p>
-                                    ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
-                            )}
+                                    <div className="mv_product_table_padd" >
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Main Category</th>
+                                                    <th className=''>Category</th>
+                                                    <th className=''>Product Name</th>
+                                                    <th className=''>Price</th>
+                                                    <th className=''>Rating</th>
+                                                    <th className=''>Stock Status</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{item.mainCategoriesData[0].mainCategoryName}</td>
+                                                        <td>{item.categoriesData[0].categoryName}</td>
+                                                        <td>
+                                                            <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item.productVariantData[0].images[0]}`} alt="" />
+                                                            {item.productName}
+                                                        </td>
+                                                        <td>{item.productVariantData[0].originalPrice}</td>
+                                                        <td>
+                                                            <div className='mv_rating_img'>
+                                                                <FaStar className='mv_star_yellow' />
+                                                                {item.rating}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            {
+                                                                item.stockStatus === 'In Stock' ? (
+                                                                    <p className='m-0 mv_delivered_padd'>{item.stockStatus}</p>
+                                                                ) : item.stock === 'Low Stock' ? (
+                                                                    <p className='m-0 mv_pending_padd'>{item.stockStatus}</p>
+                                                                ) : item.stock === 'Out of Stock' ? (
+                                                                    <p className='m-0 mv_cancelled_padd'>{item.stockStatus}</p>
+                                                                ) : null
+                                                            }
+                                                        </td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon">                                                           
+                                                                <Link  to={`/viewProduct?id=${item._id}&productVariantId=${item.productVariantData[0]._id}`}>
+                                                                    <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon">
+                                                                <Link>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                                    onClick={() => handlePageChange(page)}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
                                 </>
                             ) : (
                                 <NoResultsFound />
                             )}
-                            
+
                         </div>
                     </div>
                 </div>

@@ -1,17 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import Select from 'react-select';
+// import Select from 'react-select';
 import { SketchPicker } from 'react-color';
 import { IoMdClose } from "react-icons/io";
-import { Formik, ErrorMessage } from 'formik';
+import { Formik, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AddProduct = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
+
+    const navigate = useNavigate();
 
     // State variables
     let [isedit, setisedit] = useState(false);
@@ -27,18 +30,17 @@ const AddProduct = () => {
     const [filteredSubCategories, setFilteredSubCategories] = useState([]);
     const fileInputRef = useRef(null);
     const [editSize, setEditSize] = useState(false);
-    const [selectedOffers, setSelectedOffers] = useState([]);
+    // const [selectedOffers, setSelectedOffers] = useState([]);
     const [size, setSize] = useState([]);
     const [filteredSizes, setFilteredSizes] = useState([]);
-    const [details, setDetails] = useState([
-        { key: '', value: '' }
-    ]);
+    const [unit, setUnit] = useState([]);
 
-    const options = [
-        { value: 'New100', label: 'NEW100' },
-        { value: 'New200', label: 'NEW200' },
-        { value: 'New300', label: 'NEW300' }
-    ]
+
+    // const options = [
+    //     { value: 'New100', label: 'NEW100' },
+    //     { value: 'New200', label: 'NEW200' },
+    //     { value: 'New300', label: 'NEW300' }
+    // ]
     const change_edit = () => {
         setisedit(!isedit);
         setEditSize(!editSize);
@@ -55,7 +57,7 @@ const AddProduct = () => {
         productName: Yup.string()
             .required('Product name is required')
             .min(3, 'Product name must be at least 3 characters'),
-        sizeName: Yup.string()
+        sizeNameId: Yup.string()
             .required('Size name is required'),
         size: Yup.string()
             .required('Size is required'),
@@ -64,8 +66,6 @@ const AddProduct = () => {
         shortDescription: Yup.string()
             .required('Short description is required')
             .max(200, 'Short description must not exceed 200 characters'),
-        stockStatus: Yup.string()
-            .required('Stock status is required'),
         originalPrice: Yup.number()
             .required('Price is required')
             .positive('Price must be positive')
@@ -74,9 +74,9 @@ const AddProduct = () => {
             .nullable()
             .transform((value, originalValue) => originalValue.trim() === '' ? null : value)
             .lessThan(Yup.ref('originalPrice'), 'Discount price must be less than regular price'),
-        productOfferId: Yup.array()
-            .nullable()
-            .min(0, 'Select at least one offer'),
+        // productOfferId: Yup.array()
+        //     .nullable()
+        //     .min(0, 'Select at least one offer'),
         description: Yup.string()
             .required('Description is required')
             .min(20, 'Description must be at least 20 characters'),
@@ -86,12 +86,14 @@ const AddProduct = () => {
             .required('Shipping details are required'),
         returnPolicy: Yup.string()
             .required('Return/Exchange policy is required'),
+        manufacturingDetails: Yup.string()
+            .required('Manufacturing Details is required'),
         colorName: Yup.array()
             .min(1, 'At least one color must be selected'),
         images: Yup.array()
             .min(1, 'At least one image must be uploaded')
             .max(5, 'Maximum 5 images allowed'),
-        details: Yup.array().of(
+        specifications: Yup.array().of(
             Yup.object().shape({
                 key: Yup.string().required('Key is required'),
                 value: Yup.string().required('Value is required')
@@ -109,31 +111,76 @@ const AddProduct = () => {
         size: '',
         unitId: '',
         shortDescription: '',
-        stockStatus: '',
         originalPrice: '',
         discountPrice: '',
-        productOfferId: [],
+        colorName: [],
+        images: [],
+        // productOfferId: [],
         description: '',
         manufacturingDetails: '',
         shipping: '',
         returnPolicy: '',
-        details: [{ key: '', value: '' }]
+        specifications: [{ key: '', value: '' }]
     };
 
     // Form submission handler
-    const handleSubmit = (values, { setSubmitting }) => {
-        const formData = {
-            ...values,
-            colors,
-            images: selectedImages
-        };
-        console.log('Form submitted with:', formData);
-        setSubmitting(false);
-        setisedit(false);
-    };
+    const handleSubmit = async (values, { setSubmitting }) => {
+        // console.log("ardjedsfnkdermgj");
 
-    const handleOfferChange = (selectedOptions) => {
-        setSelectedOffers(selectedOptions);
+        // console.log("value", values);
+        // const formData = {
+        //     ...values,
+        //     images: selectedImages
+        // };
+
+        // console.log('Form submitted with:', formData);
+        try {
+            const response = await axios.post(`${BaseUrl}/api/createProduct`, {
+                mainCategoryId: values.mainCategoryId,
+                categoryId: values.categoryId,
+                subCategoryId: values.subCategoryId,
+                productName: values.productName
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("Resposne", response.data.product);
+
+            const formData = new FormData();
+            values.images.forEach((image) => {
+                formData.append("images", image.file);
+            });
+    
+            formData.append("productId", response.data.product._id);
+            formData.append("sizeNameId", values.sizeNameId);
+            formData.append("size", values.size);
+            formData.append("unitId", values.unitId);
+            formData.append("shortDescription", values.shortDescription);
+            formData.append("originalPrice", values.originalPrice);
+            formData.append("discountPrice", values.discountPrice);
+            formData.append("colorName", values.colorName);
+            formData.append("description", values.description);
+            formData.append("shipping", values.shipping);
+            formData.append("returnPolicy", values.returnPolicy);
+            formData.append("manufacturingDetails", values.manufacturingDetails);
+            formData.append("specifications", JSON.stringify(values.specifications));
+    
+            const proResponse = await axios.post(`${BaseUrl}/api/createProductVariant`, formData, {
+                headers: { 
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+    
+            // console.log("proresponse", proResponse.data);
+            if(proResponse.data.status === 200){
+                navigate('/product');
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+        // setSubmitting(false);
+        setisedit(false);
+        setEditSize(false);
     };
 
     // Color picker handlers
@@ -150,32 +197,42 @@ const AddProduct = () => {
         setDisplayColorPicker(!displayColorPicker);
     };
 
-    const addColor = () => {
+    const addColor = (setFieldValue) => {
         if (!colors.includes(currentColor)) {
-            setColors([...colors, currentColor]);
+            const updatedColors = [...colors, currentColor];
+            setColors(updatedColors);
+            setFieldValue('colorName', updatedColors);
         }
         setDisplayColorPicker(false);
     };
 
-    const removeColor = (colorToRemove) => {
-        setColors(colors.filter(color => color !== colorToRemove));
+    const removeColor = (colorToRemove, setFieldValue) => {
+        const updatedColors = colors.filter(color => color !== colorToRemove);
+        setColors(updatedColors);
+        setFieldValue('colorName', updatedColors);
     };
 
     // Image handlers
-    const handleImageSelect = (event) => {
+    const handleImageSelect = (event, setFieldValue) => {
         const files = Array.from(event.target.files);
         const newImages = files.map(file => ({
             file: file,
             name: file.name,
             preview: URL.createObjectURL(file)
         }));
-        setSelectedImages(prevImages => [...prevImages, ...newImages]);
+        const updatedImages = [...selectedImages, ...newImages];
+        setSelectedImages(updatedImages);
+
+        setFieldValue('images', updatedImages);
     };
 
-    const removeImage = (index) => {
+    const removeImage = (index, setFieldValue) => {
         setSelectedImages(prevImages => {
+            const updatedImages = prevImages.filter((_, i) => i !== index);
             URL.revokeObjectURL(prevImages[index].preview);
-            return prevImages.filter((_, i) => i !== index);
+
+            setFieldValue('images', updatedImages);
+            return updatedImages;
         });
     };
 
@@ -183,18 +240,8 @@ const AddProduct = () => {
         return () => {
             selectedImages.forEach(image => URL.revokeObjectURL(image.preview));
         };
-          // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const handleAddMore = () => {
-        setDetails([...details, { key: '', value: '' }]);
-    };
-
-    const handleDetailChange = (index, field, value) => {
-        const newDetails = [...details];
-        newDetails[index][field] = value;
-        setDetails(newDetails);
-    };
 
     const fetchMainCategory = async () => {
         try {
@@ -229,6 +276,36 @@ const AddProduct = () => {
             console.error('Data Fetching Error:', error);
         }
     }
+    const fetchSize = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSizes`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("REsponse",response.data.sizes);
+            setSize(response.data.sizes);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    const fetchUnit = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allUnits`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response",response.data.unit);
+            setUnit(response.data.unit);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        fetchSize();
+        fetchUnit();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleMainCategoryChange = (event, setFieldValue) => {
         const mainCategoryId = event.target.value;
@@ -266,25 +343,19 @@ const AddProduct = () => {
         );
         setFilteredSizes(subCategorySpecificSizes);
     };
-    const fetchSize = async () => {
-        try {
-            const response = await axios.get(`${BaseUrl}/api/allSizes`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // console.log("REsponse",response.data.sizes);
-            setSize(response.data.sizes);
-        } catch (error) {
-            console.error('Data Fetching Error:', error);
-        }
-    }
-    useEffect(() => {
-        fetchMainCategory();
-        fetchCategory();
-        fetchSubCategory();
-        fetchSize();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
+    const handleSizeNameChange = (event, setFieldValue) => {
+        const sizeNameId = event.target.value;
+        setFieldValue('sizeNameId', sizeNameId);
+
+        const selectedSizeItem = filteredSizes.find(item => item._id === sizeNameId);
+
+        if (selectedSizeItem) {
+            setFieldValue('size', selectedSizeItem.size);
+        } else {
+            setFieldValue('size', '');
+        }
+    };
     return (
         <>
             <div>
@@ -380,10 +451,11 @@ const AddProduct = () => {
                                                         <label className='mv_label_input'>Size Name</label>
                                                         <Form.Select
                                                             name='sizeNameId'
+                                                            value={values.sizeNameId}
+                                                            onChange={(e) => handleSizeNameChange(e, setFieldValue)}
+                                                            disabled={!values.subCategoryId}
                                                             className='mv_form_select'>
                                                             <option>Select</option>
-                                                            {console.log("filteredSizes",filteredSizes)}
-                                                            
                                                             {filteredSizes.map((item) => (
                                                                 <option value={item._id} key={item._id}>{item.sizeName}</option>
                                                             ))}
@@ -400,10 +472,7 @@ const AddProduct = () => {
                                                                 value={values.size}
                                                                 onChange={handleChange}
                                                                 placeholder="Enter size"
-                                                                 />
-                                                                 {filteredSizes.map((item) => (
-                                                                    <option value={item._id} key={item._id}>{item.size}</option>
-                                                                ))}
+                                                            />
                                                         </Form.Group>
                                                         <ErrorMessage name="size" component="small" className="text-danger" />
                                                     </div>
@@ -415,13 +484,11 @@ const AddProduct = () => {
                                                             name='unitId'
                                                             value={values.unitId}
                                                             onChange={handleChange}
-                                                            aria-label="Default select example"
                                                             className='mv_form_select'>
                                                             <option value="">Select</option>
-                                                            <option value="gm">gm</option>
-                                                            <option value="ltr">ltr</option>
-                                                            <option value="ml">ml</option>
-                                                            <option value="GB">GB</option>
+                                                            {unit.map((unit) => (
+                                                                <option value={unit._id} key={unit._id}>{unit.name}</option>
+                                                            ))}
                                                         </Form.Select>
                                                         <ErrorMessage name="unitId" component="small" className="text-danger" />
                                                     </div>
@@ -440,24 +507,7 @@ const AddProduct = () => {
                                                         <ErrorMessage name="shortDescription" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
-                                                <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
-                                                    <div className="mv_input_content mb-3">
-                                                        <label className='mv_label_input'>Stock Status</label>
-                                                        <Form.Select
-                                                            aria-label="Default select example"
-                                                            className='mv_form_select '
-                                                            name='stockStatus'
-                                                            value={values.stockStatus}
-                                                            onChange={handleChange}>
-                                                            <option>Select</option>
-                                                            <option value="In Stock">In Stock</option>
-                                                            <option value="Low Stock">Low Stock</option>
-                                                            <option value="Out of Stock">Out of Stock</option>
-                                                        </Form.Select>
-                                                        <ErrorMessage name="stockStatus" component="small" className="text-danger" />
-                                                    </div>
-                                                </div>
-                                                <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                                <div className="col-md-6 col-sm-6">
                                                     <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Price</label>
                                                         <InputGroup className="">
@@ -471,7 +521,7 @@ const AddProduct = () => {
                                                         <ErrorMessage name="originalPrice" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
-                                                <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                                <div className=" col-md-6 col-sm-6">
                                                     <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Discount Price</label>
                                                         <Form.Group className="">
@@ -484,7 +534,7 @@ const AddProduct = () => {
                                                         </Form.Group>
                                                     </div>
                                                 </div>
-                                                <div className="col-12 mb-3">
+                                                {/* <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Product Offer</label>
                                                         <Select
@@ -499,7 +549,7 @@ const AddProduct = () => {
                                                         />
                                                     </div>
                                                     <ErrorMessage name="productOfferId" component="small" className="text-danger" />
-                                                </div>
+                                                </div> */}
                                                 <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Colors</label>
@@ -522,7 +572,7 @@ const AddProduct = () => {
                                                                         <IoMdClose
                                                                             className="text-danger ms-1 cursor-pointer"
                                                                             style={{ cursor: 'pointer' }}
-                                                                            onClick={() => removeColor(color)}
+                                                                            onClick={() => removeColor(color, setFieldValue)}
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -552,7 +602,7 @@ const AddProduct = () => {
                                                                     <button
                                                                         className="btn btn-sm w-100 mt-2"
                                                                         style={{ backgroundColor: '#2B221E', color: 'white' }}
-                                                                        onClick={addColor}
+                                                                        onClick={() => addColor(setFieldValue)}
                                                                     >
                                                                         Add Color
                                                                     </button>
@@ -573,7 +623,7 @@ const AddProduct = () => {
                                                                         <div className="text-truncate " style={{ maxWidth: '100px' }}>
                                                                             {image.name}
                                                                         </div>
-                                                                        <IoMdClose style={{ color: '#ff0000' }} onClick={() => removeImage(index)} />
+                                                                        <IoMdClose style={{ color: '#ff0000' }} onClick={() => removeImage(index, setFieldValue)} />
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -584,11 +634,12 @@ const AddProduct = () => {
                                                                     className="d-none"
                                                                     multiple
                                                                     accept="image/*"
-                                                                    onChange={handleImageSelect}
+                                                                    name='images'
+                                                                    onChange={(e) => handleImageSelect(e, setFieldValue)}
                                                                 />
                                                                 <button
                                                                     className="btn btn-sm ms-auto"
-                                                                    style={{ backgroundColor: "#2B221E", color: 'white' }}
+                                                                    style={{ backgroundColor: "#2B221E", color: 'white', fontSize: '12px' }}
                                                                     onClick={() => fileInputRef.current.click()}
                                                                 >
                                                                     Browse
@@ -601,50 +652,58 @@ const AddProduct = () => {
                                                 <div className="col-12 mb-3">
                                                     <div className="d-flex">
                                                         <label className='mv_label_input'>More Details</label>
-                                                        <button className='border-0 bg-transparent sb_btn ms-auto' onClick={handleAddMore}>
-                                                            Add More
-                                                        </button>
+                                                        <FieldArray name="specifications">
+                                                            {({ push }) => (
+                                                                <button
+                                                                    type="button"
+                                                                    className='border-0 bg-transparent sb_btn ms-auto'
+                                                                    onClick={() => push({ key: '', value: '' })}
+                                                                >
+                                                                    Add More
+                                                                </button>
+                                                            )}
+                                                        </FieldArray>
                                                     </div>
-                                                    {details.map((detail, index) => (
+                                                    <FieldArray name="specifications">
                                                         <>
-                                                            <div className="row" key={index} >
-                                                                <div className="col-md-6 col-12">
-                                                                    <div className="mv_input_content mb-3">
-                                                                        <label className='mv_label_input'>Key</label>
-                                                                        <Form.Group className="">
-                                                                            <Form.Control
-                                                                                type="text"
-                                                                                placeholder="Key"
-                                                                                value={detail.key}
-                                                                                onChange={(e) => handleDetailChange(index, 'key', e.target.value)} />
-                                                                        </Form.Group>
+                                                            {values.specifications.map((specification, index) => (
+                                                                <div className="row" key={index}>
+                                                                    <div className="col-md-6 col-12">
+                                                                        <div className="mv_input_content mb-3">
+                                                                            <label className='mv_label_input'>Key</label>
+                                                                            <Form.Group className="">
+                                                                                <Form.Control
+                                                                                    type="text"
+                                                                                    placeholder="Key"
+                                                                                    name={`specifications.${index}.key`}
+                                                                                    value={values.specifications[index].key}
+                                                                                    onChange={handleChange}
+                                                                                />
+                                                                            </Form.Group>
+                                                                            <ErrorMessage name={`specifications.${index}.key`} component="small" className="text-danger" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-6 col-12">
+                                                                        <div className="mv_input_content mb-3">
+                                                                            <label className='mv_label_input'>Value</label>
+                                                                            <div className="d-flex">
+                                                                                <Form.Group className="flex-grow-1">
+                                                                                    <Form.Control
+                                                                                        type="text"
+                                                                                        placeholder="Value"
+                                                                                        name={`specifications.${index}.value`}
+                                                                                        value={values.specifications[index].value}
+                                                                                        onChange={handleChange}
+                                                                                    />
+                                                                                </Form.Group>
+                                                                            </div>
+                                                                            <ErrorMessage name={`specifications.${index}.value`} component="small" className="text-danger" />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <div className="col-md-6 col-12">
-                                                                    <div className="mv_input_content mb-3">
-                                                                        <label className='mv_label_input'>Value</label>
-                                                                        <Form.Group className="">
-                                                                            <Form.Control
-                                                                                type="text"
-                                                                                placeholder="Value"
-                                                                                value={detail.value}
-                                                                                onChange={(e) => handleDetailChange(index, 'value', e.target.value)} />
-                                                                        </Form.Group>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            {/* { index > 0 && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemove(index)}
-                                                                className="ml-2 p-1 text-red-500 hover:text-red-700"
-                                                            >
-                                                                <IoMdClose />
-                                                            </button>
-                                                        )} */}
+                                                            ))}
                                                         </>
-                                                    ))}
-
+                                                    </FieldArray>
                                                 </div>
                                                 <div className="col-md-6 col-sm-6">
                                                     <div className="mv_input_content mb-3">
@@ -665,9 +724,12 @@ const AddProduct = () => {
                                                         <label className='mv_label_input'>Manufacturing Details</label>
                                                         <Form.Group className="">
                                                             <Form.Control
-                                                                type=""
+                                                                name='manufacturingDetails'
+                                                                value={values.manufacturingDetails}
+                                                                onChange={handleChange}
                                                                 placeholder="Enter Manufacturing Details" />
                                                         </Form.Group>
+                                                        <ErrorMessage name="manufacturingDetails" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6 col-sm-6">
@@ -701,10 +763,10 @@ const AddProduct = () => {
                                                         <button className='border-0 bg-transparent'>
                                                             Cancel
                                                         </button>
-                                                        {editSize === true ? <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                        {editSize === true ? <button className='border-0 bg-transparent' >
                                                             Update
                                                         </button> :
-                                                            <button className='border-0 bg-transparent' onClick={change_edit}>
+                                                            <button className='border-0 bg-transparent' >
                                                                 Add
                                                             </button>
                                                         }

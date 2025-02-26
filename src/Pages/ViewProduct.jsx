@@ -1,34 +1,47 @@
-import React from 'react';
-import { Col, Row, Tab } from 'react-bootstrap';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const ViewProduct = () => {
 
-    const productData = {
-        mainCategory: "Women",
-        category: "Indian Wear",
-        subCategory: "Chaniya Choli",
-        productName: "Traditional Chaniya choli",
-        shortDescription: "Lorem ipsum dolor sit amet consectetur. Massa facilisis scelerisque iaculis habitant congue est blandit amet.",
-        gender: "Female",
-        size: "34, 36, 38, 40, 42, 44",
-        stockStatus: "In stock",
-        colors: ["#FF6B6B", "#4169E1", "#000000"],
-        qty: 60,
-        description: "Lorem ipsum dolor sit amet consectetur. Massa facilisis scelerisque iaculis habitant congue est blandit amet. Tortor in vulputate nulla vitae quam.Lorem ipsum dol amet consectetur. Massa",
-        price: "$12000",
-        discountPrice: "$120",
-        offerCode: "NEW201",
-        rating: 4.5,
-        brand: "Louis Vitton",
-        fabric: "Cotton Silk",
-        pattern: "Leheriya Print",
-        sleeveType: "Full Sleeve",
-        washCase: "Dry Clean Only",
-        work: "Cutdana, Sequence",
-        occasion: "Navratri",
-        countryOrigin: "India"
-    };
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const id = searchParams.get('id');
+    const productVariantId = searchParams.get('productVariantId');
 
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [product, setProduct] = useState({});
+    const [productVariant, setProductVariant] = useState({});
+
+
+    const fetchProduct = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getProduct/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("resposnse",response.data);
+            setProduct(response.data.product)
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    const fetchProductVariant = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getProductVariant/${productVariantId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            console.log("response", response.data.productVariant);
+            setProductVariant(response.data.productVariant);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchProduct();
+        fetchProductVariant();
+    }, []);
     return (
         <div className="container-fluid p-4">
             {/* Header */}
@@ -96,41 +109,42 @@ const ViewProduct = () => {
                 </div>
                 {/* Left Column */}
                 <div className="col-md-6 col-12 p-4">
-                    <InfoField label="Main Category" value={productData.mainCategory} />
-                    <InfoField label="Category" value={productData.category} />
-                    <InfoField label="Sub Category" value={productData.subCategory} />
-                    <InfoField label="Product Name" value={productData.productName} />
-                    <InfoField label="Gender" value={productData.gender} />
-                    <InfoField label="Size" value={productData.size} />
-                    <InfoField label="Stock status" value={productData.stockStatus} />
-                    <InfoField label="Short Description" value={productData.shortDescription} />
-                    <InfoField label="Description" value={productData.description} />
-                    <div className="flex items-center gap-2">
-                        <span className="font-medium">Color:</span>
-                        {productData.colors.map((color, index) => (
-                            <div
-                                key={index}
-                                className="w-6 h-6 rounded-full"
-                                style={{ backgroundColor: color }}
-                            />
-                        ))}
+                    <InfoField label="Main Category" value={product.mainCategory} />
+                    <InfoField label="Category" value={product.category} />
+                    <InfoField label="Sub Category" value={product.subCategory} />
+                    <InfoField label="Product Name" value={product.productName} />
+                    <InfoField label="Gender" value={product.gender || '-'} />
+                    <InfoField label="Size" value={productVariant.size} />
+                    <InfoField label="Stock status" value={product.stockStatus} />
+                    <InfoField label="Short Description" value={productVariant.shortDescription} />
+                    <InfoField label="Description" value={productVariant.description} />
+                    <div className="d-flex items-center gap-2">
+                        <span style={{ color: '#808080', fontWeight: 'bold' }}>Color:</span>
+                        {productVariant.colorName &&
+                            productVariant.colorName.split(',').map((color, index) => (
+                                <div
+                                    key={index}
+                                    style={{ backgroundColor: color, width: '24px', height: '24px', borderRadius:'50%' }}
+                                ></div>
+                            ))}
                     </div>
+
                 </div>
 
                 <div className="col-md-6 col-12 p-4">
-                    <InfoField label="Rating" value={`⭐ ${productData.rating}`} />
-                    <InfoField label="Brand" value={productData.brand} />
-                    <InfoField label="Fabric" value={productData.fabric} />
-                    <InfoField label="Pattern" value={productData.pattern} />
-                    <InfoField label="Sleeve Type" value={productData.sleeveType} />
-                    <InfoField label="Wash case" value={productData.washCase} />
-                    <InfoField label="Work" value={productData.work} />
-                    <InfoField label="Occasion" value={productData.occasion} />
-                    <InfoField label="Country Origin" value={productData.countryOrigin} />
-                    <InfoField label="QTY" value={productData.qty} />
-                    <InfoField label="Price" value={productData.price} />
-                    <InfoField label="Discount Price" value={productData.discountPrice} />
-                    <InfoField label="Offer code" value={productData.offerCode} />
+                    <InfoField label="Rating" value={`⭐ ${product.rating}` || '-'} />
+                    <InfoField label="Brand" value={productVariant.brand || '-'} />
+                    <InfoField label="Fabric" value={productVariant.fabric || '-'} />
+                    <InfoField label="Pattern" value={productVariant.pattern || '-'} />
+                    <InfoField label="Sleeve Type" value={productVariant.sleeveType || '-'} />
+                    <InfoField label="Wash case" value={productVariant.washCase || '-'} />
+                    <InfoField label="Work" value={productVariant.work || '-'} />
+                    <InfoField label="Occasion" value={productVariant.occasion || '-'} />
+                    <InfoField label="Country Origin" value={productVariant.countryOrigin || '-'} />
+                    <InfoField label="QTY" value={productVariant.qty || '-'} />
+                    <InfoField label="Price" value={productVariant.originalPrice || '-'} />
+                    <InfoField label="Discount Price" value={productVariant.discountPrice || '-'} />
+                    <InfoField label="Offer code" value={productVariant.offerCode || '-'} />
                 </div>
             </div>
         </div>
