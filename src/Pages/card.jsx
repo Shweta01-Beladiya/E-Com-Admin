@@ -13,85 +13,20 @@ const Cards = ({ editData }) => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
-   
-    var data = [
-    //     {   
-    //         id: 1,
-    //         img: "mobile.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 2,
-    //         img: "watch.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 3,
-    //         img: "book.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 4,
-    //         img: "mobile.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 5,
-    //         img: "book.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 6,
-    //         img: "mobile.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 7,
-    //         img: "book.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 8,
-    //         img: "mobile.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 9,
-    //         img: "book.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 10,
-    //         img: "watch.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    //     {   
-    //         id: 11,
-    //         img: "mobile.png",
-    //         title: "lorem ipsum",
-    //         subtitle: "Lorem ipsum",
-    //     },
-    ];
+
+    const [toggle, setToggle] = useState(false)
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedItem, setSelectedItem] = useState(null);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState([]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     console.log("totalpage",totalPages)
-    const [toggle, setToggle] = useState(false)
-
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -140,18 +75,8 @@ const Cards = ({ editData }) => {
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
 
-    // const [values, setValues] = useState({
-    //     name: "",
-    //     name1: ""
-    // });
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setValues({ ...values, [name]: value });
-    // };
-
     // Select img
-    let [addimg, setaddimg] = useState("");
+    const [addimg, setaddimg] = useState("");
 
     const [brandLogoPreview, setBrandLogoPreview] = useState(null);
     const [brandImagePreview, setBrandImagePreview] = useState(null);
@@ -177,7 +102,7 @@ const Cards = ({ editData }) => {
         addcardimage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
     });
     
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
+    const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
         onSubmit: async (values) => {
@@ -195,19 +120,18 @@ const Cards = ({ editData }) => {
             }
 
             //************************************** Edit and Add **************************************
-            if (editData) {
+            if (id) {
                 try {
-                    const response = await axios.put(`${BaseUrl}/api/updateCard/${editData._id}`, formData, {
+                    const response = await axios.put(`${BaseUrl}/api/updateCard/${id}`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "multipart/form-data"
                         }
                     });
                     console.log("Response:", response?.data);
-
-                    // window.location.href = "./popularbrands"
-                    // navigate("/popularbrands")
-
+                    setModalShow1(false);
+                    setToggle(!toggle); // Refresh data
+                    resetForm();
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");
@@ -222,17 +146,18 @@ const Cards = ({ editData }) => {
                         }
                     });
                     console.log("Response:", response?.data);
-
-                    // window.location.href = "./popularbrands"
-                    // navigate("/popularbrands")
-
+                    setModalShow1(false);
+                    setToggle(!toggle); // Refresh data
+                    resetForm();
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");
                 }
             }
         }
-    })
+    });
+    
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue, resetForm, setValues } = formik;
     // *******************************************************************************
 
     // ************************************** Show Data **************************************
@@ -244,17 +169,101 @@ const Cards = ({ editData }) => {
                     Authorization: `Bearer ${token}`,
                 }
               })
-            //   console.log("data" , response?.data?.popularBrand);
-            //   setFilteredData(response?.data?.popularBrand)
-            //   setData(response?.data?.popularBrand)/
+              console.log("data" , response?.data);
+              setFilteredData(response?.data?.card)
+              setData(response?.data?.card)
            }catch(error){
-              
+              console.error("Error fetching data:", error);
            }
        }
 
        fetchBrandData()
     },[toggle])
     // ***************************************************************************************
+
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+
+    const handleDelete = async () => {
+        try{
+           const response = await axios.delete(`${BaseUrl}/api/deleteCard/${deleteToggle}`,{
+               headers: {
+                   Authorization: `Bearer ${token}`,
+               }
+           })
+           console.log("delete response " , response);
+           setModalShow(false)
+           setToggle(!toggle)
+        }catch(error){
+            alert(error)
+        }
+    }
+    // ***************************************************************************************
+
+    // Edit
+    const handleEdit = (item) => {
+        setId(item._id);
+        setSelectedItem(item);
+        console.log("item" , item?.cardImage.split("\\").pop());
+        
+        // Set form values with the selected item data
+        setValues({
+            title: item.title || "",
+            subTitle: item.subTitle || "",
+            addcardimage: ""  // Don't set the file input
+        });
+        
+        // Set image preview
+        if(item.cardImage) {
+            let fileimg = item.cardImage.split("\\").pop();
+            setBrandImagePreview(`${BaseUrl}/${item.cardImage}`);
+            setaddimg(fileimg.substring(fileimg.indexOf('-') + 1)); // Show some text to indicate there's an existing image
+        } else {
+            setBrandImagePreview(null);
+            setaddimg("");
+        }
+        
+        setModalShow1(true);
+    };
+
+    // Add new - reset form
+    const handleAddNew = () => {
+        setId(null);
+        setSelectedItem(null);
+        resetForm();
+        setBrandImagePreview(null);
+        setaddimg("");
+        setModalShow1(true);
+    };
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("" , result);
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.subTitle?.includes(searchTerm)
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1);
+    }, [data, searchTerm]);
+
+    // Reset form when modal closes
+    const handleModalClose = () => {
+        setModalShow1(false);
+        setId(null);
+        setSelectedItem(null);
+        resetForm();
+        setBrandImagePreview(null);
+        setaddimg("");
+    };
 
     return (
         <>
@@ -276,14 +285,14 @@ const Cards = ({ editData }) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
                                 <div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>
+                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={handleAddNew}>
                                             <button><Link>+ Add</Link></button>
                                         </div>
                                     </div>
@@ -303,19 +312,18 @@ const Cards = ({ editData }) => {
                                     <tbody>
                                         {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
+                                            <td>{index + 1}</td>
                                             <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.img}`)}  alt="" />
+                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.cardImage }`}  alt="" />
+                                                {/* <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.img}`)}  alt="" /> */}
                                             </td>
                                             <td>{item.title}</td>
-                                            <td>{item.subtitle}</td>
+                                            <td>{item.subTitle}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
+                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -331,7 +339,7 @@ const Cards = ({ editData }) => {
                                     </p>
                                     {getPaginationButtons().map((page, index) => (
                                         <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
+                                            onClick={() => typeof page === 'number' ? handlePageChange(page) : null}>
                                             {page}
                                         </p>
                                     ))}
@@ -355,14 +363,14 @@ const Cards = ({ editData }) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
 
             {/* Add Edit Cards Modal */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1} onHide={handleModalClose} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -370,7 +378,7 @@ const Cards = ({ editData }) => {
                     {id ? 'Edit Cards' : 'Add Cards'}
                 </Modal.Title>
                 <Modal.Body className='mv_edit_profile_model_padd'>
-                    <form onSubmit={handleSubmit} enctype="multipart/form-data">
+                    <form onSubmit={handleSubmit} encType="multipart/form-data">
                         <div className="mv_input_content mb-3">
                             <label className='mv_label_input'>Title</label>
                             <InputGroup className="">
@@ -421,7 +429,6 @@ const Cards = ({ editData }) => {
                                                 setFieldValue("addcardimage", file);
                                                 setBrandImagePreview(URL.createObjectURL(file));
                                             }
-                                            setToggle(true)
                                         }}
                                     />
                                 </label>
@@ -431,7 +438,7 @@ const Cards = ({ editData }) => {
                                 <div className="mt-2">
                                     <img
                                         className='mv_update_img'
-                                        src={`${toggle ? `${brandImagePreview}` : `${BaseUrl}/${brandLogoPreview}`}`}
+                                        src={brandImagePreview}
                                         alt="Brand Image Preview"
                                         style={{
                                             maxWidth: '20px',
@@ -447,7 +454,7 @@ const Cards = ({ editData }) => {
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={handleModalClose}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">
@@ -463,4 +470,4 @@ const Cards = ({ editData }) => {
     );
 };
 
-export default Cards
+export default Cards;

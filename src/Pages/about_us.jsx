@@ -6,83 +6,25 @@ import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-i
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
+import axios from 'axios';
 import * as Yup from 'yup';
 
-const Aboutus = (props) => {
-   
-    var data = [
-        {   
-            id: 1,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 2,
-            img: "watch.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 3,
-            img: "book.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 4,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 5,
-            img: "book.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 6,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 7,
-            img: "book.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 8,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 9,
-            img: "book.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 10,
-            img: "watch.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 11,
-            img: "mobile.png",
-            title: "lorem ipsum",
-            description: "Lorem ipsum dolor sit amet consectetur",
-        },
-    ];
+const Aboutus = ({ editData }) => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [toggle, setToggle] = useState(false)
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentEditItem, setCurrentEditItem] = useState(null);
+    
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState([]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     console.log("totalpage",totalPages)
@@ -134,18 +76,17 @@ const Aboutus = (props) => {
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
 
-    // const [values, setValues] = useState({
-    //     name: "",
-    //     name1: ""
-    // });
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setValues({ ...values, [name]: value });
-    // };
-
     // Select img
     let [addimg, setaddimg] = useState("");
+
+    const [brandLogoPreview, setBrandLogoPreview] = useState(null);
+    const [brandImagePreview, setBrandImagePreview] = useState(null);
+
+    useEffect(() => {
+        if (editData) {
+            setBrandImagePreview(editData.aboutUsImage);
+        }
+    }, [editData]);
 
     // ******************************* Validation *******************************
     const [id, setId] = useState(null);
@@ -159,18 +100,168 @@ const Aboutus = (props) => {
     const validate = Yup.object().shape({
         title: Yup.string().required("Title is required"),
         description: Yup.string().required("Description is required"),
-        addaboutimage: Yup.string().required("Image is required")
+        addaboutimage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
     });
     
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
+    const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
-            // aboutus(values)
+
+            const formData = new FormData();
+            formData.append("title", values.title);
+            formData.append("description", values.description);
+
+            if (values.addaboutimage) {
+                formData.append("aboutUsImage", values.addaboutimage);
+            }
+
+            //************************************** Edit and Add **************************************
+            if (id) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateAboutUs/${id}`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createAboutUs`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
     });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue, resetForm, setValues } = formik;
     // *******************************************************************************
+
+    // ************************************** Show Data **************************************
+    useEffect(()=>{
+        const fetchBrandData = async () => {
+            try{
+               const response = await axios.get(`${BaseUrl}/api/allAboutUs`,{
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 }
+               })
+               console.log("data" , response?.data);
+               setFilteredData(response?.data?.aboutUs)
+               setData(response?.data?.aboutUs)
+            }catch(error){
+               console.error("Error fetching data:", error);
+            }
+        }
+ 
+        fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
+ 
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+ 
+    const handleDelete = async () => {
+        try{
+            const response = await axios.delete(`${BaseUrl}/api/deleteAboutUs/${deleteToggle}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            console.log("delete response " , response);
+            setModalShow(false)
+            setToggle(!toggle)
+        }catch(error){
+            alert(error)
+        }
+     }
+    // ***************************************************************************************
+
+    // Edit
+    const handleEdit = (item) => {
+        setId(item._id);
+        setCurrentEditItem(item);
+        console.log("item" , item?.aboutUsImage.split("\\").pop());
+        
+        // Set form values with the selected item data
+        setValues({
+            title: item.title || "",
+            description: item.description || "",
+            addaboutimage: ""  // Don't set the file input
+        });
+        
+        // Set image preview
+        if(item.aboutUsImage) {
+            let fileimg = item.aboutUsImage.split("\\").pop();
+            setBrandImagePreview(`${BaseUrl}/${item.aboutUsImage}`);
+            setaddimg(fileimg.substring(fileimg.indexOf('-') + 1)); // Show some text to indicate there's an existing image
+        } else {
+            setBrandImagePreview(null);
+            setaddimg("");
+        }
+        
+        setModalShow1(true);
+    };
+
+    // Add new item
+    const handleAddNew = () => {
+        setId(null);
+        setCurrentEditItem(null);
+        resetForm();
+        setaddimg("");
+        setBrandImagePreview(null);
+        setModalShow1(true);
+    };
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("" , result);
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.description?.includes(searchTerm)
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1);
+    }, [data, searchTerm]);
+
+    // Reset form when modal closes
+    const handleCloseModal = () => {
+        setModalShow1(false);
+        setId(null);
+        setCurrentEditItem(null);
+        resetForm();
+        setBrandImagePreview(null);
+        setaddimg("");
+    };
 
     return (
         <>
@@ -192,8 +283,8 @@ const Aboutus = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -202,7 +293,7 @@ const Aboutus = (props) => {
                                         <div className="mv_column_button">
                                             <Link to="/viewaboutus"><button>View</button></Link>
                                         </div>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>
+                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={handleAddNew}>
                                             <button><Link>+ Add</Link></button>
                                         </div>
                                     </div>
@@ -222,19 +313,17 @@ const Aboutus = (props) => {
                                     <tbody>
                                         {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
+                                            <td>{index + 1}</td>
                                             <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.img}`)}  alt="" />
+                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.aboutUsImage}`}  alt="" />
                                             </td>
                                             <td>{item.title}</td>
                                             <td>{item.description}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
-                                                    <Link>
+                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -250,7 +339,7 @@ const Aboutus = (props) => {
                                     </p>
                                     {getPaginationButtons().map((page, index) => (
                                         <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
+                                            onClick={() => typeof page === 'number' ? handlePageChange(page) : null}>
                                             {page}
                                         </p>
                                     ))}
@@ -274,14 +363,14 @@ const Aboutus = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
 
             {/* Add Edit About Us Modal */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -337,16 +426,38 @@ const Aboutus = (props) => {
                                             if (file) {
                                                 setaddimg(file.name);
                                                 setFieldValue("addaboutimage", file);
+                                                setBrandImagePreview(URL.createObjectURL(file));
                                             }
                                         }}
                                     />
                                 </label>
                             </InputGroup>
                             {errors.addaboutimage && touched.addaboutimage && <div className="text-danger small">{errors.addaboutimage}</div>}
+                            {brandImagePreview && (
+                                <div className="mt-2">
+                                    <img
+                                        className='mv_update_img'
+                                        src={typeof brandImagePreview === 'string' && brandImagePreview.startsWith('http') 
+                                            ? brandImagePreview 
+                                            : `${typeof brandImagePreview === 'string' && !brandImagePreview.startsWith('blob:') 
+                                                ? `${BaseUrl}/${brandImagePreview}` 
+                                                : brandImagePreview}`}
+                                        alt="Brand Image Preview"
+                                        style={{
+                                            maxWidth: '20px',
+                                            maxHeight: '20px',
+                                            objectFit: 'contain',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px',
+                                            padding: '2px'
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={handleCloseModal}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">
@@ -361,4 +472,4 @@ const Aboutus = (props) => {
     );
 };
 
-export default Aboutus
+export default Aboutus;
