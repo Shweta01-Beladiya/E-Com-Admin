@@ -32,7 +32,7 @@ const ViewProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getProductVariant/${productVariantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("response", response.data.productVariant); 
+            console.log("response", response.data.productVariant); 
             setProductVariant(response.data.productVariant);
         } catch (error) {
             console.error('Data Fetching Error:', error);
@@ -66,7 +66,7 @@ const ViewProduct = () => {
                                 productVariant.images.map((image, index) => (
                                     <div key={index} className="col-3">
                                         <img
-                                            src={`${BaseUrl}/${image}`}
+                                            src={`${BaseUrl}/${image.replace('\\', '/')}`}
                                             alt={`Product view ${index + 1}`}
                                             className="img-fluid rounded"
                                         />
@@ -97,18 +97,18 @@ const ViewProduct = () => {
                     <InfoField label="Gender" value={product.gender || '-'} />
                     <InfoField label="Size" value={productVariant.size} />
                     <InfoField label="Stock status" value={product.stockStatus} />
-                    <InfoField label="QTY" value={productVariant.specifications?.find(spec => spec.key === 'QTY')?.value || '-'} />
+                    <InfoField label="QTY" value={productVariant.specifications?.QTY || '-'} />
                     <InfoField label="Description" value={productVariant.description} />
                     <InfoField label="Price" value={productVariant.originalPrice || '-'} />
                     <InfoField label="Discount Price" value={productVariant.discountPrice || '-'} />
                     <InfoField label="Offer code" value={productVariant.offerCode || '-'} />
                     <div className="d-flex items-center gap-2">
-                        <span style={{ color: '#808080', fontWeight: 'bold' }}>Color:</span>
+                        <span style={{ color: '#808080', fontWeight: 'bold' }}>Color :</span>
                         {productVariant.colorName &&
                             productVariant.colorName.split(',').map((color, index) => (
                                 <div
                                     key={index}
-                                    style={{ backgroundColor: color, width: '24px', height: '24px', borderRadius: '50%' }}
+                                    style={{ backgroundColor: color, width: '20px', height: '20px', borderRadius: '50%' }}
                                 ></div>
                             ))}
                     </div>
@@ -118,15 +118,15 @@ const ViewProduct = () => {
                 <div className="col-md-6 col-12 p-4">
                     <InfoField label="Rating" value={`⭐ ${product.rating}` || '-'} />
                     <InfoField label="Unit" value={productVariant.unitId} />
-                    <InfoField label="Brand" value={productVariant.specifications?.find(spec => spec.key === 'Brand')?.value || '-'} />
-                    <InfoField label="Fabric" value={productVariant.specifications?.find(spec => spec.key === 'Fabric')?.value || '-'} />
-                    <InfoField label="Pattern" value={productVariant.specifications?.find(spec => spec.key === 'Pattern')?.value || '-'} />
-                    <InfoField label="Sleeve Type" value={productVariant.specifications?.find(spec => spec.key === 'Sleeve Type')?.value || '-'} />
-                    <InfoField label="Wash case" value={productVariant.specifications?.find(spec => spec.key === 'washCase')?.value || '-'} />
-                    <InfoField label="Work" value={productVariant.specifications?.find(spec => spec.key === 'Work')?.value || '-'} />
-                    <InfoField label="Occasion" value={productVariant.specifications?.find(spec => spec.key === 'Occasion')?.value || '-'} />
-                    <InfoField label="Country Origin" value={productVariant.specifications?.find(spec => spec.key === 'Country Origin')?.value || '-'} />
-                    <InfoField label="Warning" value={productVariant.specifications?.find(spec => spec.key === 'Warning')?.value || '-'} />
+                    <InfoField label="Brand" value={productVariant.specifications?.Brand || '-'} />
+                    <InfoField label="Fabric" value={productVariant.specifications?.Fabric || '-'} />
+                    <InfoField label="Pattern" value={productVariant.specifications?.Pattern || '-'} />
+                    <InfoField label="Sleeve Type" value={productVariant.specifications?.SleeveType || '-'} />
+                    <InfoField label="Wash case" value={productVariant.specifications?.washCase || '-'} />
+                    <InfoField label="Work" value={productVariant.specifications?.Work || '-'} />
+                    <InfoField label="Occasion" value={productVariant.specifications?.Occasion || '-'} />
+                    <InfoField label="Country Origin" value={productVariant.specifications?.CountryOrigin || '-'} />
+                    <InfoField label="Warning" value={productVariant.specifications?.Warning || '-'} />
                     <InfoField label="Manufacturing Details" value={productVariant.manufacturingDetails || '-'} />
                     <InfoField label="Shipping" value={productVariant.shiping || '-'} />
                     <InfoField label="Return / exchange Policy" value={productVariant.returnPolicy || '-'} />
@@ -138,7 +138,7 @@ const ViewProduct = () => {
 const InfoField = ({ label, value }) => (
     <table style={{ width: '100%' }}>
         <tr style={{ width: '50%' }}>
-            <td style={{ width: '50%', padding: '5px 0', color: 'gray', fontWeight: 'bold' }}>{label}: </td>
+            <td style={{ width: '50%', padding: '5px 0', color: 'gray', fontWeight: 'bold' }}>{label} : </td>
             <td className="text-gray-600" style={{ width: '50%', padding: '5px 0', fontWeight: "bold" }}>{value}</td>
         </tr>
     </table>

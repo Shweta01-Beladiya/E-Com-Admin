@@ -7,7 +7,7 @@ import { IoMdClose } from "react-icons/io";
 import { Formik, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const AddProduct = () => {
 
@@ -36,7 +36,6 @@ const AddProduct = () => {
     const [size, setSize] = useState([]);
     const [filteredSizes, setFilteredSizes] = useState([]);
     const [unit, setUnit] = useState([]);
-    const [existingImages, setExistingImages] = useState([]);
     // const options = [
     //     { value: 'New100', label: 'NEW100' },
     //     { value: 'New200', label: 'NEW200' },
@@ -170,7 +169,6 @@ const AddProduct = () => {
                             existingPath: img
                         }));
                         setSelectedImages(imageObjects);
-                        setExistingImages(imageObjects);
                     }
                     console.log("productName", product.productName);
 
@@ -192,8 +190,8 @@ const AddProduct = () => {
                         manufacturingDetails: variant.manufacturingDetails || '',
                         shiping: variant.shiping || '',
                         returnPolicy: variant.returnPolicy || '',
-                        specifications: variant.specifications && variant.specifications.length > 0
-                            ? variant.specifications
+                        specifications: variant.specifications
+                            ? Object.entries(variant.specifications).map(([key, value]) => ({ key, value }))
                             : [{ key: '', value: '' }]
                     };
                     console.log("initialData", initialData);
@@ -210,7 +208,7 @@ const AddProduct = () => {
         try {
             if (id) {
                 // Update existing product
-                 await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
+                await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
                     mainCategoryId: values.mainCategoryId,
                     categoryId: values.categoryId,
                     subCategoryId: values.subCategoryId,
@@ -227,21 +225,27 @@ const AddProduct = () => {
 
                 const formData = new FormData();
 
-                // Add only new images that have actual file objects
-                existingImages.forEach((image) => {
-                    if (image.existingPath) {
-                        formData.append("images", image.existingPath);
-                    }
-                });
-        
-                // Add only new images that have actual file objects
                 values.images.forEach((image) => {
                     if (image.file) {
-                        formData.append("images", image.file);
+                        formData.append("images", image.file); 
                     }
                 });
                 
-                formData.append("existingImages", JSON.stringify(existingImages));
+                values.images.forEach((image) => {
+                    if (image.existingPath) {
+                        formData.append("images", image.existingPath || image.file); 
+                    }
+                });
+                
+
+
+                const specObject = {};
+                values.specifications.forEach(spec => {
+                    if (spec.key && spec.value) {
+                        specObject[spec.key] = spec.value;
+                    }
+                });
+
                 formData.append("productId", id);
                 formData.append("variantId", variantId);
                 formData.append("sizeNameId", values.sizeNameId);
@@ -250,14 +254,19 @@ const AddProduct = () => {
                 formData.append("shortDescription", values.shortDescription);
                 formData.append("originalPrice", values.originalPrice);
                 formData.append("discountPrice", values.discountPrice || '');
-                formData.append("colorName", Array.isArray(values.colorName) 
-                ? values.colorName.join(',') 
-                : (typeof values.colorName === 'string' ? values.colorName : String(values.colorName)));
+                formData.append("colorName", Array.isArray(values.colorName)
+                    ? values.colorName.join(',')
+                    : (typeof values.colorName === 'string' ? values.colorName : String(values.colorName)));
                 formData.append("description", values.description);
                 formData.append("shiping", values.shiping);
                 formData.append("returnPolicy", values.returnPolicy);
                 formData.append("manufacturingDetails", values.manufacturingDetails);
-                formData.append("specifications", JSON.stringify(values.specifications));
+                Object.entries(specObject).forEach(([key, value]) => {
+                    formData.append(`specifications[${key}]`, value);
+                });
+
+
+                // console.log("fromDarta",formData);
 
                 const variantResponse = await axios.put(`${BaseUrl}/api/updateProductVariant/${variantId}`, formData, {
                     headers: {
@@ -267,7 +276,7 @@ const AddProduct = () => {
                 });
 
                 if (variantResponse.data.status === 200) {
-                    navigate('/product');
+                    // navigate('/product');
                 }
             } else {
                 // Create new product logic remains the same
@@ -284,7 +293,12 @@ const AddProduct = () => {
                 values.images.forEach((image) => {
                     formData.append("images", image.file);
                 });
-
+                const specObject = {};
+                values.specifications.forEach(spec => {
+                    if (spec.key && spec.value) {
+                        specObject[spec.key] = spec.value;
+                    }
+                });
                 formData.append("productId", response.data.product._id);
                 formData.append("sizeNameId", values.sizeNameId);
                 formData.append("size", values.size);
@@ -292,14 +306,14 @@ const AddProduct = () => {
                 formData.append("shortDescription", values.shortDescription);
                 formData.append("originalPrice", values.originalPrice);
                 formData.append("discountPrice", values.discountPrice || '');
-                formData.append("colorName", typeof values.colorName === 'string' 
-                    ? values.colorName 
+                formData.append("colorName", typeof values.colorName === 'string'
+                    ? values.colorName
                     : (Array.isArray(values.colorName) ? values.colorName.join(',') : values.colorName.toString()));
                 formData.append("description", values.description);
                 formData.append("shiping", values.shiping);
                 formData.append("returnPolicy", values.returnPolicy);
                 formData.append("manufacturingDetails", values.manufacturingDetails);
-                formData.append("specifications", JSON.stringify(values.specifications));
+                formData.append("specifications", JSON.stringify(specObject));
 
                 const proResponse = await axios.post(`${BaseUrl}/api/createProductVariant`, formData, {
                     headers: {
@@ -350,21 +364,27 @@ const AddProduct = () => {
     // Image handlers
     const handleImageSelect = (event, setFieldValue) => {
         const files = Array.from(event.target.files);
+
         const newImages = files.map(file => ({
             file: file,
             name: file.name,
             preview: URL.createObjectURL(file)
         }));
-        const updatedImages = [...selectedImages, ...newImages];
-        setSelectedImages(updatedImages);
 
+        const updatedImages = [...selectedImages, ...newImages];
+
+        setSelectedImages(updatedImages);
         setFieldValue('images', updatedImages);
     };
+
 
     const removeImage = (index, setFieldValue) => {
         setSelectedImages(prevImages => {
             const updatedImages = prevImages.filter((_, i) => i !== index);
-            URL.revokeObjectURL(prevImages[index].preview);
+
+            if (prevImages[index].preview && !prevImages[index].existingPath) {
+                URL.revokeObjectURL(prevImages[index].preview);
+            }
 
             setFieldValue('images', updatedImages);
             return updatedImages;
@@ -810,7 +830,10 @@ const AddProduct = () => {
                                                                 <button
                                                                     className="btn btn-sm ms-auto"
                                                                     style={{ backgroundColor: "#2B221E", color: 'white', fontSize: '12px' }}
-                                                                    onClick={() => fileInputRef.current.click()}
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        fileInputRef.current.click();
+                                                                    }}
                                                                 >
                                                                     Browse
                                                                 </button>
@@ -930,7 +953,8 @@ const AddProduct = () => {
                                                 <div className='text-center mt-5'>
                                                     <div className="mv_edit_profile">
                                                         <button className='border-0 bg-transparent'>
-                                                            Cancel
+                                                            <Link to={'/product'} style={{ color: '#2B221E', textDecoration: 'none' }}>Cancel
+                                                            </Link>
                                                         </button>
                                                         {id ? <button className='border-0 bg-transparent' >
                                                             Update

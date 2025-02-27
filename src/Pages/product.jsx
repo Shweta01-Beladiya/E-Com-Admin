@@ -23,64 +23,52 @@ const Product = () => {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     // Filter states
-    const [searchQuery, setSearchQuery] = useState('');
     const [selectedMainCategory, setSelectedMainCategory] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedStockStatus, setSelectedStockStatus] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const [priceRange, setPriceRange] = useState([0, 300]);
     const [deleteToProduct, setDeleteToProduct] = useState('');
+    const [selectedStockStatus, setSelectedStockStatus] = useState('');
 
     // Apply filters
     const applyFilters = () => {
         let filtered = data;
-
-        // Search filter
-        if (searchQuery) {
+    
+        // 🔍 Search by Product Name
+        if (searchQuery.trim() !== '') {
             filtered = filtered.filter(item =>
-                item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.price.includes(searchQuery)
+                item.productName.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
-
-        // Main Category filter
+    
+        // 🏷️ Filter by Main Category
         if (selectedMainCategory) {
-            filtered = filtered.filter(item =>
-                item.category.toLowerCase() === selectedMainCategory.toLowerCase()
-            );
+            filtered = filtered.filter(item => item.mainCategoryId === selectedMainCategory);
         }
-
-        // Category filter
+    
+        // 📂 Filter by Category
         if (selectedCategory) {
-            filtered = filtered.filter(item =>
-                item.subcategory.toLowerCase() === selectedCategory.toLowerCase()
-            );
+            filtered = filtered.filter(item => item.categoryId === selectedCategory);
         }
-
-        // Stock Status filter
+    
+        // ✅ Filter by Stock Status
         if (selectedStockStatus) {
-            filtered = filtered.filter(item =>
-                item.stock === selectedStockStatus
-            );
+            filtered = filtered.filter(item => item.stockStatus === selectedStockStatus);
         }
-
-        // Price Range filter
-        filtered = filtered.filter(item => {
-            const price = parseFloat(item.price.replace('$', ''));
-            return price >= priceRange[0] && price <= priceRange[1];
-        });
-
+    
+        // 💰 Filter by Price Range
+        filtered = filtered.filter(item => 
+            item.price >= priceRange[0] && item.price <= priceRange[1]
+        );
+    
         setFilteredData(filtered);
         setCurrentPage(1);
     };
-
+    
     // Handle search input
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
     };
-
-    // Handle filter changes
     const handleMainCategoryChange = (e) => {
         setSelectedMainCategory(e.target.value);
     };
@@ -92,7 +80,6 @@ const Product = () => {
     const handleStockStatusChange = (e) => {
         setSelectedStockStatus(e.target.value);
     };
-
     const handleSliderChange = (newRange) => {
         setPriceRange(newRange);
     };
@@ -100,7 +87,7 @@ const Product = () => {
     useEffect(() => {
         applyFilters();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchQuery]);
+    }, [searchQuery, selectedMainCategory, selectedCategory, selectedStockStatus, priceRange, data]);
 
     const handleApplyFilters = () => {
         applyFilters();
@@ -109,12 +96,6 @@ const Product = () => {
 
     // Handle filter reset
     const handleResetFilters = () => {
-        setSelectedMainCategory('');
-        setSelectedCategory('');
-        setSelectedStockStatus('');
-        setPriceRange([0, 300]);
-        setSearchQuery('');
-        setFilteredData(data);
         setCurrentPage(1);
     };
 
@@ -166,18 +147,14 @@ const Product = () => {
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
-    const [id,setId] = useState(null);
+    const [id, setId] = useState(null);
+    const [category, setCategory] = useState([]);
+    const [mainCategory, setMainCategory] = useState([]);
     // offcanvas
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
-    // offcanvas price
-    // const [priceRange, setPriceRange] = useState([0, 300]);
-    // const handleSliderChange = (newRange) => {
-    //     setPriceRange(newRange);
-    // };
 
     const fetchData = async () => {
         try {
@@ -185,17 +162,43 @@ const Product = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // console.log("response", response.data.product);
-            setData(response.data.product)
+            setData(response.data.product);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
 
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("Response>>>>>>>",response.data.category);
+            setCategory(response.data.category);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("Response>>>>>>>",response.data.users);
+            setMainCategory(response.data.users);
         } catch (error) {
             console.error('Data Fetching Error:', error);
         }
     }
     useEffect(() => {
         fetchData();
+        fetchMainCategory();
+        fetchCategory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
     useEffect(() => {
-        setFilteredData(data); // Ensure filteredData updates when data changes
+        setFilteredData(data);
     }, [data]);
 
     const handleDelete = (id, product) => {
@@ -204,13 +207,13 @@ const Product = () => {
         setId(id);
     }
 
-    const handleDeleteProduct = async() => {
+    const handleDeleteProduct = async () => {
         try {
             const response = await axios.delete(`${BaseUrl}/api/deleteProduct/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response",response);
-            if(response.data.status === 200) {
+            console.log("response", response);
+            if (response.data.status === 200) {
                 setData(preData => preData.filter(product => product._id !== id));
                 setModalShow(false);
             }
@@ -218,6 +221,7 @@ const Product = () => {
             console.error('Data Fetching Error:', error);
         }
     }
+
     return (
         <>
             <div id='mv_container_fluid'>
@@ -258,28 +262,20 @@ const Product = () => {
                                                     <div>
                                                         <div className="mv_input_content mt-3">
                                                             <label className='mv_offcanvas_filter_category'>Main Category</label>
-                                                            <Form.Select className="mb-4"
-                                                                value={selectedMainCategory}
-                                                                onChange={handleMainCategoryChange}>
-                                                                <option>Select</option>
-                                                                <option value="Women">Women</option>
-                                                                <option value="Men">Men</option>
-                                                                <option value="Baby & Kids">Baby & Kids</option>
-                                                                <option value="Beauty & Health">Beauty & Health</option>
+                                                            <Form.Select className="mb-4" value={selectedMainCategory} onChange={handleMainCategoryChange}
+                                                            >
+                                                                {mainCategory.map((mainCat) => (
+                                                                    <option key={mainCat._id} value={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                                ))}
                                                             </Form.Select>
                                                         </div>
                                                         <div className="mv_input_content mt-3">
                                                             <label className='mv_offcanvas_filter_category'>Category</label>
-                                                            <Form.Select className="mb-4"
-                                                                value={selectedCategory}
-                                                                onChange={handleCategoryChange}>
-                                                                <option>Select</option>
-                                                                <option value="Indian Wear">Indian Wear</option>
-                                                                <option value="Western Wear">Western Wear</option>
-                                                                <option value="Baby Care">Baby Care</option>
-                                                                <option value="Treditional Wear">Treditional Wear</option>
-                                                                <option value="Footwere">Footwere</option>
-                                                                <option value="Skin Care">Skin Care</option>
+                                                            <Form.Select className="mb-4" value={selectedCategory} onChange={handleCategoryChange}
+                                                            >
+                                                                {category.map((cat) => (
+                                                                    <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
+                                                                ))}
                                                             </Form.Select>
                                                         </div>
                                                         <div className="mv_input_content">
@@ -357,42 +353,50 @@ const Product = () => {
                                                 {paginatedData.map((item, index) => (
                                                     <tr key={index}>
                                                         <td>{index + 1}</td>
-                                                        <td>{item.mainCategoriesData[0].mainCategoryName}</td>
-                                                        <td>{item.categoriesData[0].categoryName}</td>
+                                                        <td>{item.mainCategoriesData?.[0]?.mainCategoryName || 'N/A'}</td>
+                                                        <td>{item.categoriesData?.[0]?.categoryName || 'N/A'}</td>
                                                         <td>
-                                                            <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item.productVariantData[0].images[0]}`} alt="" />
+                                                            {item.productVariantData?.[0]?.images?.[0] && (
+                                                                <img
+                                                                    className='mv_product_img mv_product_radius_img'
+                                                                    src={`${BaseUrl}/${item.productVariantData[0].images[0]}`}
+                                                                    alt=""
+                                                                />
+                                                            )}
                                                             {item.productName}
                                                         </td>
-                                                        <td>{item.productVariantData[0].originalPrice}</td>
+                                                        <td>{item.productVariantData?.[0]?.originalPrice || 'N/A'}</td>
                                                         <td>
                                                             <div className='mv_rating_img'>
                                                                 <FaStar className='mv_star_yellow' />
-                                                                {item.rating}
+                                                                {item.rating || '0'}
                                                             </div>
                                                         </td>
                                                         <td>
                                                             {
                                                                 item.stockStatus === 'In Stock' ? (
                                                                     <p className='m-0 mv_delivered_padd'>{item.stockStatus}</p>
-                                                                ) : item.stock === 'Low Stock' ? (
+                                                                ) : item.stockStatus === 'Low Stock' ? (
                                                                     <p className='m-0 mv_pending_padd'>{item.stockStatus}</p>
-                                                                ) : item.stock === 'Out of Stock' ? (
+                                                                ) : item.stockStatus === 'Out of Stock' ? (
                                                                     <p className='m-0 mv_cancelled_padd'>{item.stockStatus}</p>
-                                                                ) : null
+                                                                ) : (
+                                                                    <p className='m-0'>Unknown</p>
+                                                                )
                                                             }
                                                         </td>
                                                         <td className='d-flex align-items-center justify-content-end'>
-                                                            <div className="mv_pencil_icon">                                                           
-                                                                <Link  to={`/viewProduct?id=${item._id}&productVariantId=${item.productVariantData[0]._id}`}>
+                                                            <div className="mv_pencil_icon">
+                                                                <Link to={`/viewProduct?id=${item._id}&productVariantId=${item.productVariantData?.[0]?._id || ''}`}>
                                                                     <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>
                                                             <div className="mv_pencil_icon">
-                                                                <Link to={`/editProduct/${item._id}?productVariantId=${item.productVariantData[0]._id}`}>
+                                                                <Link to={`/editProduct/${item._id}?productVariantId=${item.productVariantData?.[0]?._id || ''}`}>
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>
-                                                            <div className="mv_pencil_icon" onClick={()=>handleDelete(item._id, item.productName)}>
+                                                            <div className="mv_pencil_icon" onClick={() => handleDelete(item._id, item.productName)}>
                                                                 <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                             </div>
                                                         </td>
@@ -408,7 +412,7 @@ const Product = () => {
                                             </p>
                                             {getPaginationButtons().map((page, index) => (
                                                 <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                    onClick={() => handlePageChange(page)}>
+                                                    onClick={() => typeof page === 'number' ? handlePageChange(page) : null}>
                                                     {page}
                                                 </p>
                                             ))}
