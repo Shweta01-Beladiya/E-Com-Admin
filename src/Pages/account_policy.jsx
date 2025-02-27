@@ -7,62 +7,24 @@ import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Accountpolicy = (props) => {
-   
-    var data = [
-        {   
-            id: 1,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 2,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 3,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 4,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 5,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 6,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 7,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 8,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 9,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 10,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-        {   
-            id: 11,
-            accountpolicy: "Lorem ipsum dolor sit amet consectetur",
-        },
-    ];
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [toggle, setToggle] = useState(false)
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState();
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
     console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
@@ -102,7 +64,7 @@ const Accountpolicy = (props) => {
         return buttons;
     };
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -126,25 +88,148 @@ const Accountpolicy = (props) => {
     const [id, setId] = useState(null);
 
     const init = {
-        policy: "",
+        policyName: "",
     };
     
     const validate = Yup.object().shape({
-        policy: Yup.string().required("Account Policy is required")
+        policyName: Yup.string().required("Account Policy is required")
     });
     
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
             // accountpolicy(values)
+
+            const accpolicy = {
+                policyName:values?.policyName
+            }
+
+            //************************************** Edit and Add **************************************
+            if (id) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updatePolicy/${id}`, accpolicy, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createPolicy`, accpolicy, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
     });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
     // *******************************************************************************
+
+    // ************************************** Show Data **************************************
+    useEffect(()=>{
+        const fetchBrandData = async () => {
+            try{
+               const response = await axios.get(`${BaseUrl}/api/allPolicy`,{
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 }
+               })
+               console.log("data" , response?.data);
+               setFilteredData(response?.data?.
+                accountpolicy)
+               setData(response?.data?.accountpolicy)
+            }catch(error){
+               console.error("Error fetching data:", error);
+            }
+        }
+        fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
+ 
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+ 
+    const handleDelete = async () => {
+        try{
+            const response = await axios.delete(`${BaseUrl}/api/deletePolicy/${deleteToggle}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            console.log("delete response " , response);
+            setModalShow(false)
+            setToggle(!toggle)
+        }catch(error){
+            alert(error)
+        }
+     }
+    // ***************************************************************************************
     
-    // State variables
-    let [description, setDescription] = useState("");
+    // Edit
+    const handleEdit = (item) => {
+        setId(item._id);
+        
+        // Set form values with the selected item data
+        setValues({
+            policyName: item.policyName || "",
+        });
+        
+        setModalShow1(true);
+    };
+
+    // Add new item
+    const handleAddNew = () => {
+        setId(null);
+        resetForm();
+        setModalShow1(true);
+    };
+
+    // Reset form when modal closes
+    const handleCloseModal = () => {
+        setModalShow1(false);
+        setId(null);
+        resetForm();
+    };
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("" , result);
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.policyName?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1);
+    }, [data, searchTerm]);
 
     return (
         <>
@@ -166,14 +251,14 @@ const Accountpolicy = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
                                 <div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>
+                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={handleAddNew}>
                                             <button><Link>+ Add</Link></button>
                                         </div>
                                     </div>
@@ -189,17 +274,15 @@ const Accountpolicy = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {paginatedData.map((item, index) => (
+                                        {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.accountpolicy}</td>
+                                            <td>{index + 1}</td>
+                                            <td>{item.policyName}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
-                                                    <Link>
+                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -239,14 +322,14 @@ const Accountpolicy = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
 
             {/* Add Edit Account Policy Modal */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1}  onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
 
                 </Modal.Header>
@@ -260,17 +343,17 @@ const Accountpolicy = (props) => {
                             <InputGroup>
                                 <Form.Control
                                     placeholder="Enter account policy"
-                                    name="policy"
-                                    value={values.policy}
+                                    name="policyName"
+                                    value={values.policyName}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {errors.policy && touched.policy && <div className="text-danger small">{errors.policy}</div>}
+                            {errors.policyName && touched.policyName && <div className="text-danger small">{errors.policyName}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button"  onClick={handleCloseModal}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">

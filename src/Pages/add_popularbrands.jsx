@@ -51,8 +51,13 @@ const Addpopularbrands = ({ editData }) => {
 
     useEffect(() => {
         if (editData) {
-            setBrandLogoPreview(editData.brandLogo);
-            setBrandImagePreview(editData.brandImage);
+            const filename1 = editData.brandLogo.split("\\").pop();
+            setbrandimg(filename1.substring(filename1.indexOf('-') + 1));
+            setBrandLogoPreview(`${BaseUrl}/${editData.brandLogo}`);
+
+            const filename = editData.brandImage.split("\\").pop();
+            setaddimg(filename.substring(filename.indexOf('-') + 1));
+            setBrandImagePreview(`${BaseUrl}/${editData.brandImage}`);
         }
     }, [editData]);
 
@@ -243,7 +248,7 @@ const Addpopularbrands = ({ editData }) => {
                                                     <div className="mt-2">
                                                         <img
                                                             className='mv_update_img'
-                                                            src={`${myToggle ? `${brandLogoPreview}` : `${BaseUrl}/${brandLogoPreview}`}`}
+                                                            src={brandLogoPreview}
                                                             alt="Brand Logo Preview"
                                                             style={{
                                                                 maxWidth: '20px',
@@ -293,7 +298,7 @@ const Addpopularbrands = ({ editData }) => {
                                                     <div className="mt-2">
                                                         <img
                                                             className='mv_update_img'
-                                                            src={`${toggle ? `${brandImagePreview}` : `${BaseUrl}/${brandLogoPreview}`}`}
+                                                            src={brandImagePreview}
                                                             alt="Brand Image Preview"
                                                             style={{
                                                                 maxWidth: '20px',
@@ -310,7 +315,7 @@ const Addpopularbrands = ({ editData }) => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button onClick={()=> window.location.href = "/popularbrands"} className='border-0 bg-transparent'>
+                                                <button onClick={() => window.location.href = "/popularbrands"} className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
                                                 {editData ?

@@ -7,28 +7,24 @@ import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Termsconditions = (props) => {
-   
-    var data = [
-        {   
-            id: 1,
-            title: "Terms of use",
-            description: "Lorem ipsum dolor sit amet consectetur. Elit egestas faucibus porta ipsum  Elit egestas faucibus porta ipsum d...",
-        },
-        {   
-            id: 2,
-            title: "Conditions",
-            description: "Lorem ipsum dolor sit amet consectetur. Elit egestas faucibus porta ipsum  Elit egestas faucibus porta ipsum d...",
-        },
-    ];
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [toggle, setToggle] = useState(false)
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState();
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
     console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
@@ -68,7 +64,7 @@ const Termsconditions = (props) => {
         return buttons;
     };
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -101,18 +97,144 @@ const Termsconditions = (props) => {
         description: Yup.string().required("Description is required")
     });
     
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
             // termsconditions(values)
+
+            const termsconditions = {
+                title:values?.title,
+                description:values?.description
+            }
+
+            //************************************** Edit and Add **************************************
+            if (id) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateTerm/${id}`, termsconditions, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createTerms`, termsconditions, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
     });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
     // ***************************************************************************
 
-    // State variables
-    let [description, setDescription] = useState("");
+    // ************************************** Show Data **************************************
+    useEffect(()=>{
+        const fetchBrandData = async () => {
+            try{
+               const response = await axios.get(`${BaseUrl}/api/allTerms`,{
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 }
+               })
+               console.log("data" , response?.data);
+               setFilteredData(response?.data?.
+                terms)
+               setData(response?.data?.terms)
+            }catch(error){
+               console.error("Error fetching data:", error);
+            }
+        }
+        fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
+ 
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+ 
+    const handleDelete = async () => {
+        try{
+            const response = await axios.delete(`${BaseUrl}/api/deleteTerm/${deleteToggle}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            console.log("delete response " , response);
+            setModalShow(false)
+            setToggle(!toggle)
+        }catch(error){
+            alert(error)
+        }
+     }
+    // ***************************************************************************************
+
+    // Edit
+    const handleEdit = (item) => {
+        setId(item._id);
+        
+        // Set form values with the selected item data
+        setValues({
+            title: item.title || "",
+            description: item.description || "",
+        });
+        
+        setModalShow1(true);
+    };
+
+    // Add new item
+    const handleAddNew = () => {
+        setId(null);
+        resetForm();
+        setModalShow1(true);
+    };
+
+    // Reset form when modal closes
+    const handleCloseModal = () => {
+        setModalShow1(false);
+        setId(null);
+        resetForm();
+    };
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("" , result);
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1);
+    }, [data, searchTerm]);
 
     return (
         <>
@@ -134,8 +256,8 @@ const Termsconditions = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -144,7 +266,7 @@ const Termsconditions = (props) => {
                                         <div className="mv_column_button mv_view_status_padd">
                                             <Link to="/viewtermsconditions"><button>View Status</button></Link>
                                         </div>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>
+                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={handleAddNew}>
                                             <button><Link>+ Add</Link></button>
                                         </div>
                                     </div>
@@ -161,18 +283,18 @@ const Termsconditions = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {paginatedData.map((item, index) => (
+                                        {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
+                                            <td>{index + 1}</td>
                                             <td>{item.title}</td>
                                             <td>{item.description}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
                                                     <Link>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -212,14 +334,14 @@ const Termsconditions = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
 
             {/* Add Terms & Condition Model */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -259,7 +381,7 @@ const Termsconditions = (props) => {
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={handleCloseModal}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">
