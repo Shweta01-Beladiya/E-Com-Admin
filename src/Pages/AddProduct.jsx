@@ -7,7 +7,7 @@ import { IoMdClose } from "react-icons/io";
 import { Formik, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const AddProduct = () => {
 
@@ -15,9 +15,12 @@ const AddProduct = () => {
     const token = localStorage.getItem('token');
 
     const navigate = useNavigate();
+    const { id } = useParams();
+    const query = new URLSearchParams(useLocation().search);
+    const variantId = query.get("productVariantId");
+    // console.log("variantId",variantId);
 
     // State variables
-    let [isedit, setisedit] = useState(false);
     const [colors, setColors] = useState([]);
     const [currentColor, setCurrentColor] = useState("#000");
     const [pickerPosition, setPickerPosition] = useState({ x: 0, y: 0 });
@@ -29,23 +32,38 @@ const AddProduct = () => {
     const [filteredCategories, setFilteredCategories] = useState([]);
     const [filteredSubCategories, setFilteredSubCategories] = useState([]);
     const fileInputRef = useRef(null);
-    const [editSize, setEditSize] = useState(false);
     // const [selectedOffers, setSelectedOffers] = useState([]);
     const [size, setSize] = useState([]);
     const [filteredSizes, setFilteredSizes] = useState([]);
     const [unit, setUnit] = useState([]);
-
-
+    const [existingImages, setExistingImages] = useState([]);
     // const options = [
     //     { value: 'New100', label: 'NEW100' },
     //     { value: 'New200', label: 'NEW200' },
     //     { value: 'New300', label: 'NEW300' }
     // ]
-    const change_edit = () => {
-        setisedit(!isedit);
-        setEditSize(!editSize);
-    };
 
+    // Initial form values
+    const [initialValues, setInitialValues] = useState({
+        mainCategoryId: '',
+        categoryId: '',
+        subCategoryId: '',
+        productName: '',
+        sizeNameId: '',
+        size: '',
+        unitId: '',
+        shortDescription: '',
+        originalPrice: '',
+        discountPrice: '',
+        colorName: '',
+        images: [],
+        // productOfferId: [],
+        description: '',
+        manufacturingDetails: '',
+        shiping: '',
+        returnPolicy: '',
+        specifications: [{ key: '', value: '' }]
+    });
     // Validation Schema
     const validationSchema = Yup.object().shape({
         mainCategoryId: Yup.string()
@@ -82,14 +100,12 @@ const AddProduct = () => {
             .min(20, 'Description must be at least 20 characters'),
         manufacturingDetails: Yup.string()
             .required('Manufacturing details are required'),
-        shipping: Yup.string()
+        shiping: Yup.string()
             .required('Shipping details are required'),
         returnPolicy: Yup.string()
             .required('Return/Exchange policy is required'),
-        manufacturingDetails: Yup.string()
-            .required('Manufacturing Details is required'),
-        colorName: Yup.array()
-            .min(1, 'At least one color must be selected'),
+        colorName: Yup.string()
+            .required('Color name is required'),
         images: Yup.array()
             .min(1, 'At least one image must be uploaded')
             .max(5, 'Maximum 5 images allowed'),
@@ -101,86 +117,205 @@ const AddProduct = () => {
         )
     });
 
-    // Initial form values
-    const initialValues = {
-        mainCategoryId: '',
-        categoryId: '',
-        subCategoryId: '',
-        productName: '',
-        sizeNameId: '',
-        size: '',
-        unitId: '',
-        shortDescription: '',
-        originalPrice: '',
-        discountPrice: '',
-        colorName: [],
-        images: [],
-        // productOfferId: [],
-        description: '',
-        manufacturingDetails: '',
-        shipping: '',
-        returnPolicy: '',
-        specifications: [{ key: '', value: '' }]
-    };
 
-    // Form submission handler
-    const handleSubmit = async (values, { setSubmitting }) => {
-        // console.log("ardjedsfnkdermgj");
+    const fetchProductData = async () => {
+        if (!id) return;
 
-        // console.log("value", values);
-        // const formData = {
-        //     ...values,
-        //     images: selectedImages
-        // };
-
-        // console.log('Form submitted with:', formData);
         try {
-            const response = await axios.post(`${BaseUrl}/api/createProduct`, {
-                mainCategoryId: values.mainCategoryId,
-                categoryId: values.categoryId,
-                subCategoryId: values.subCategoryId,
-                productName: values.productName
-            }, {
+            // Fetch product data
+            const response = await axios.get(`${BaseUrl}/api/getProduct/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("Resposne", response.data.product);
+            // console.log("response>>>>>>>>>", response.data.product);
 
-            const formData = new FormData();
-            values.images.forEach((image) => {
-                formData.append("images", image.file);
+            // Fetch variant data
+            const preResponse = await axios.get(`${BaseUrl}/api/getProductVariant/${variantId}`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-    
-            formData.append("productId", response.data.product._id);
-            formData.append("sizeNameId", values.sizeNameId);
-            formData.append("size", values.size);
-            formData.append("unitId", values.unitId);
-            formData.append("shortDescription", values.shortDescription);
-            formData.append("originalPrice", values.originalPrice);
-            formData.append("discountPrice", values.discountPrice);
-            formData.append("colorName", values.colorName);
-            formData.append("description", values.description);
-            formData.append("shipping", values.shipping);
-            formData.append("returnPolicy", values.returnPolicy);
-            formData.append("manufacturingDetails", values.manufacturingDetails);
-            formData.append("specifications", JSON.stringify(values.specifications));
-    
-            const proResponse = await axios.post(`${BaseUrl}/api/createProductVariant`, formData, {
-                headers: { 
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
+            console.log("preResponse", preResponse.data.productVariant);
+
+            if (response.data && response.data.product) {
+                const product = response.data.product;
+                const variant = preResponse.data.productVariant;
+
+                if (product && variant) {
+                    // Setup filtered categories based on main category
+                    const relatedCategories = categories.filter(
+                        category => category.mainCategoryId === product.mainCategoryId
+                    );
+                    setFilteredCategories(relatedCategories);
+
+                    // Setup filtered subcategories based on category
+                    const relatedSubCategories = subCategories.filter(
+                        subCategory => subCategory.categoryId === product.categoryId
+                    );
+                    setFilteredSubCategories(relatedSubCategories);
+
+                    // Setup filtered sizes based on subcategory
+                    const subCategorySpecificSizes = size.filter(
+                        sizeItem => sizeItem.subCategoryId === product.subCategoryId
+                    );
+                    setFilteredSizes(subCategorySpecificSizes);
+
+                    // Set colors from variant
+                    const variantColors = variant.colorName ? variant.colorName.split(',') : [];
+                    setColors(variantColors);
+
+                    // Set images for display
+                    if (variant.images && variant.images.length > 0) {
+                        const imageObjects = variant.images.map(img => ({
+                            file: null,
+                            name: img.split('/').pop() || 'image.jpg',
+                            preview: `${BaseUrl}/${img}`,
+                            existingPath: img
+                        }));
+                        setSelectedImages(imageObjects);
+                        setExistingImages(imageObjects);
+                    }
+                    console.log("productName", product.productName);
+
+                    // Set form values for Formik
+                    const initialData = {
+                        mainCategoryId: product.mainCategoryId || '',
+                        categoryId: product.categoryId || '',
+                        subCategoryId: product.subCategoryId || '',
+                        productName: product.productName,
+                        sizeNameId: variant.sizeNameId || '',
+                        size: variant.size || '',
+                        unitId: variant.unitId || '',
+                        shortDescription: variant.shortDescription || '',
+                        originalPrice: variant.originalPrice || '',
+                        discountPrice: variant.discountPrice || '',
+                        colorName: variant.colorName,
+                        images: selectedImages,
+                        description: variant.description || '',
+                        manufacturingDetails: variant.manufacturingDetails || '',
+                        shiping: variant.shiping || '',
+                        returnPolicy: variant.returnPolicy || '',
+                        specifications: variant.specifications && variant.specifications.length > 0
+                            ? variant.specifications
+                            : [{ key: '', value: '' }]
+                    };
+                    console.log("initialData", initialData);
+
+                    setInitialValues(initialData);
                 }
-            });
-    
-            // console.log("proresponse", proResponse.data);
-            if(proResponse.data.status === 200){
-                navigate('/product');
+            }
+        } catch (error) {
+            console.error('Error fetching product data:', error);
+        }
+    };
+    // Form submission handler
+    const handleSubmit = async (values, { setSubmitting }) => {
+        try {
+            if (id) {
+                // Update existing product
+                 await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
+                    mainCategoryId: values.mainCategoryId,
+                    categoryId: values.categoryId,
+                    subCategoryId: values.subCategoryId,
+                    productName: values.productName
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                // Use the variant ID from the URL params instead of from productData
+                if (!variantId) {
+                    console.error('Variant ID not found for updating');
+                    return;
+                }
+
+                const formData = new FormData();
+
+                // Add only new images that have actual file objects
+                existingImages.forEach((image) => {
+                    if (image.existingPath) {
+                        formData.append("images", image.existingPath);
+                    }
+                });
+        
+                // Add only new images that have actual file objects
+                values.images.forEach((image) => {
+                    if (image.file) {
+                        formData.append("images", image.file);
+                    }
+                });
+                
+                formData.append("existingImages", JSON.stringify(existingImages));
+                formData.append("productId", id);
+                formData.append("variantId", variantId);
+                formData.append("sizeNameId", values.sizeNameId);
+                formData.append("size", values.size);
+                formData.append("unitId", values.unitId);
+                formData.append("shortDescription", values.shortDescription);
+                formData.append("originalPrice", values.originalPrice);
+                formData.append("discountPrice", values.discountPrice || '');
+                formData.append("colorName", Array.isArray(values.colorName) 
+                ? values.colorName.join(',') 
+                : (typeof values.colorName === 'string' ? values.colorName : String(values.colorName)));
+                formData.append("description", values.description);
+                formData.append("shiping", values.shiping);
+                formData.append("returnPolicy", values.returnPolicy);
+                formData.append("manufacturingDetails", values.manufacturingDetails);
+                formData.append("specifications", JSON.stringify(values.specifications));
+
+                const variantResponse = await axios.put(`${BaseUrl}/api/updateProductVariant/${variantId}`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+
+                if (variantResponse.data.status === 200) {
+                    navigate('/product');
+                }
+            } else {
+                // Create new product logic remains the same
+                const response = await axios.post(`${BaseUrl}/api/createProduct`, {
+                    mainCategoryId: values.mainCategoryId,
+                    categoryId: values.categoryId,
+                    subCategoryId: values.subCategoryId,
+                    productName: values.productName
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                const formData = new FormData();
+                values.images.forEach((image) => {
+                    formData.append("images", image.file);
+                });
+
+                formData.append("productId", response.data.product._id);
+                formData.append("sizeNameId", values.sizeNameId);
+                formData.append("size", values.size);
+                formData.append("unitId", values.unitId);
+                formData.append("shortDescription", values.shortDescription);
+                formData.append("originalPrice", values.originalPrice);
+                formData.append("discountPrice", values.discountPrice || '');
+                formData.append("colorName", typeof values.colorName === 'string' 
+                    ? values.colorName 
+                    : (Array.isArray(values.colorName) ? values.colorName.join(',') : values.colorName.toString()));
+                formData.append("description", values.description);
+                formData.append("shiping", values.shiping);
+                formData.append("returnPolicy", values.returnPolicy);
+                formData.append("manufacturingDetails", values.manufacturingDetails);
+                formData.append("specifications", JSON.stringify(values.specifications));
+
+                const proResponse = await axios.post(`${BaseUrl}/api/createProductVariant`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+
+                if (proResponse.data.status === 200) {
+                    navigate('/product');
+                }
             }
         } catch (error) {
             console.error('Data Fetching Error:', error);
         }
-        // setSubmitting(false);
-        setisedit(false);
-        setEditSize(false);
+        setSubmitting(false);
     };
 
     // Color picker handlers
@@ -201,7 +336,7 @@ const AddProduct = () => {
         if (!colors.includes(currentColor)) {
             const updatedColors = [...colors, currentColor];
             setColors(updatedColors);
-            setFieldValue('colorName', updatedColors);
+            setFieldValue('colorName', updatedColors.join(','));
         }
         setDisplayColorPicker(false);
     };
@@ -209,7 +344,7 @@ const AddProduct = () => {
     const removeColor = (colorToRemove, setFieldValue) => {
         const updatedColors = colors.filter(color => color !== colorToRemove);
         setColors(updatedColors);
-        setFieldValue('colorName', updatedColors);
+        setFieldValue('colorName', updatedColors.join(','));
     };
 
     // Image handlers
@@ -299,13 +434,44 @@ const AddProduct = () => {
         }
     }
     useEffect(() => {
-        fetchMainCategory();
-        fetchCategory();
-        fetchSubCategory();
-        fetchSize();
-        fetchUnit();
+        const fetchAllData = async () => {
+            await fetchMainCategory();
+            await fetchCategory();
+            await fetchSubCategory();
+            await fetchSize();
+            await fetchUnit();
+
+            if (id && variantId) {
+                await fetchProductData();
+            }
+        };
+
+        fetchAllData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    // This will ensure filters are updated when product data or category data changes
+    useEffect(() => {
+        if (initialValues.mainCategoryId && categories.length > 0) {
+            const relatedCategories = categories.filter(
+                category => category.mainCategoryId === initialValues.mainCategoryId
+            );
+            setFilteredCategories(relatedCategories);
+        }
+
+        if (initialValues.categoryId && subCategories.length > 0) {
+            const relatedSubCategories = subCategories.filter(
+                subCategory => subCategory.categoryId === initialValues.categoryId
+            );
+            setFilteredSubCategories(relatedSubCategories);
+        }
+
+        if (initialValues.subCategoryId && size.length > 0) {
+            const subCategorySpecificSizes = size.filter(
+                sizeItem => sizeItem.subCategoryId === initialValues.subCategoryId
+            );
+            setFilteredSizes(subCategorySpecificSizes);
+        }
+    }, [initialValues, categories, subCategories, size]);
 
     const handleMainCategoryChange = (event, setFieldValue) => {
         const mainCategoryId = event.target.value;
@@ -332,6 +498,7 @@ const AddProduct = () => {
         );
         setFilteredSubCategories(relatedSubCategories);
     };
+
     const handleSubCategoryChange = (event, setFieldValue) => {
         const subCategoryId = event.target.value;
         setFieldValue('subCategoryId', subCategoryId);
@@ -361,11 +528,11 @@ const AddProduct = () => {
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editSize ? 'Edit Product' : 'Add Product'}</p>
+                        <p className='mb-1'>{id ? 'Edit Product' : 'Add Product'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editSize ? 'Edit Product' : 'Add Product'}
+                                {id ? 'Edit Product' : 'Add Product'}
                             </p>
                         </div>
                     </div>
@@ -379,6 +546,7 @@ const AddProduct = () => {
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
                                     onSubmit={handleSubmit}
+                                    enableReinitialize={true}
                                 >
                                     {({ handleSubmit, handleChange, values, setFieldValue }) => (
                                         <form onSubmit={handleSubmit}>
@@ -407,7 +575,8 @@ const AddProduct = () => {
                                                             name='categoryId'
                                                             value={values.categoryId}
                                                             onChange={(e) => handleCategoryChange(e, setFieldValue)}
-                                                            disabled={!values.mainCategoryId}>
+                                                            disabled={!values.mainCategoryId}
+                                                        >
                                                             <option>Select</option>
                                                             {filteredCategories.map((cat) => (
                                                                 <option value={cat._id} key={cat._id}>{cat.categoryName}</option>
@@ -440,6 +609,7 @@ const AddProduct = () => {
                                                             <Form.Control
                                                                 placeholder="Enter product name"
                                                                 name='productName'
+                                                                value={values.productName}
                                                                 onChange={handleChange}
                                                             />
                                                         </InputGroup>
@@ -554,7 +724,7 @@ const AddProduct = () => {
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Colors</label>
                                                         <div className="color-box border rounded p-2 d-flex align-items-center flex-wrap">
-                                                            {colors.map((color, index) => (
+                                                            {colors?.map((color, index) => (
                                                                 <div key={index} className="color-circle me-2">
                                                                     <div
                                                                         style={{ backgroundColor: '#EAEAEA' }}
@@ -718,7 +888,6 @@ const AddProduct = () => {
                                                         <ErrorMessage name="description" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
-
                                                 <div className="col-md-6 col-sm-6">
                                                     <div className="mv_input_content mb-3">
                                                         <label className='mv_label_input'>Manufacturing Details</label>
@@ -737,12 +906,12 @@ const AddProduct = () => {
                                                         <label className='mv_label_input'>Shipping</label>
                                                         <Form.Group className="">
                                                             <Form.Control
-                                                                name='shipping'
-                                                                value={values.shipping}
+                                                                name='shiping'
+                                                                value={values.shiping}
                                                                 onChange={handleChange}
                                                                 placeholder="Enter Shipping details" />
                                                         </Form.Group>
-                                                        <ErrorMessage name="shipping" component="small" className="text-danger" />
+                                                        <ErrorMessage name="shiping" component="small" className="text-danger" />
                                                     </div>
                                                 </div>
                                                 <div className="col-md-6 col-sm-6">
@@ -763,7 +932,7 @@ const AddProduct = () => {
                                                         <button className='border-0 bg-transparent'>
                                                             Cancel
                                                         </button>
-                                                        {editSize === true ? <button className='border-0 bg-transparent' >
+                                                        {id ? <button className='border-0 bg-transparent' >
                                                             Update
                                                         </button> :
                                                             <button className='border-0 bg-transparent' >

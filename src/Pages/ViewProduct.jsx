@@ -32,7 +32,7 @@ const ViewProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getProductVariant/${productVariantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response", response.data.productVariant);
+            // console.log("response", response.data.productVariant); 
             setProductVariant(response.data.productVariant);
         } catch (error) {
             console.error('Data Fetching Error:', error);
@@ -41,6 +41,7 @@ const ViewProduct = () => {
     useEffect(() => {
         fetchProduct();
         fetchProductVariant();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
         <div className="container-fluid p-4">
@@ -60,43 +61,22 @@ const ViewProduct = () => {
                         <h6 className="p-3 m-0" style={{ fontWeight: 'bold' }}>Product Image</h6>
                         <hr className='m-0' />
                         <div className="row d-flex p-4">
-                            {/* {productImages.map((image, index) => (
-                <div key={index} className="col-3 col-lg-6">
-                  <img
-                    src="/api/placeholder/100/100"
-                    alt={`Product view ${index + 1}`}
-                    className="img-fluid rounded"
-                  />
-                </div>
-              ))} */}
-                            <div className="col-3">
-                                <img
-                                    src={require('../s_img/image1.png')}
-                                    alt=""
-                                    className="img-fluid rounded"
-                                />
-                            </div>
-                            <div className="col-3">
-                                <img
-                                    src={require('../s_img/image2.png')}
-                                    alt=""
-                                    className="img-fluid rounded"
-                                />
-                            </div>
-                            <div className="col-3 ">
-                                <img
-                                    src={require('../s_img/image3.png')}
-                                    alt=""
-                                    className="img-fluid rounded"
-                                />
-                            </div>
-                            <div className="col-3">
-                                <img
-                                    src={require('../s_img/image4.png')}
-                                    alt=""
-                                    className="img-fluid rounded"
-                                />
-                            </div>
+                            {/* {console.log("productVariant.images", productVariant.images)} */}
+                            {productVariant.images && productVariant.images.length > 0 ? (
+                                productVariant.images.map((image, index) => (
+                                    <div key={index} className="col-3">
+                                        <img
+                                            src={`${BaseUrl}/${image}`}
+                                            alt={`Product view ${index + 1}`}
+                                            className="img-fluid rounded"
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-muted">No images available</p>
+                            )}
+
+
                         </div>
                     </div>
                 </div>
@@ -113,18 +93,22 @@ const ViewProduct = () => {
                     <InfoField label="Category" value={product.category} />
                     <InfoField label="Sub Category" value={product.subCategory} />
                     <InfoField label="Product Name" value={product.productName} />
+                    <InfoField label="Short Description" value={productVariant.shortDescription} />
                     <InfoField label="Gender" value={product.gender || '-'} />
                     <InfoField label="Size" value={productVariant.size} />
                     <InfoField label="Stock status" value={product.stockStatus} />
-                    <InfoField label="Short Description" value={productVariant.shortDescription} />
+                    <InfoField label="QTY" value={productVariant.specifications?.find(spec => spec.key === 'QTY')?.value || '-'} />
                     <InfoField label="Description" value={productVariant.description} />
+                    <InfoField label="Price" value={productVariant.originalPrice || '-'} />
+                    <InfoField label="Discount Price" value={productVariant.discountPrice || '-'} />
+                    <InfoField label="Offer code" value={productVariant.offerCode || '-'} />
                     <div className="d-flex items-center gap-2">
                         <span style={{ color: '#808080', fontWeight: 'bold' }}>Color:</span>
                         {productVariant.colorName &&
                             productVariant.colorName.split(',').map((color, index) => (
                                 <div
                                     key={index}
-                                    style={{ backgroundColor: color, width: '24px', height: '24px', borderRadius:'50%' }}
+                                    style={{ backgroundColor: color, width: '24px', height: '24px', borderRadius: '50%' }}
                                 ></div>
                             ))}
                     </div>
@@ -133,18 +117,19 @@ const ViewProduct = () => {
 
                 <div className="col-md-6 col-12 p-4">
                     <InfoField label="Rating" value={`⭐ ${product.rating}` || '-'} />
-                    <InfoField label="Brand" value={productVariant.brand || '-'} />
-                    <InfoField label="Fabric" value={productVariant.fabric || '-'} />
-                    <InfoField label="Pattern" value={productVariant.pattern || '-'} />
-                    <InfoField label="Sleeve Type" value={productVariant.sleeveType || '-'} />
-                    <InfoField label="Wash case" value={productVariant.washCase || '-'} />
-                    <InfoField label="Work" value={productVariant.work || '-'} />
-                    <InfoField label="Occasion" value={productVariant.occasion || '-'} />
-                    <InfoField label="Country Origin" value={productVariant.countryOrigin || '-'} />
-                    <InfoField label="QTY" value={productVariant.qty || '-'} />
-                    <InfoField label="Price" value={productVariant.originalPrice || '-'} />
-                    <InfoField label="Discount Price" value={productVariant.discountPrice || '-'} />
-                    <InfoField label="Offer code" value={productVariant.offerCode || '-'} />
+                    <InfoField label="Unit" value={productVariant.unitId} />
+                    <InfoField label="Brand" value={productVariant.specifications?.find(spec => spec.key === 'Brand')?.value || '-'} />
+                    <InfoField label="Fabric" value={productVariant.specifications?.find(spec => spec.key === 'Fabric')?.value || '-'} />
+                    <InfoField label="Pattern" value={productVariant.specifications?.find(spec => spec.key === 'Pattern')?.value || '-'} />
+                    <InfoField label="Sleeve Type" value={productVariant.specifications?.find(spec => spec.key === 'Sleeve Type')?.value || '-'} />
+                    <InfoField label="Wash case" value={productVariant.specifications?.find(spec => spec.key === 'washCase')?.value || '-'} />
+                    <InfoField label="Work" value={productVariant.specifications?.find(spec => spec.key === 'Work')?.value || '-'} />
+                    <InfoField label="Occasion" value={productVariant.specifications?.find(spec => spec.key === 'Occasion')?.value || '-'} />
+                    <InfoField label="Country Origin" value={productVariant.specifications?.find(spec => spec.key === 'Country Origin')?.value || '-'} />
+                    <InfoField label="Warning" value={productVariant.specifications?.find(spec => spec.key === 'Warning')?.value || '-'} />
+                    <InfoField label="Manufacturing Details" value={productVariant.manufacturingDetails || '-'} />
+                    <InfoField label="Shipping" value={productVariant.shiping || '-'} />
+                    <InfoField label="Return / exchange Policy" value={productVariant.returnPolicy || '-'} />
                 </div>
             </div>
         </div>
