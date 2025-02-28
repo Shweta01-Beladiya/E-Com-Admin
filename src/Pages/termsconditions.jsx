@@ -273,7 +273,7 @@ const Termsconditions = (props) => {
                                 </div>
                             </div>
                             <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
+                                <table className='mv_product_table mv_help_table justify-content-between'>
                                     <thead>
                                         <tr>
                                             <th className=''>ID</th>

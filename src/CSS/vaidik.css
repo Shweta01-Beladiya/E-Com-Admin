@@ -160,6 +160,7 @@
     line-height: 21.78px;
     text-wrap: nowrap !important;
     color: #000000 !important;
+    vertical-align: top;
 }
 /* .mv_product_table tbody tr td:last-child{
     margin-right: 20px !important;

@@ -7,73 +7,25 @@ import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Reasonforcancellation = (props) => {
    
-    var data = [
-        {   
-            id: 1,
-            reason: "I was hopping for a shorter delivery time",
-            status: true,
-        },
-        {   
-            id: 2,
-            reason: "Price of the product has now decreased",
-            status: false,
-        },
-        {   
-            id: 3,
-            reason: "I was hopping for a shorter delivery time",
-            status: true,
-        },
-        {   
-            id: 4,
-            reason: "I’m worried about the ratings/reviews",
-            status: true,
-        },
-        {   
-            id: 5,
-            reason: "My reason are not listed here",
-            status: true,
-        },
-        {   
-            id: 6,
-            reason: "I’m worried about the ratings/reviews",
-            status: true,
-        },
-        {   
-            id: 7,
-            reason: "I’m worried about the ratings/reviews",
-            status: true,
-        },
-        {   
-            id: 8,
-            reason: "I’m worried about the ratings/reviews",
-            status: true,
-        },
-        {   
-            id: 9,
-            reason: "I’m worried about the ratings/reviews",
-            status: true,
-        },
-        {   
-            id: 10,
-            reason: "I’m worried about the ratings/reviews",
-            status: true,
-        },
-        {   
-            id: 11,
-            reason: "I was hopping for a shorter delivery time",
-            status: true,
-        },
-    ];
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [toggle, setToggle] = useState(false)
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState();
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
     console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
@@ -113,7 +65,7 @@ const Reasonforcancellation = (props) => {
         return buttons;
     };
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -137,25 +89,148 @@ const Reasonforcancellation = (props) => {
     const [id, setId] = useState(null);
 
     const init = {
-        reasonforcancellation: "",
+        reasonName: "",
     };
     
     const validate = Yup.object().shape({
-        reasonforcancellation: Yup.string().required("Reason for cancellation is required")
+        reasonName: Yup.string().required("Reason for cancellation is required")
     });
     
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
             // reasonforcancellation(values)
+
+            const reasonforcancel = {
+                reasonName:values?.reasonName,
+            }
+
+            //************************************** Edit and Add **************************************
+            if (id) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateReason/${id}`, reasonforcancel, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createReason`, reasonforcancel, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
     });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
     // **************************************************************************
 
-    // State variables
-    let [description, setDescription] = useState("");
+    // ************************************** Show Data **************************************
+    useEffect(()=>{
+        const fetchBrandData = async () => {
+            try{
+               const response = await axios.get(`${BaseUrl}/api/allReasons`,{
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 }
+               })
+               console.log("data" , response?.data);
+               setFilteredData(response?.data?.
+                reasons)
+               setData(response?.data?.reasons)
+            }catch(error){
+               console.error("Error fetching data:", error);
+            }
+        }
+        fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
+ 
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+ 
+    const handleDelete = async () => {
+        try{
+            const response = await axios.delete(`${BaseUrl}/api/deleteReason/${deleteToggle}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            console.log("delete response " , response);
+            setModalShow(false)
+            setToggle(!toggle)
+        }catch(error){
+            alert(error)
+        }
+     }
+    // ***************************************************************************************
+
+    // Edit
+    const handleEdit = (item) => {
+        setId(item._id);
+        
+        // Set form values with the selected item data
+        setValues({
+            reasonName: item.reasonName || "",
+        });
+        
+        setModalShow1(true);
+    };
+
+    // Add new item
+    const handleAddNew = () => {
+        setId(null);
+        resetForm();
+        setModalShow1(true);
+    };
+
+    // Reset form when modal closes
+    const handleCloseModal = () => {
+        setModalShow1(false);
+        setId(null);
+        resetForm();
+    };
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("" , result);
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.reasonName?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1);
+    }, [data, searchTerm]);
 
     return (
         <>
@@ -177,14 +252,14 @@ const Reasonforcancellation = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
                                 <div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>
+                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={handleAddNew}>
                                             <button><Link>+ Add</Link></button>
                                         </div>
                                     </div>
@@ -201,10 +276,10 @@ const Reasonforcancellation = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {paginatedData.map((item, index) => (
+                                        {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.reason}</td>
+                                            <td>{index + 1}</td>
+                                            <td>{item.reasonName}</td>
                                             <td>
                                                 <Form.Check
                                                     type="switch"
@@ -215,12 +290,12 @@ const Reasonforcancellation = (props) => {
                                                     />
                                             </td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
                                                     <Link>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -261,14 +336,14 @@ const Reasonforcancellation = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
 
             {/* Add Edit Reason Model */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -281,8 +356,8 @@ const Reasonforcancellation = (props) => {
                             <label className='mv_label_input'>Reason For Cancellation</label>
                             <InputGroup className="">
                                 <Form.Control
-                                    name="reasonforcancellation"
-                                    value={values.reasonforcancellation}
+                                    name="reasonName"
+                                    value={values.reasonName}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter reason for cancellatoin"
@@ -291,11 +366,11 @@ const Reasonforcancellation = (props) => {
                                     aria-describedby="basic-addon1"
                                 />
                             </InputGroup>
-                            {errors.reasonforcancellation && touched.reasonforcancellation && <div className="text-danger small">{errors.reasonforcancellation}</div>}
+                            {errors.reasonName && touched.reasonName && <div className="text-danger small">{errors.reasonName}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={handleCloseModal}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">
