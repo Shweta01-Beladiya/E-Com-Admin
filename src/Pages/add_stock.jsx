@@ -1,74 +1,155 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Addstock = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const navigate = useNavigate();
+
+    const [mainCategory, setMainCategory] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [subCategory, setSubCategory] = useState([]);
+    const [product, setProduct] = useState([]);
+
+    // Filtered Lists
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [filteredSubCategories, setFilteredSubCategories] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+
     // State variables
     let [isedit, setisedit] = useState(false);
-    // let [mainCategory, setMainCategory] = useState("");
-    // let [category, setCategory] = useState("");
-    // let [subCategory, setSubCategory] = useState("");
-    // let [product, setProduct] = useState("");
-    // let [stockStatus, setStockStatus] = useState("");
-    // let [quantity, setQuantity] = useState("");
+
 
     let change_edit = () => {
         setisedit(!isedit);
     };
 
-    // let handlesubmit = (event) => {
-    //     event.preventDefault();
-
-    //     const formData = {
-    //         mainCategory,
-    //         category,
-    //         subCategory,
-    //         product,
-    //         stockStatus,
-    //         quantity,
-    //     };
-
-    //     console.log('Form Submitted:', formData);
-    //     setisedit(false);
-    // };
-
     // Edit Stock
     const location = useLocation();
     const editStock = location.state?.editStock;
-    console.log(editStock)
+    // console.log(editStock)
 
 
     // ******************************* Validation *******************************
     const stockInit = {
-        mainCategory: "",
-        category: "",
-        subCategory: "",
-        product: "",
+        mainCategoryId: "",
+        categoryId: "",
+        subCategoryId: "",
+        productId: "",
         stockStatus: "",
         quantity: "",
     }
 
     const stockValidate = Yup.object().shape({
-        mainCategory: Yup.string().required("Main Category is required"),
-        category: Yup.string().required("Category is required"),
-        subCategory: Yup.string().required("Sub Category is required"),
-        product: Yup.string().required("Product is required"),
+        mainCategoryId: Yup.string().required("Main Category is required"),
+        categoryId: Yup.string().required("Category is required"),
+        subCategoryId: Yup.string().required("Sub Category is required"),
+        productId: Yup.string().required("Product is required"),
         stockStatus: Yup.string().required("Stock Status is required"),
         quantity: Yup.number().required("Quantity is required"),
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: stockInit,
         validationSchema: stockValidate,
-        onSubmit: (values) => {
+        onSubmit: async(values) => {
             console.log(values);
             // addstock(values)
+
+            const response = await axios.post(`${BaseUrl}/api/createStock`, values, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log("Response",response.data);
+            if(response.data.status === 201) {
+                navigate('/stock');
+            }
         }
     })
     // **************************************************************************
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("reposne",response.data.users);
+            setMainCategory(response.data.users);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("reposne",response.data.category);
+            setCategory(response.data.category);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("fetchsubcategory",response.data.subCategory);
+            setSubCategory(response.data.subCategory);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchProduct = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allProduct`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("repsone",response.data.product);
+            setProduct(response.data.product);
+
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        fetchProduct();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        setFilteredCategories(category.filter(cat => cat.mainCategoryId === values.mainCategoryId));
+        setFieldValue("categoryId", "");
+        setFilteredSubCategories([]);
+        setFieldValue("subCategoryId", "");
+        setFilteredProducts([]);
+        setFieldValue("productId", "");
+    }, [values.mainCategoryId]);
+
+    useEffect(() => {
+        setFilteredSubCategories(subCategory.filter(subCat => subCat.categoryId === values.categoryId));
+        setFieldValue("subCategoryId", "");
+        setFilteredProducts([]);
+        setFieldValue("productId", "");
+    }, [values.categoryId]);
+
+    useEffect(() => {
+        setFilteredProducts(product.filter(pro => pro.subCategoryId === values.subCategoryId));
+        setFieldValue("productId", "");
+    }, [values.subCategoryId]);
 
     return (
         <>
@@ -95,86 +176,68 @@ const Addstock = () => {
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Main Category</label>
                                                 <Form.Select
-                                                    name="mainCategory"
-                                                    value={values.mainCategory}
+                                                    name="mainCategoryId"
+                                                    value={values.mainCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option>Select</option>
-                                                    <option value="Women">Women</option>
-                                                    <option value="Men">Men</option>
-                                                    <option value="Baby & Kids">Baby & Kids</option>
-                                                    <option value="Beauty & Health">Beauty & Health</option>
-                                                    <option value="Home & Kitchen">Home & Kitchen</option>
-                                                    <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                    {mainCategory.map((mainCat) => (
+                                                        <option value={mainCat._id} key={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.mainCategory && touched.mainCategory && <div className="text-danger small">{errors.mainCategory}</div>}
+                                                {errors.mainCategoryId && touched.mainCategoryId && <div className="text-danger small">{errors.mainCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
-                                                    name="category"
-                                                    value={values.category}
+                                                    name="categoryId"
+                                                    value={values.categoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option>Select</option>
-                                                    <option value="Jewelry">Jewelry</option>
-                                                    <option value="Western Wear">Western Wear</option>
-                                                    <option value="Baby Care">Baby Care</option>
-                                                    <option value="Skin Care">Skin Care</option>
-                                                    <option value="Electronics">Electronics</option>
-                                                    <option value="Fragrance">Fragrance</option>
-                                                    <option value="Kitchen wear">Kitchen wear</option>
-                                                    <option value="Mobile">Mobile</option>
+                                                    {filteredCategories.map((cat) => (
+                                                        <option value={cat._id} key={cat._id}>{cat.categoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.category && touched.category && <div className="text-danger small">{errors.category}</div>}
+                                                {errors.categoryId && touched.categoryId && <div className="text-danger small">{errors.categoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
-                                                    name="subCategory"
-                                                    value={values.subCategory}
+                                                    name="subCategoryId"
+                                                    value={values.subCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option>Select</option>
-                                                    <option value="Necklace">Necklace</option>
-                                                    <option value="Blazer">Blazer</option>
-                                                    <option value="Baby Soap">Baby Soap</option>
-                                                    <option value="Facewash">Facewash</option>
-                                                    <option value="Refrigerator">Refrigerator</option>
-                                                    <option value="Perfume">Perfume</option>
-                                                    <option value="Pressure Cooker">Pressure Cooker</option>
-                                                    <option value="Smart Phone">Smart Phone</option>
+                                                    {filteredSubCategories.map((subCat) => (
+                                                        <option value={subCat._id} key={subCat._id}>{subCat.subCategoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.subCategory && touched.subCategory && <div className="text-danger small">{errors.subCategory}</div>}
+                                                {errors.subCategoryId && touched.subCategoryId && <div className="text-danger small">{errors.subCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Product</label>
                                                 <Form.Select
-                                                    name="product"
-                                                    value={values.product}
+                                                    name="productId"
+                                                    value={values.productId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option value="">Select</option>
-                                                    <option value="Gold Necklace">Gold Necklace</option>
-                                                    <option value="Black blazer">Black blazer</option>
-                                                    <option value="White Soap">White Soap</option>
-                                                    <option value="vitamin c facewash">vitamin c facewash</option>
-                                                    <option value="265 L fridge">265 L fridge</option>
-                                                    <option value="Denver scent">Denver scent</option>
-                                                    <option value="3 L Coocker">3 L Coocker</option>
-                                                    <option value="Vivo v27 Pro">Vivo v27 Pro</option>
+                                                    {filteredProducts.map((pro) => (
+                                                        <option value={pro._id} key={pro._id}>{pro.productName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.product && touched.product && <div className="text-danger small">{errors.product}</div>}
+                                                {errors.productId && touched.productId && <div className="text-danger small">{errors.productId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -214,12 +277,12 @@ const Addstock = () => {
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
                                                 <button className='border-0 bg-transparent'>
-                                                    Cnacel
+                                                    Cancel
                                                 </button>
-                                                {editStock === true ? 
+                                                {editStock === true ?
                                                     <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
                                                         Update
-                                                    </button> : 
+                                                    </button> :
                                                     <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
                                                         Add
                                                     </button>
