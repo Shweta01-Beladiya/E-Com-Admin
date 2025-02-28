@@ -33,19 +33,18 @@ const Addstock = () => {
 
     // Edit Stock
     const location = useLocation();
-    const editStock = location.state?.editStock;
-    // console.log(editStock)
+    const id = location.state?.id;
 
 
     // ******************************* Validation *******************************
-    const stockInit = {
+      const [initialValues, setInitialValues] = useState({
         mainCategoryId: "",
         categoryId: "",
         subCategoryId: "",
         productId: "",
         stockStatus: "",
         quantity: "",
-    }
+    })
 
     const stockValidate = Yup.object().shape({
         mainCategoryId: Yup.string().required("Main Category is required"),
@@ -57,19 +56,34 @@ const Addstock = () => {
     });
 
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
-        initialValues: stockInit,
+        initialValues: initialValues,
         validationSchema: stockValidate,
-        onSubmit: async(values) => {
-            console.log(values);
+        enableReinitialize: true, 
+        onSubmit: async (values) => {
+            // console.log(values);
             // addstock(values)
-
-            const response = await axios.post(`${BaseUrl}/api/createStock`, values, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            console.log("Response",response.data);
-            if(response.data.status === 201) {
-                navigate('/stock');
+            if (id) {
+                const response = await axios.put(`${BaseUrl}/api/updateStock/${id}`, values, {
+                    headers: {Authorization: `Bearer ${token}`}
+                });
+                // console.log("response",response.data);
+                if(response.data.status === 200) {
+                    navigate('/stock');
+                }
+            } else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createStock`, values, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    // console.log("Response", response.data);
+                    if (response.data.status === 201) {
+                        navigate('/stock');
+                    }
+                } catch (error) {
+                    console.error('Data Fetching Error:', error)
+                }
             }
+
         }
     })
     // **************************************************************************
@@ -123,6 +137,41 @@ const Addstock = () => {
     }
 
     useEffect(() => {
+        const fetchSingleData = async() => {
+           if(id) {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/getStock/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response",response.data.stock);
+               const stockData = response.data.stock;
+               
+               setInitialValues({
+                mainCategoryId: stockData.mainCategoryId,
+                categoryId:stockData.categoryId,
+                subCategoryId:stockData.subCategoryId,
+                productId: stockData.productId,
+                stockStatus: stockData.stockStatus,
+                quantity: stockData.quantity
+               });
+            } catch (error) {
+                console.error('Data fetching error:', error);
+            }
+           } else {
+                setInitialValues({
+                    mainCategoryId: "",
+                    categoryId: "",
+                    subCategoryId: "",
+                    productId: "",
+                    stockStatus: "",
+                    quantity: ""
+                })
+           }
+        }
+        fetchSingleData();
+    },[id]);
+
+    useEffect(() => {
         fetchMainCategory();
         fetchCategory();
         fetchSubCategory();
@@ -131,36 +180,49 @@ const Addstock = () => {
     }, []);
 
     useEffect(() => {
-        setFilteredCategories(category.filter(cat => cat.mainCategoryId === values.mainCategoryId));
-        setFieldValue("categoryId", "");
-        setFilteredSubCategories([]);
-        setFieldValue("subCategoryId", "");
-        setFilteredProducts([]);
-        setFieldValue("productId", "");
-    }, [values.mainCategoryId]);
-
+        if (values.mainCategoryId) {
+            const filtered = category.filter(cat => cat.mainCategoryId === values.mainCategoryId);
+            setFilteredCategories(filtered);
+            
+            if (!filtered.some(cat => cat._id === values.categoryId)) {
+                setFieldValue("categoryId", ""); 
+            }
+        }
+    }, [values.mainCategoryId, category]);
+    
     useEffect(() => {
-        setFilteredSubCategories(subCategory.filter(subCat => subCat.categoryId === values.categoryId));
-        setFieldValue("subCategoryId", "");
-        setFilteredProducts([]);
-        setFieldValue("productId", "");
-    }, [values.categoryId]);
-
+        if (values.categoryId) {
+            const filtered = subCategory.filter(subCat => subCat.categoryId === values.categoryId);
+            setFilteredSubCategories(filtered);
+    
+            if (!filtered.some(subCat => subCat._id === values.subCategoryId)) {
+                setFieldValue("subCategoryId", ""); 
+            }
+        }
+    }, [values.categoryId, subCategory]);
+    
     useEffect(() => {
-        setFilteredProducts(product.filter(pro => pro.subCategoryId === values.subCategoryId));
-        setFieldValue("productId", "");
-    }, [values.subCategoryId]);
+        if (values.subCategoryId) {
+            const filtered = product.filter(pro => pro.subCategoryId === values.subCategoryId);
+            setFilteredProducts(filtered);
+    
+            if (!filtered.some(pro => pro._id === values.productId)) {
+                setFieldValue("productId", ""); 
+            }
+        }
+    }, [values.subCategoryId, product]);    
 
+    
     return (
         <>
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editStock ? 'Edit Stock' : 'Add Stock'}</p>
+                        <p className='mb-1'>{id ? 'Edit Stock' : 'Add Stock'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editStock ? 'Edit Stock' : 'Add Stock'}
+                                {id ? 'Edit Stock' : 'Add Stock'}
                             </p>
                         </div>
                     </div>
@@ -251,7 +313,7 @@ const Addstock = () => {
                                                     className='mv_form_select'>
                                                     <option value="">Select</option>
                                                     <option value="In Stock">In Stock</option>
-                                                    <option value="Out of Stock">Out of Stock</option>
+                                                    <option value="Out Of Stock">Out of Stock</option>
                                                     <option value="Low Stock">Low Stock</option>
                                                 </Form.Select>
                                                 {errors.stockStatus && touched.stockStatus && <div className="text-danger small">{errors.stockStatus}</div>}
@@ -279,11 +341,11 @@ const Addstock = () => {
                                                 <button className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
-                                                {editStock === true ?
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                {id ?
+                                                    <button type="submit" className='border-0 bg-transparent' >
                                                         Update
                                                     </button> :
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                    <button type="submit" className='border-0 bg-transparent'>
                                                         Add
                                                     </button>
                                                 }

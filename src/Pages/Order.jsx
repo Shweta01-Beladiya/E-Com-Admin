@@ -8,51 +8,19 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Link } from 'react-router-dom';
 import NoResultsFound from '../Component/Noresult';
+import axios from 'axios';
 
 const Order = () => {
 
-  var data = [
-    {
-      id: 1,
-      CustomerName: "John Desai",
-      OrderDate: "02/09/2024",
-      TotalAmount: "$2000",
-      OrderStatus: "Deliverd"
-    },
-    {
-      id: 2,
-      CustomerName: "Mitesh Shah",
-      OrderDate: "02/08/2024",
-      TotalAmount: "$3000",
-      OrderStatus: "Panding"
-    },
-    {
-      id: 3,
-      CustomerName: "John Desai",
-      OrderDate: "02/01/2025",
-      TotalAmount: "$2200",
-      OrderStatus: "Cancelled"
-    },
-    {
-      id: 4,
-      CustomerName: "Om Patel",
-      OrderDate: "20/02/2025",
-      TotalAmount: "$800",
-      OrderStatus: "Deliverd"
-    },
-    {
-      id: 5,
-      CustomerName: "Nizam Patel ",
-      OrderDate: "18/11/2024",
-      TotalAmount: "$1200",
-      OrderStatus: "Cancelled"
-    },
-  ];
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [filteredData, setFilteredData] = useState(data);
-  const [originalData] = useState(data);
+  const [filteredData, setFilteredData] = useState([]);
+  const [data, setData] = useState([]);
+  // const [originalData] = useState(data);
 
   // ************************************** Pagination **************************************
   const itemsPerPage = 10;
@@ -66,12 +34,12 @@ const Order = () => {
     // Reset to page 1 when filters change
     setCurrentPage(1);
 
-    let results = originalData;
+    let results = [...data]; // Start with original data
 
     // Apply search filter
     if (searchTerm) {
       results = results.filter(item =>
-        item.CustomerName.toLowerCase().includes(searchTerm.toLowerCase())
+        item.userData[0].name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -79,7 +47,7 @@ const Order = () => {
     if (filterDate) {
       const formattedFilterDate = formatDateForComparison(filterDate);
       results = results.filter(item => {
-        const orderDate = formatDateForComparison(item.OrderDate);
+        const orderDate = formatDateForComparison(item.createdAt);
         return orderDate === formattedFilterDate;
       });
     }
@@ -87,13 +55,12 @@ const Order = () => {
     // Apply status filter
     if (filterStatus && filterStatus !== 'Select') {
       results = results.filter(item =>
-        item.OrderStatus === filterStatus
+        item.orderStatus === filterStatus
       );
     }
 
     setFilteredData(results);
   };
-
   const formatDateForComparison = (dateString) => {
     if (!dateString) return '';
 
@@ -122,7 +89,7 @@ const Order = () => {
     setSearchTerm('');
     setFilterDate('');
     setFilterStatus('');
-    setFilteredData(originalData);
+    // setFilteredData(originalData);
     handleClose();
   };
 
@@ -181,6 +148,25 @@ const Order = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${BaseUrl}/api/allOrders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // console.log("response", response.data.orders);
+        setData(response.data.orders);
+        setFilteredData(response.data.orders)
+      } catch (error) {
+        console.error('Data Fetching Error:', error);
+      }
+    }
+    fetchData();
+  }, []);
+  const clearDateFilter = () => {
+    setFilterDate('');
+  };
+
   return (
     <>
       <div id='mv_container_fluid'>
@@ -195,7 +181,7 @@ const Order = () => {
         </div>
         <div className="row mt-4">
           <div className="col-12">
-            <div className="mv_product_table_content" style={{height:'80vh'}}>
+            <div className="mv_product_table_content" style={{ height: '80vh' }}>
               <div className='mv_table_search'>
                 <div className="mv_product_search">
                   <InputGroup>
@@ -207,16 +193,20 @@ const Order = () => {
                   </InputGroup>
                 </div>
                 <div className='d-flex'>
-                  <div className="sb_date_input">
-                    {/* {selectedDate ? (
-                                    <Button variant="primary" onClick={clearDateFilter}>
-                                        <IoMdClose /> Clear Date
-                                    </Button>
-                                ) : ( */}
-                    <input type="date" name="" id="" value={filterDate}
-                      onChange={handleDateChange} />
-                    {/* )} */}
+                  {filterDate ? (
+                    <div className="mv_column_button mv_column_padd">
+                   <Button onClick={clearDateFilter}>Clear Date</Button>
                   </div>
+                  ) : (
+                    <div className="sb_date_input ">
+                      <input
+                        type="date"
+                        value={filterDate}
+                        onChange={handleDateChange}
+                      />
+                    </div>
+                  )}
+
                   <div className="mv_column_button mv_column_padd">
                     <Button variant="primary" onClick={handleShow}>
                       <img src={require('../mv_img/filter.png')} alt="" />
@@ -233,8 +223,8 @@ const Order = () => {
                             <Form.Select className="mb-3" aria-label="Default select example" value={filterStatus}
                               onChange={handleStatusChange}>
                               <option>Select</option>
-                              <option value="Deliverd">Order Delivered</option>
-                              <option value="Panding">Order Panding</option>
+                              <option value="Delivered">Order Delivered</option>
+                              <option value="Confirmed">Order Confirmed</option>
                               <option value="Cancelled">Order Cancelled</option>
                             </Form.Select>
                           </div>
@@ -272,23 +262,23 @@ const Order = () => {
                         {paginatedData.map((item, index) => (
                           <tr key={index}>
                             <td>{index + 1}</td>
-                            <td>{item.CustomerName}</td>
-                            <td>{item.OrderDate}</td>
-                            <td>{item.TotalAmount}</td>
+                            <td>{item.userData[0].name}</td>
+                            <td>{new Date(item.createdAt).toLocaleDateString('en-GB')}</td>
+                            <td>{item.totalAmount}</td>
                             <td>
                               {
-                                item.OrderStatus === 'Deliverd' ? (
-                                  <p className='m-0 mv_delivered_padd'>{item.OrderStatus}</p>
-                                ) : item.OrderStatus === 'Panding' ? (
-                                  <p className='m-0 mv_pending_padd'>{item.OrderStatus}</p>
-                                ) : item.OrderStatus === 'Cancelled' ? (
-                                  <p className='m-0 mv_cancelled_padd'>{item.OrderStatus}</p>
+                                item.orderStatus === 'Delivered' ? (
+                                  <p className='m-0 mv_delivered_padd'>{item.orderStatus}</p>
+                                ) : item.orderStatus === 'Confirmed' ? (
+                                  <p className='m-0 mv_pending_padd'>{item.orderStatus}</p>
+                                ) : item.orderStatus === 'Cancelled' ? (
+                                  <p className='m-0 mv_cancelled_padd'>{item.orderStatus}</p>
                                 ) : null
                               }
                             </td>
                             <td className='d-flex align-items-center justify-content-end'>
                               <div className="mv_pencil_icon">
-                                <Link to={'/viewOrder'}>
+                                <Link to={`/viewOrder/${item._id}`}>
                                   <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                 </Link>
                               </div>
