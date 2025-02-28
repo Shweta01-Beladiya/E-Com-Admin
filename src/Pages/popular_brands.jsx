@@ -21,6 +21,7 @@ const Popularbrands = (props) => {
     const [filters, setFilters] = useState({
         brandname: '',
     });
+    const [tempFilters, setTempFilters] = useState(filters);
 
     // Edit Offer
     const [editpopularbrands,setEditPopularbrands] = useState(false);
@@ -33,97 +34,6 @@ const Popularbrands = (props) => {
         setEditPopularbrands(true);
         // navigate('addsize')
     }
-
-    // var data = [
-    //     {   
-    //         id: 1,
-    //         barndimg: "apple.png",
-    //         name: "Apple",
-    //         img: "mobile.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 2,
-    //         barndimg: "noise.png",
-    //         name: "Noise",
-    //         img: "watch.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 3,
-    //         barndimg: "asus.png",
-    //         name: "Asus",
-    //         img: "book.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 4,
-    //         barndimg: "apple.png",
-    //         name: "Apple",
-    //         img: "mobile.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 5,
-    //         barndimg: "asus.png",
-    //         name: "Asus",
-    //         img: "book.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 6,
-    //         barndimg: "apple.png",
-    //         name: "Apple",
-    //         img: "mobile.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 7,
-    //         barndimg: "asus.png",
-    //         name: "Asus",
-    //         img: "book.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 8,
-    //         barndimg: "apple.png",
-    //         name: "Apple",
-    //         img: "mobile.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 9,
-    //         barndimg: "asus.png",
-    //         name: "Asus",
-    //         img: "book.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 10,
-    //         barndimg: "noise.png",
-    //         name: "Noise",
-    //         img: "watch.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    //     {   
-    //         id: 11,
-    //         barndimg: "apple.png",
-    //         name: "Apple",
-    //         img: "mobile.png",
-    //         offer: "Upto 20% OFF",
-    //         title: "lorem ipsum",
-    //     },
-    // ];
 
     // Search Data
     useEffect(() => {
@@ -147,10 +57,15 @@ const Popularbrands = (props) => {
 
     // Offcanvas Filter
     const handleFilterChange = (field, value) => {
-        setFilters(prev => ({
+        setTempFilters(prev => ({
           ...prev,
           [field]: value
         }));
+    };
+
+    const handleApplyFilters = () => {
+        setFilters(tempFilters);
+        handleClose();
     };
 
     // ************************************** Show Data **************************************
@@ -305,7 +220,7 @@ const Popularbrands = (props) => {
                                     </InputGroup>
                                 </div>
                                 <div className='d-flex'>
-                                    <div className="mv_column_button mv_column_padd">
+                                <div className="mv_column_button mv_column_padd">
                                         <Button variant="primary" onClick={handleShow}>
                                             <img src={require('../mv_img/filter.png')} alt="" />
                                             Filters
@@ -314,11 +229,11 @@ const Popularbrands = (props) => {
                                             <Offcanvas.Header closeButton className='mv_offcanvas_filter_heading'>
                                                 <Offcanvas.Title className='mv_offcanvas_filter_title'>Filters</Offcanvas.Title>
                                             </Offcanvas.Header>
-                                            <Offcanvas.Body className=''>
+                                            <Offcanvas.Body>
                                                 <div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Brand Name</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example" value={filters.brandname}
+                                                        <Form.Select className="mb-3" aria-label="Default select example" value={tempFilters.brandName}
                                                             onChange={(e) => handleFilterChange('brandName', e.target.value)}>
                                                             <option>Select</option>
                                                             <option value="Apple">Apple</option>
@@ -334,7 +249,7 @@ const Popularbrands = (props) => {
                                                             <button type="button" onClick={handleClose}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="button" onClick={handleApplyFilters}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>

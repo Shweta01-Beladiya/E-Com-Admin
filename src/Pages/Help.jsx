@@ -7,73 +7,25 @@ import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
-const Help = (props) => {
-   
-    var data = [
-        {   
-            id: 1,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 2,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 3,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 4,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 5,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 6,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 7,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 8,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 9,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 10,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 11,
-            faqquestion: "Lorem ipsum dolor sit amet consectetur",
-            answer: "Lorem ipsum dolor sit amet consectetu Lorem ipsum dolor sit amet",
-        },
-    ];
+const Help = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [toggle, setToggle] = useState(false)
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
+    const [filteredData, setFilteredData] = useState();
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
     console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
@@ -113,7 +65,7 @@ const Help = (props) => {
         return buttons;
     };
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -137,27 +89,153 @@ const Help = (props) => {
     const [id, setId] = useState(null);
 
     const init = {
-        helpquestion: "",
+        helpQuestion: "",
         answer: "",
     };
     
     const validate = Yup.object().shape({
-        helpquestion: Yup.string().required("Help question is required"),
+        helpQuestion: Yup.string().required("Help question is required"),
         answer: Yup.string().required("Answer is required")
     });
     
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched } = useFormik({
+    const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
             // help(values)
+
+             const helpObj = {
+                helpQuestion:values?.helpQuestion,
+                answer:values?.answer
+            }
+
+            //************************************** Edit and Add **************************************
+            if (id) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateHelpQuestion/${id}`, helpObj, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createHelpQuestion`, helpObj, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+                    setModalShow1(false);
+                    setToggle(!toggle);
+                    resetForm();
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
     });
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
     // *******************************************************************************
+
+    // ************************************** Show Data **************************************
+    useEffect(()=>{
+        const fetchBrandData = async () => {
+            try{
+               const response = await axios.get(`${BaseUrl}/api/allHelpQuestions`,{
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 }
+               })
+               console.log("data" , response?.data);
+               setFilteredData(response?.data?.
+                helpQuestion)
+               setData(response?.data?.helpQuestion)
+            }catch(error){
+               console.error("Error fetching data:", error);
+            }
+        }
+        fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
+ 
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+ 
+    const handleDelete = async () => {
+        try{
+            const response = await axios.delete(`${BaseUrl}/api/deleteHelpQuestion/${deleteToggle}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            console.log("delete response " , response);
+            setModalShow(false)
+            setToggle(!toggle)
+        }catch(error){
+            alert(error)
+        }
+     }
+    // ***************************************************************************************
+
+    // Edit
+    const handleEdit = (item) => {
+        setId(item._id);
+        
+        // Set form values with the selected item data
+        setValues({
+            helpQuestion: item.helpQuestion || "",
+            answer: item.answer || "",
+        });
+        
+        setModalShow1(true);
+    };
+
+    // Add new item
+    const handleAddNew = () => {
+        setId(null);
+        resetForm();
+        setModalShow1(true);
+    };
+
+    // Reset form when modal closes
+    const handleCloseModal = () => {
+        setModalShow1(false);
+        setId(null);
+        resetForm();
+    };
+
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("" , result);
     
-    // State variables
-    let [description, setDescription] = useState("");
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.helpQuestion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.answer?.includes(searchTerm)
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1);
+    }, [data, searchTerm]);
 
     return (
         <>
@@ -179,42 +257,40 @@ const Help = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
                                 <div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
-                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={() => setModalShow1(true)}>
+                                        <div className="mv_add_category mv_add_subcategory mv_add_product" onClick={handleAddNew}>
                                             <button><Link>+ Add</Link></button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
+                                <table className='mv_product_table mv_help_table justify-content-between'>
                                     <thead>
                                         <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Help Question</th>
-                                            <th className=''>Answer</th>
+                                            <th className='text-wrap'>ID</th>
+                                            <th className='text-wrap'>Help Question</th>
+                                            <th className='text-wrap'>Answer</th>
                                             <th className='d-flex align-items-center justify-content-end'>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {paginatedData.map((item, index) => (
+                                        {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.faqquestion}</td>
+                                            <td>{index + 1}</td>
+                                            <td>{item.helpQuestion}</td>
                                             <td>{item.answer}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow1(true)}>
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
+                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -255,14 +331,14 @@ const Help = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
             </Modal>
 
             {/* Add Edit Help Modal */}
-            <Modal show={modalShow1} onHide={() => { setModalShow1(false); setId(null); }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+            <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
                     
                 </Modal.Header>
@@ -276,13 +352,13 @@ const Help = (props) => {
                             <InputGroup className="">
                                 <Form.Control
                                     placeholder="Enter help question"
-                                    name="helpquestion"
-                                    value={values.helpquestion}
+                                    name="helpQuestion"
+                                    value={values.helpQuestion}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                 />
                             </InputGroup>
-                            {errors.helpquestion && touched.helpquestion && <div className="text-danger small">{errors.helpquestion}</div>}
+                            {errors.helpQuestion && touched.helpQuestion && <div className="text-danger small">{errors.helpQuestion}</div>}
                         </div>
                         <div className="mv_input_content mb-5">
                             <label className='mv_label_input'>Answer</label>
@@ -302,7 +378,7 @@ const Help = (props) => {
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => setModalShow1(false)}>Cancel</button>
+                                <button type="button" onClick={handleCloseModal}>Cancel</button>
                             </div>
                             <div className="mv_logout_button">
                                 <button type="submit">
