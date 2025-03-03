@@ -278,7 +278,7 @@ const Reasonforcancellation = (props) => {
                                     <tbody>
                                         {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>{item.reasonName}</td>
                                             <td>
                                                 <Form.Check

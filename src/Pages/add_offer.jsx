@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, use } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -77,9 +77,11 @@ const Addoffer = ({ editData }) => {
         const formattedDate = `${day}-${month}-${year}`;
         
         if (dateType === 'start') {
-            setDate(formattedDate);
+            setDate(formattedDate); // For UI display
+            setFieldValue("startDate", e.target.value)
         } else if (dateType === 'end') {
-            setDate1(formattedDate);
+            setDate1(formattedDate); // For UI display
+            setFieldValue("endDate", e.target.value);
         }
     };
 
@@ -113,7 +115,7 @@ const Addoffer = ({ editData }) => {
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: addofferInit,
         validationSchema: addofferValidate,
-        onsubmit: async (values) => {
+        onSubmit: async (values) => {
             console.log(values);
             // addproductoffer(values)
 
@@ -170,6 +172,64 @@ const Addoffer = ({ editData }) => {
             }
         }
     })
+    const [mainCategory, setMainCategory] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [subcategories, setsubCategories] = useState([]);
+    const [selectedCategories, setselectedCategories] = useState([]);
+    const [selectedSubCategories, setselectedSubCategories] = useState([]);
+
+
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data.users);
+            setMainCategory(response.data.users);
+        } catch (error) {
+            console.error('Data fetching Error:', error);
+        }
+    }
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data.category);
+                setCategories(response.data.category);
+        } catch (error) {
+            console.error('Data fetching Error:', error);
+        }
+    }
+    const fetchsubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data);
+                setsubCategories(response.data.subCategory);
+        } catch (error) {
+            console.error('Data fetching Error:', error);
+        }
+    }
+    function mCategory(value){
+        var fliter = categories.filter(item=> item.mainCategoryId === value)
+        console.log('f',fliter);
+        setselectedCategories(fliter)
+    }
+    function sCategory(value){
+        console.log('sub',subcategories);
+        var fliter = subcategories.filter(item=> item.categoriesData[0]._id
+            === value)
+        console.log('f123',fliter);
+        setselectedSubCategories(fliter)
+        // setselectedCategories(fliter)
+    }
+    useEffect(()=>{
+        fetchMainCategory();
+        fetchCategory();
+        fetchsubCategory();
+    },[])
     // **************************************************************************
 
     return (
@@ -199,16 +259,18 @@ const Addoffer = ({ editData }) => {
                                                 <Form.Select
                                                     name="mainCategoryId"
                                                     value={values.mainCategoryId}
-                                                    onChange={handleChange}
+                                                    onChange={(e) => {
+                                                        handleChange(e);  // ✅ Correctly pass the event
+                                                        mCategory(e.target.value);  // ✅ Get updated value from the event
+                                                    }}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
-                                                    <option>Select</option>
-                                                    <option value="Women">Women</option>
-                                                    <option value="Men">Men</option>
-                                                    <option value="Baby & Kids">Baby & Kids</option>
-                                                    <option value="Beauty & Health">Beauty & Health</option>
-                                                    <option value="Home & Kitchen">Home & Kitchen</option>
-                                                    <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                    <option value="">Select</option>
+                                                    {mainCategory.map(cat => (
+                                                        <option key={cat._id} value={cat._id}>
+                                                            {cat.mainCategoryName}
+                                                        </option>
+                                                    ))}
                                                 </Form.Select>
                                                 {errors.mainCategoryId && touched.mainCategoryId && <div className="text-danger small">{errors.mainCategoryId}</div>}
                                             </div>
@@ -219,18 +281,18 @@ const Addoffer = ({ editData }) => {
                                                 <Form.Select
                                                     name="categoryId"
                                                     value={values.categoryId}
-                                                    onChange={handleChange}
+                                                    onChange={(e) => {
+                                                        handleChange(e);  // ✅ Correctly pass the event
+                                                        sCategory(e.target.value);  // ✅ Get updated value from the event
+                                                    }}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option>Select</option>
-                                                    <option value="Jewelry">Jewelry</option>
-                                                    <option value="Western Wear">Western Wear</option>
-                                                    <option value="Baby Care">Baby Care</option>
-                                                    <option value="Skin Care">Skin Care</option>
-                                                    <option value="Electronics">Electronics</option>
-                                                    <option value="Fragrance">Fragrance</option>
-                                                    <option value="Kitchen wear">Kitchen wear</option>
-                                                    <option value="Mobile">Mobile</option>
+                                                    {selectedCategories.map(cat => (
+                                                        <option key={cat._id} value={cat._id}>
+                                                            {cat.categoryName}
+                                                        </option>
+                                                    ))}
                                                 </Form.Select>
                                                 {errors.categoryId && touched.categoryId && <div className="text-danger small">{errors.categoryId}</div>}
                                             </div>
@@ -245,14 +307,11 @@ const Addoffer = ({ editData }) => {
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option>Select</option>
-                                                    <option value="Necklace">Necklace</option>
-                                                    <option value="Blazer">Blazer</option>
-                                                    <option value="Baby Soap">Baby Soap</option>
-                                                    <option value="Facewash">Facewash</option>
-                                                    <option value="Refrigerator">Refrigerator</option>
-                                                    <option value="Perfume">Perfume</option>
-                                                    <option value="Pressure Cooker">Pressure Cooker</option>
-                                                    <option value="Smart Phone">Smart Phone</option>
+                                                    {selectedSubCategories.map(cat => (
+                                                        <option key={cat._id} value={cat._id}>
+                                                            {cat.subCategoryName}
+                                                        </option>
+                                                    ))}
                                                 </Form.Select>
                                                 {errors.subCategoryId && touched.subCategoryId && <div className="text-danger small">{errors.subCategoryId}</div>}
                                             </div>
@@ -426,6 +485,7 @@ const Addoffer = ({ editData }) => {
                     </div>
                 </div>
             </div>
+
         </>
     );
 };

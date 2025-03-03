@@ -38,7 +38,7 @@ const Offer = (props) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("hihi" , result);
+        
         if (filters.offerType) {
           result = result.filter(user => user.offerType === filters.offerType);
         }
@@ -93,9 +93,9 @@ const Offer = (props) => {
                     Authorization: `Bearer ${token}`,
                 }
               })
-            //   console.log("data" , response?.data?.popularBrand);
-              setFilteredData(response?.data?.popularBrand)
-              setData(response?.data?.popularBrand)
+              console.log("data" , response?.data);
+              setFilteredData(response?.data?.offers )
+              setData(response?.data?.offers)
            }catch(error){
               
            }
@@ -131,7 +131,7 @@ const Offer = (props) => {
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
  
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
     console.log("totalpage",totalPages)
  
     const handlePageChange = (newPage) => {
@@ -171,7 +171,7 @@ const Offer = (props) => {
         return buttons;
     };
  
-    const paginatedData = filteredData.slice(
+    const paginatedData = filteredData?.slice(
          (currentPage - 1) * itemsPerPage,
          currentPage * itemsPerPage
     );
@@ -287,8 +287,6 @@ const Offer = (props) => {
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
-                                                            value={tempFilters.startDate}
-                                                            onChange={(e) => handleFilterChange('startDate', e.target.value)}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -296,8 +294,6 @@ const Offer = (props) => {
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
-                                                            value={tempFilters.endDate}
-                                                            onChange={(e) => handleFilterChange('endDate', e.target.value)}
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
@@ -332,7 +328,7 @@ const Offer = (props) => {
                                 </div>
                             </div>
                             <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
+                                <table className='mv_product_table mv_help_table  justify-content-between'>
                                     <thead>
                                         <tr>
                                             <th className=''>ID</th>
@@ -348,18 +344,18 @@ const Offer = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       {paginatedData.map((item, index) => (
+                                       {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{item.id}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>
                                                 <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.offerImage }`}  alt="" />
                                             </td>
-                                            <td>{item.offertype}</td>
-                                            <td>{item.offername}</td>
-                                            <td>{item.description}</td>
-                                            <td>{item.buttontext}</td>
-                                            <td>{item.startdate}</td>
-                                            <td>{item.enddate}</td>
+                                            <td>{item.offerType}</td>
+                                            <td>{item.offerName}</td>
+                                            <td className='text-trancute'>{item.description}</td>
+                                            <td>{item.buttonText}</td>
+                                            <td>{item.startDate}</td>
+                                            <td>{item.endDate}</td>
                                             <td>
                                                 <Form.Check
                                                     type="switch"

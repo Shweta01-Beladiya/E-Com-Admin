@@ -282,7 +282,7 @@ const Faqs = (props) => {
                                     <tbody>
                                         {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>{item.question}</td>
                                             <td>{item.answer}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
