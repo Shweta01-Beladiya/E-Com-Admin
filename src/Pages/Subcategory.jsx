@@ -25,7 +25,7 @@ const SubCategory = () => {
     const [filters, setFilters] = useState({ category: '', mainCategory: '', status: '' });
     const [id, setId] = useState(null);
     const [subCatToDelete, setSubCatToDelete] = useState(null);
-    const [filteredCategories, setFilteredCategories] = useState([]); // use for Fileter category
+    const [filteredCategories, setFilteredCategories] = useState([]); // use for Filter category
     const [initialValues, setInitialValues] = useState({
         mainCategoryId: '',
         categoryId: '',
@@ -94,7 +94,10 @@ const SubCategory = () => {
                         mainCategoryId: subcategoryData.mainCategoryId,
                         categoryId: subcategoryData.categoryId,
                         subCategoryName: subcategoryData.subCategoryName
-                    })
+                    });
+                    
+                    // When editing, filter categories based on the mainCategoryId
+                    filterCategoriesByMainCategory(subcategoryData.mainCategoryId);
                 } catch (error) {
                     console.error('Data Fetching Error:', error);
                 }
@@ -103,12 +106,31 @@ const SubCategory = () => {
                     mainCategoryId: '',
                     categoryId: '',
                     subCategoryName: ''
-                })
+                });
+                setFilteredCategories([]);
             }
         }
         fetchSingleSubCategory();
 
-    }, [id, BaseUrl, token])
+    }, [id, BaseUrl, token]);
+
+    // Function to filter categories based on selected main category
+    const filterCategoriesByMainCategory = (mainCatId) => {
+        if (!mainCatId) {
+            setFilteredCategories([]);
+            return;
+        }
+        
+        const relatedCategories = category.filter(cat => cat.mainCategoryId === mainCatId);
+        setFilteredCategories(relatedCategories);
+    };
+
+    // Watch for filter changes
+    useEffect(() => {
+        if (filters.mainCategory) {
+            filterCategoriesByMainCategory(filters.mainCategory);
+        }
+    }, [filters.mainCategory, category]);
 
     const handleSubmit = async (values) => {
         setId(id);
@@ -178,28 +200,6 @@ const SubCategory = () => {
         setCurrentPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, filters, subCategories]);
-
-    useEffect(() => {
-        const handleCategoryFilter = (mainCatId) => {
-            if (!mainCatId) {
-                setFilteredCategories([]); // Reset filtered categories if no main category selected
-                return;
-            }
-
-            const relatedCategories = category.filter(cat => cat.mainCategoryId === mainCatId);
-            setFilteredCategories(relatedCategories);
-        };
-
-        // For the filter modal
-        if (filters.mainCategory) {
-            handleCategoryFilter(filters.mainCategory);
-        }
-
-        // For the add/edit form - watch initialValues.mainCategoryId
-        if (initialValues.mainCategoryId) {
-            handleCategoryFilter(initialValues.mainCategoryId);
-        }
-    }, [filters.mainCategory, initialValues.mainCategoryId, category]);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -414,9 +414,15 @@ const SubCategory = () => {
                                     onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                                 >
                                     <option value="">Select Category</option>
-                                    {category.map((cat) => (
-                                        <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
-                                    ))}
+                                    {filters.mainCategory ? 
+                                        filteredCategories.map((cat) => (
+                                            <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
+                                        ))
+                                        :
+                                        category.map((cat) => (
+                                            <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
+                                        ))
+                                    }
                                 </Form.Control>
                             </Form.Group>
                             <Form.Group className="mb-3">
@@ -457,20 +463,19 @@ const SubCategory = () => {
                             onSubmit={handleSubmit}
                             enableReinitialize={true}
                         >
-                            {({ handleSubmit, setFieldValue }) => (
+                            {({ handleSubmit, setFieldValue, values }) => (
                                 <FormikForm onSubmit={handleSubmit} className="r_form">
                                     <Form.Group className="mb-3">
                                         <Form.Label>Main Category</Form.Label>
-                                        <Form.Select
+                                        <Field
+                                            as="select"
                                             name="mainCategoryId"
                                             className="form-select"
                                             onChange={(e) => {
-                                                setFieldValue('mainCategoryId', e.target.value);
+                                                const mainCatId = e.target.value;
+                                                setFieldValue('mainCategoryId', mainCatId);
                                                 setFieldValue('categoryId', ''); // Reset category when main category changes
-                                                const relatedCategories = category.filter(
-                                                    cat => cat.mainCategoryId === e.target.value
-                                                );
-                                                setFilteredCategories(relatedCategories);
+                                                filterCategoriesByMainCategory(mainCatId);
                                             }}
                                         >
                                             <option value="">Select</option>
@@ -479,7 +484,7 @@ const SubCategory = () => {
                                                     {main.mainCategoryName}
                                                 </option>
                                             ))}
-                                        </Form.Select>
+                                        </Field>
                                         <ErrorMessage name="mainCategoryId" component="small" className="text-danger" />
                                     </Form.Group>
 
@@ -489,7 +494,7 @@ const SubCategory = () => {
                                             as="select"
                                             name="categoryId"
                                             className="form-select"
-                                        // disabled={!initialValues.mainCategoryId} 
+                                            disabled={!values.mainCategoryId}
                                         >
                                             <option value="">Select</option>
                                             {filteredCategories.map((cat) => (
@@ -513,7 +518,10 @@ const SubCategory = () => {
                                     </Form.Group>
 
                                     <div className="d-flex justify-content-center gap-2 mt-4">
-                                        <Button onClick={() => setShowAddEditModal(false)} className="r_cancel">
+                                        <Button onClick={() => {
+                                            setShowAddEditModal(false);
+                                            setId(null);
+                                        }} className="r_cancel">
                                             Cancel
                                         </Button>
                                         <Button type="submit" className="r_delete">

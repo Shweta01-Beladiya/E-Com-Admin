@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
@@ -6,43 +6,49 @@ import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-i
 import Modal from 'react-bootstrap/Modal';
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import NoResultsFound from '../Component/Noresult';
+import axios from 'axios';
 
 const ReviewManagement = () => {
 
-  var data = [
-    {
-      id: 1,
-      customerName: "Johan Desai",
-      product: 'Smart Watch',
-      date: "02/09/2023",
-      rate: '4.5',
-      description: "Lorem ipsum dolor sit",
-    },
-    {
-      id: 2,
-      customerName: "Om Patel",
-      product: 'Skin Care',
-      date: "12/08/2024",
-      rate: '4.0',
-      description: "Lorem ipsum dolor sit",
-    },
-    {
-      id: 3,
-      customerName: "Nizam Patel",
-      product: 'Smart Watch',
-      date: "02/10/2024",
-      rate: '3.5',
-      description: "Lorem ipsum dolor sit",
-    },
-    {
-      id: 5,
-      customerName: "Johan Desai",
-      product: 'Smart Watch',
-      date: "02/09/2023",
-      rate: '4.1',
-      description: "Lorem ipsum dolor sit",
-    },
-  ];
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
+
+  const [data,setData] = useState([]);
+
+  // var data = [
+  //   {
+  //     id: 1,
+  //     customerName: "Johan Desai",
+  //     product: 'Smart Watch',
+  //     date: "02/09/2023",
+  //     rate: '4.5',
+  //     description: "Lorem ipsum dolor sit",
+  //   },
+  //   {
+  //     id: 2,
+  //     customerName: "Om Patel",
+  //     product: 'Skin Care',
+  //     date: "12/08/2024",
+  //     rate: '4.0',
+  //     description: "Lorem ipsum dolor sit",
+  //   },
+  //   {
+  //     id: 3,
+  //     customerName: "Nizam Patel",
+  //     product: 'Smart Watch',
+  //     date: "02/10/2024",
+  //     rate: '3.5',
+  //     description: "Lorem ipsum dolor sit",
+  //   },
+  //   {
+  //     id: 5,
+  //     customerName: "Johan Desai",
+  //     product: 'Smart Watch',
+  //     date: "02/09/2023",
+  //     rate: '4.1',
+  //     description: "Lorem ipsum dolor sit",
+  //   },
+  // ];
 
   const renderStars = (rating) => {
     const stars = [];
@@ -131,6 +137,20 @@ const ReviewManagement = () => {
   const [modalShow, setModalShow] = React.useState(false);
   const [viewModalShow, setViewModalShow] = React.useState(false);
 
+  useEffect(() => {
+    const fetchData = async() => {
+      try {
+        const response = await axios.get(`${BaseUrl}/api/allratingAndReview`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log("repsonse",response.data.ratingAndReview);
+        setData(response.data.ratingAndReview);
+      } catch (error) {
+        console.error('Data Fetching Error:', error);
+      }
+    }
+    fetchData();
+  },[]);
   return (
     <>
       <div id='mv_container_fluid'>

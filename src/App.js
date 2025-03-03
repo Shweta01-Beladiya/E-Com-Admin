@@ -84,7 +84,7 @@ function App() {
             <Route path='/addstock' element={<Addstock />}></Route>
 
             <Route path="/order" element={<OrderManagement/>}></Route>
-            <Route path="/viewOrder" element={<OrderDetail/>}></Route>
+            <Route path="/viewOrder/:id" element={<OrderDetail/>}></Route>
             <Route path='/review' element={<ReviewManagement />}></Route>
             <Route path="/DeactivateAccount" element={<DeactivatedAccount/>}></Route>
             <Route path='/coupon' element={<Coupon />}></Route>

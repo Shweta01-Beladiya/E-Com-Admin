@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
-const Stock = (props) => {
+const Stock = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
     // Edit Stock
-    const [editstok,setEditstock] = useState(false);
+    const [editstok, setEditstock] = useState(false);
 
     const navigate = useNavigate();
 
@@ -20,145 +25,63 @@ const Stock = (props) => {
         // navigate('addsize')
     }
 
-    var data = [
-        {   
-            id: 1,
-            maincategory: "Women",
-            category: "Jewelry",
-            subcategory: "Necklace",
-            product: "Gold Necklace",
-            stock: "In Stock",
-            qty: "142",
-        },
-        {   
-            id: 2,
-            maincategory: "Men",
-            category: "Western Wear",
-            subcategory: "Blazer",
-            product: "Black blazer",
-            stock: "Out of Stock",
-            qty: "2",
-        },
-        {   
-            id: 3,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            product: "White Soap",
-            stock: "Low Stock",
-            qty: "21",
-        },
-        {   
-            id: 4,
-            maincategory: "Beauty & Health",
-            category: "Skin Care",
-            subcategory: "Facewash",
-            product: "vitamin c facewash",
-            stock: "Out of Stock",
-            qty: "6",
-        },
-        {   
-            id: 5,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            product: "White Soap",
-            stock: "Low Stock",
-            qty: "22",
-        },
-        {   
-            id: 6,
-            maincategory: "Mobile & Electronics",
-            category: "Electronics",
-            subcategory: "Refrigerator",
-            product: "265 L fridge",
-            stock: "In Stock",
-            qty: "874",
-        },
-        {   
-            id: 7,
-            maincategory: "Beauty & Health",
-            category: "Fragrance",
-            subcategory: "Perfume",
-            product: "Denver scent",
-            stock: "Out of Stock",
-            qty: "11",
-        },
-        {   
-            id: 8,
-            maincategory: "Home & Kitchen",
-            category: "Kitchen wear",
-            subcategory: "Pressure Cooker",
-            product: "3 L Coocker",
-            stock: "Low Stock",
-            qty: "27",
-        },
-        {   
-            id: 9,
-            maincategory: "Baby & Kids",
-            category: "Baby Care",
-            subcategory: "Baby Soap",
-            product: "White Soap",
-            stock: "Out of Stock",
-            qty: "3",
-        },
-        {   
-            id: 10,
-            maincategory: "Mobile & Electronics",
-            category: "Mobile",
-            subcategory: "Smart Phone",
-            product: "Vivo v27 Pro",
-            stock: "In Stock",
-            qty: "264",
-        },
-        {   
-            id: 11,
-            maincategory: "Women",
-            category: "Jewelry",
-            subcategory: "Necklace",
-            product: "Gold Necklace",
-            stock: "In Stock",
-            qty: "142",
-        },
-    ];
-
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
- 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
- 
+    const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [modalShow, setModalShow] = React.useState(false); // Modal
+    const [show, setShow] = useState(false);  // Offcanvas
+    const [maincategory, setMainCategory] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [subcategory, setSubcategory] = useState([]);
+    const [product, setProduct] = useState([]);
+    const [id, setId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(''); // Add search term state
+
+    // Add state for filtered dropdown options
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [filteredSubcategories, setFilteredSubcategories] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+
+    // Add state for selected values
+    const [selectedMainCategory, setSelectedMainCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedSubcategory, setSelectedSubcategory] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState('');
+    const [selectedStockStatus, setSelectedStockStatus] = useState(''); // Add stock status state
+
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-             setCurrentPage(newPage);
+            setCurrentPage(newPage);
         }
     };
- 
+
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-         
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-         
+
         // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
- 
+
         // Add first page if not included
         if (startPage > 1) {
             buttons.push(1);
             if (startPage > 2) buttons.push('...');
         }
- 
+
         // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
- 
+
         // Add last page if not included
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) buttons.push('...');
@@ -166,21 +89,264 @@ const Stock = (props) => {
         }
         return buttons;
     };
- 
-    const paginatedData = filteredData.slice(
-         (currentPage - 1) * itemsPerPage,
-         currentPage * itemsPerPage
+
+    const paginatedData = filteredData?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     // *******************************************************************************
 
-    // Modal
-    const [modalShow, setModalShow] = React.useState(false);
 
-    // Offcanvas
-    const [show, setShow] = useState(false);
+    const handleClose = () => {
+        setShow(false);
+    };
 
-    const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setMainCategory(response.data.users);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCategory(response.data.category);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSubcategory(response.data.subCategory);
+        } catch (error) {
+            console.error('Data Fetching Error', error);
+        }
+    }
+
+    const fetchProduct = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allProduct`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setProduct(response.data.product);
+        } catch (error) {
+            console.error('Data Fetching Error :', error);
+        }
+    }
+
+    const fetchStockData = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allStocks`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setData(response.data.stock);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        fetchProduct();
+        fetchStockData();
+    }, []);
+
+    // Update filteredData when data or searchTerm changes
+    useEffect(() => {
+        let result = [...data];
+
+        // Apply search filter
+        if (searchTerm.trim() !== '') {
+            result = result.filter(item =>
+                (item.mainCategoriesData && item.mainCategoriesData.length > 0 &&
+                    item.mainCategoriesData[0].mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.categoriesData && item.categoriesData.length > 0 &&
+                    item.categoriesData[0].categoryName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.subCategoriesData && item.subCategoriesData.length > 0 &&
+                    item.subCategoriesData[0].subCategoryName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.productData && item.productData.length > 0 &&
+                    item.productData[0].productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.stockStatus && item.stockStatus.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.quantity && item.quantity.toString().includes(searchTerm))
+            );
+        }
+
+        setFilteredData(result);
+    }, [data, searchTerm]);
+
+    // Handle search input change
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    // Filter categories when main category is selected
+    const handleMainCategoryChange = (e) => {
+        const mainCatId = e.target.value;
+        setSelectedMainCategory(mainCatId);
+
+        // Reset other selections
+        setSelectedCategory('');
+        setSelectedSubcategory('');
+        setSelectedProduct('');
+
+        // Filter categories related to selected main category
+        if (mainCatId) {
+            const relatedCategories = category.filter(cat => cat.mainCategoryId === mainCatId);
+            setFilteredCategories(relatedCategories);
+        } else {
+            setFilteredCategories([]);
+        }
+
+        // Clear filtered subcategories and products
+        setFilteredSubcategories([]);
+        setFilteredProducts([]);
+    };
+
+    // Filter subcategories when category is selected
+    const handleCategoryChange = (e) => {
+        const categoryId = e.target.value;
+        setSelectedCategory(categoryId);
+
+        // Reset subcategory and product selections
+        setSelectedSubcategory('');
+        setSelectedProduct('');
+
+        // Filter subcategories related to selected category
+        if (categoryId) {
+            const relatedSubcategories = subcategory.filter(subCat => subCat.categoryId === categoryId);
+            setFilteredSubcategories(relatedSubcategories);
+        } else {
+            setFilteredSubcategories([]);
+        }
+
+        // Clear filtered products
+        setFilteredProducts([]);
+    };
+
+    // Filter products when subcategory is selected
+    const handleSubcategoryChange = (e) => {
+        const subCategoryId = e.target.value;
+        setSelectedSubcategory(subCategoryId);
+
+        // Reset product selection
+        setSelectedProduct('');
+
+        // Filter products related to selected subcategory
+        if (subCategoryId) {
+            const relatedProducts = product.filter(prod => prod.subCategoryId === subCategoryId);
+            setFilteredProducts(relatedProducts);
+        } else {
+            setFilteredProducts([]);
+        }
+    };
+
+    // Handle product selection
+    const handleProductChange = (e) => {
+        setSelectedProduct(e.target.value);
+    };
+
+    // Handle stock status selection
+    const handleStockStatusChange = (e) => {
+        setSelectedStockStatus(e.target.value);
+    };
+
+    const handleDelete = (id) => {
+        setModalShow(true);
+        setId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteStock/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data.status === 200) {
+                setModalShow(false);
+                setData((prevData) => prevData.filter((stock) => stock._id !== id));
+            }
+        } catch (error) {
+            console.error('Data fetching Error:', error);
+        }
+    };
+
+    // Reset filters
+    const handleResetFilters = () => {
+        setSelectedMainCategory('');
+        setSelectedCategory('');
+        setSelectedSubcategory('');
+        setSelectedProduct('');
+        setSelectedStockStatus('');
+        setFilteredCategories([]);
+        setFilteredSubcategories([]);
+        setFilteredProducts([]);
+        setFilteredData(data);
+        handleClose();
+    };
+
+    // Apply filters
+    const handleApplyFilters = () => {
+        let filtered = [...data];
+
+        if (selectedMainCategory) {
+            filtered = filtered.filter(item =>
+                item.mainCategoriesData &&
+                item.mainCategoriesData.length > 0 &&
+                item.mainCategoriesData[0]._id === selectedMainCategory
+            );
+        }
+
+        if (selectedCategory) {
+            filtered = filtered.filter(item =>
+                item.categoriesData &&
+                item.categoriesData.length > 0 &&
+                item.categoriesData[0]._id === selectedCategory
+            );
+        }
+
+        if (selectedSubcategory) {
+            filtered = filtered.filter(item =>
+                item.subCategoriesData &&
+                item.subCategoriesData.length > 0 &&
+                item.subCategoriesData[0]._id === selectedSubcategory
+            );
+        }
+
+        if (selectedProduct) {
+            filtered = filtered.filter(item =>
+                item.productData &&
+                item.productData.length > 0 &&
+                item.productData[0]._id === selectedProduct
+            );
+        }
+
+        // Apply stock status filter
+        if (selectedStockStatus) {
+            filtered = filtered.filter(item =>
+                item.stockStatus === selectedStockStatus
+            );
+        }
+
+        setFilteredData(filtered);
+        setCurrentPage(1); // Reset to first page when filters are applied
+        handleClose();
+    };
 
     return (
         <>
@@ -201,9 +367,11 @@ const Stock = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            aria-label="Username"
+                                            aria-describedby="basic-addon1"
+                                            value={searchTerm}
+                                            onChange={handleSearch}
                                         />
                                     </InputGroup>
                                 </div>
@@ -221,64 +389,74 @@ const Stock = (props) => {
                                                 <div>
                                                     <div className="mv_input_content mt-3">
                                                         <label className='mv_offcanvas_filter_category'>Main Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Women">Women</option>
-                                                            <option value="Men">Men</option>
-                                                            <option value="Baby & Kids">Baby & Kids</option>
-                                                            <option value="Beauty & Health">Beauty & Health</option>
-                                                            <option value="Home & Kitchen">Home & Kitchen</option>
-                                                            <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            aria-label="Default select example"
+                                                            value={selectedMainCategory}
+                                                            onChange={handleMainCategoryChange}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {maincategory.map((mainCat) => (
+                                                                <option value={mainCat._id} key={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Jewelry">Jewelry</option>
-                                                            <option value="Western Wear">Western Wear</option>
-                                                            <option value="Baby Care">Baby Care</option>
-                                                            <option value="Skin Care">Skin Care</option>
-                                                            <option value="Electronics">Electronics</option>
-                                                            <option value="Fragrance">Fragrance</option>
-                                                            <option value="Kitchen wear">Kitchen wear</option>
-                                                            <option value="Mobile">Mobile</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            aria-label="Default select example"
+                                                            value={selectedCategory}
+                                                            onChange={handleCategoryChange}
+                                                            disabled={!selectedMainCategory}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {filteredCategories.map((cat) => (
+                                                                <option value={cat._id} key={cat._id}>{cat.categoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Sub Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Necklace">Necklace</option>
-                                                            <option value="Blazer">Blazer</option>
-                                                            <option value="Baby Soap">Baby Soap</option>
-                                                            <option value="Facewash">Facewash</option>
-                                                            <option value="Refrigerator">Refrigerator</option>
-                                                            <option value="Perfume">Perfume</option>
-                                                            <option value="Pressure Cooker">Pressure Cooker</option>
-                                                            <option value="Smart Phone">Smart Phone</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            aria-label="Default select example"
+                                                            value={selectedSubcategory}
+                                                            onChange={handleSubcategoryChange}
+                                                            disabled={!selectedCategory}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {filteredSubcategories.map((subCat) => (
+                                                                <option value={subCat._id} key={subCat._id}>{subCat.subCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Product</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
-                                                            <option value="Gold Necklace">Gold Necklace</option>
-                                                            <option value="Black blazer">Black blazer</option>
-                                                            <option value="White Soap ">White Soap </option>
-                                                            <option value="vitamin c facewash">vitamin c facewash</option>
-                                                            <option value="265 L fridge">265 L fridge</option>
-                                                            <option value="Denver scent">Denver scent</option>
-                                                            <option value="3 L Coocker">3 L Coocker</option>
-                                                            <option value="Vivo v27 Pro">Vivo v27 Pro</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            aria-label="Default select example"
+                                                            value={selectedProduct}
+                                                            onChange={handleProductChange}
+                                                            disabled={!selectedSubcategory}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {filteredProducts.map((pro) => (
+                                                                <option value={pro._id} key={pro._id}>{pro.productName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Stock Status</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select</option>
+                                                        <Form.Select
+                                                            className="mb-3"
+                                                            aria-label="Default select example"
+                                                            value={selectedStockStatus}
+                                                            onChange={handleStockStatusChange}
+                                                        >
+                                                            <option value="">Select</option>
                                                             <option value="In Stock">In Stock</option>
-                                                            <option value="Out of Stock">Out of Stock</option>
+                                                            <option value="Out Of Stock">Out of Stock</option>
                                                             <option value="Low Stock">Low Stock</option>
                                                         </Form.Select>
                                                     </div>
@@ -286,10 +464,13 @@ const Stock = (props) => {
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
+                                                            <button type="button" onClick={handleResetFilters}>Reset</button>
+                                                        </div>
+                                                        <div className="mv_logout_cancel">
                                                             <button type="button" onClick={handleClose}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="button" onClick={handleApplyFilters}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -303,55 +484,59 @@ const Stock = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Main Category</th>
-                                            <th className=''>Category</th>
-                                            <th className=''>Sub Category</th>
-                                            <th className=''>Product</th>
-                                            <th className=''>Stock Status</th>
-                                            <th className=''>Qty.</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.maincategory}</td>
-                                            <td>{item.category}</td>
-                                            <td>{item.subcategory}</td>
-                                            <td>{item.product}</td>
-                                            <td>
-                                                {
-                                                    item.stock === 'In Stock' ? (
-                                                        <p className='m-0 mv_delivered_padd'>{item.stock}</p>
-                                                    ) : item.stock === 'Low Stock' ? (
-                                                        <p className='m-0 mv_pending_padd'>{item.stock}</p>
-                                                    ) : item.stock === 'Out of Stock' ? (
-                                                        <p className='m-0 mv_cancelled_padd'>{item.stock}</p>
-                                                    ) : null
-                                                }
-                                            </td>
-                                            <td>{item.qty}</td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={handleditstock}>
-                                                    <Link to='/addstock' state={{ editStock: true }}>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            {paginatedData && paginatedData.length > 0 ? (
+                                <div className="mv_product_table_padd">
+                                    <table className='mv_product_table justify-content-between'>
+                                        <thead>
+                                            <tr>
+                                                <th className=''>ID</th>
+                                                <th className=''>Main Category</th>
+                                                <th className=''>Category</th>
+                                                <th className=''>Sub Category</th>
+                                                <th className=''>Product</th>
+                                                <th className=''>Stock Status</th>
+                                                <th className=''>Qty.</th>
+                                                <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {paginatedData.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                    <td>{item.mainCategoriesData[0].mainCategoryName}</td>
+                                                    <td>{item.categoriesData[0].categoryName}</td>
+                                                    <td>{item.subCategoriesData[0].subCategoryName}</td>
+                                                    <td>{item.productData[0].productName}</td>
+                                                    <td>
+                                                        {
+                                                            item.stockStatus === 'In Stock' ? (
+                                                                <p className='m-0 mv_delivered_padd'>{item.stockStatus}</p>
+                                                            ) : item.stockStatus === 'Low Stock' ? (
+                                                                <p className='m-0 mv_pending_padd'>{item.stockStatus}</p>
+                                                            ) : item.stockStatus === 'Out Of Stock' ? (
+                                                                <p className='m-0 mv_cancelled_padd'>{item.stockStatus}</p>
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                    <td>{item.quantity}</td>
+                                                    <td className='d-flex align-items-center justify-content-end'>
+                                                        <div className="mv_pencil_icon" onClick={handleditstock}>
+                                                            <Link to='/addstock' state={{ id: item._id }}>
+                                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                            </Link>
+                                                        </div>
+                                                        <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
+                                                            <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <NoResultsFound />
+                            )}
                             {totalPages > 1 && (
                                 <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
                                     <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
@@ -359,7 +544,7 @@ const Stock = (props) => {
                                     </p>
                                     {getPaginationButtons().map((page, index) => (
                                         <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
+                                            onClick={() => typeof page === 'number' ? handlePageChange(page) : null}>
                                             {page}
                                         </p>
                                     ))}
@@ -383,7 +568,7 @@ const Stock = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleConfirmDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
@@ -392,4 +577,4 @@ const Stock = (props) => {
     );
 };
 
-export default Stock
+export default Stock;

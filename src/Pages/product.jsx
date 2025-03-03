@@ -22,55 +22,70 @@ const Product = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    
     // Filter states
     const [selectedMainCategory, setSelectedMainCategory] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
     const [priceRange, setPriceRange] = useState([0, 300]);
     const [deleteToProduct, setDeleteToProduct] = useState('');
     const [selectedStockStatus, setSelectedStockStatus] = useState('');
 
     // Apply filters
     const applyFilters = () => {
-        let filtered = data;
-    
-        // 🔍 Search by Product Name
-        if (searchQuery.trim() !== '') {
-            filtered = filtered.filter(item =>
-                item.productName.toLowerCase().includes(searchQuery.toLowerCase())
+        let result = [...data];
+
+        // Apply search filter if searchQuery exists
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            result = result.filter(item => 
+                item.productName.toLowerCase().includes(query) ||
+                (item.mainCategoriesData?.[0]?.mainCategoryName.toLowerCase().includes(query)) ||
+                (item.categoriesData?.[0]?.categoryName.toLowerCase().includes(query))
             );
         }
-    
-        // 🏷️ Filter by Main Category
+
+        // Filter by main category
         if (selectedMainCategory) {
-            filtered = filtered.filter(item => item.mainCategoryId === selectedMainCategory);
+            result = result.filter(item => 
+                item.mainCategoriesData && 
+                item.mainCategoriesData[0] && 
+                item.mainCategoriesData[0]._id === selectedMainCategory
+            );
         }
-    
-        // 📂 Filter by Category
+
+        // Filter by category
         if (selectedCategory) {
-            filtered = filtered.filter(item => item.categoryId === selectedCategory);
+            result = result.filter(item => 
+                item.categoriesData && 
+                item.categoriesData[0] && 
+                item.categoriesData[0]._id === selectedCategory
+            );
         }
-    
-        // ✅ Filter by Stock Status
+
+        // Filter by stock status
         if (selectedStockStatus) {
-            filtered = filtered.filter(item => item.stockStatus === selectedStockStatus);
+            result = result.filter(item => item.stockStatus === selectedStockStatus);
         }
-    
-        // 💰 Filter by Price Range
-        filtered = filtered.filter(item => 
-            item.price >= priceRange[0] && item.price <= priceRange[1]
-        );
-    
-        setFilteredData(filtered);
-        setCurrentPage(1);
+
+        // Filter by price range
+        // result = result.filter(item => {
+        //     const price = item.productVariantData?.[0]?.originalPrice;
+        //     return price && parseFloat(price) >= priceRange[0] && parseFloat(price) <= priceRange[1];
+        // });
+
+        setFilteredData(result);
+        setCurrentPage(1); // Reset to first page after filtering
     };
-    
-    // Handle search input
-    const handleSearch = (e) => {
+
+    const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
+
     const handleMainCategoryChange = (e) => {
         setSelectedMainCategory(e.target.value);
+        // Reset subcategory when main category changes
+        setSelectedCategory('');
     };
 
     const handleCategoryChange = (e) => {
@@ -80,14 +95,25 @@ const Product = () => {
     const handleStockStatusChange = (e) => {
         setSelectedStockStatus(e.target.value);
     };
+    
     const handleSliderChange = (newRange) => {
         setPriceRange(newRange);
     };
 
     useEffect(() => {
-        applyFilters();
+        // Apply search filter on searchQuery change
+        if (data.length > 0) {
+            applyFilters();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchQuery, selectedMainCategory, selectedCategory, selectedStockStatus, priceRange, data]);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        if (data.length > 0) {
+            applyFilters();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data]);
 
     const handleApplyFilters = () => {
         applyFilters();
@@ -96,11 +122,18 @@ const Product = () => {
 
     // Handle filter reset
     const handleResetFilters = () => {
-        setCurrentPage(1);
+        setSelectedMainCategory('');
+        setSelectedCategory('');
+        setSelectedStockStatus('');
+        setPriceRange([0, 300]);
+        setSearchQuery('');
+        
+        // Reset filteredData to original data
+        setFilteredData(data);
+        handleClose();
     };
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    // console.log("totalpage", totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -179,6 +212,7 @@ const Product = () => {
             console.error('Data Fetching Error:', error);
         }
     }
+    
     const fetchMainCategory = async () => {
         try {
             const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
@@ -190,16 +224,13 @@ const Product = () => {
             console.error('Data Fetching Error:', error);
         }
     }
+    
     useEffect(() => {
         fetchData();
         fetchMainCategory();
         fetchCategory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        setFilteredData(data);
-    }, [data]);
 
     const handleDelete = (id, product) => {
         setModalShow(true);
@@ -243,7 +274,7 @@ const Product = () => {
                                         <Form.Control
                                             placeholder="Search..."
                                             value={searchQuery}
-                                            onChange={handleSearch}
+                                            onChange={handleSearchChange}
                                         />
                                     </InputGroup>
                                 </div>
@@ -264,6 +295,7 @@ const Product = () => {
                                                             <label className='mv_offcanvas_filter_category'>Main Category</label>
                                                             <Form.Select className="mb-4" value={selectedMainCategory} onChange={handleMainCategoryChange}
                                                             >
+                                                                <option value=''>Select</option>
                                                                 {mainCategory.map((mainCat) => (
                                                                     <option key={mainCat._id} value={mainCat._id}>{mainCat.mainCategoryName}</option>
                                                                 ))}
@@ -273,9 +305,13 @@ const Product = () => {
                                                             <label className='mv_offcanvas_filter_category'>Category</label>
                                                             <Form.Select className="mb-4" value={selectedCategory} onChange={handleCategoryChange}
                                                             >
-                                                                {category.map((cat) => (
-                                                                    <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
-                                                                ))}
+                                                                <option value="">Select</option>
+                                                                {category
+                                                                    .filter(cat => !selectedMainCategory || cat.mainCategoryId === selectedMainCategory)
+                                                                    .map((cat) => (
+                                                                        <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
+                                                                    ))
+                                                                }
                                                             </Form.Select>
                                                         </div>
                                                         <div className="mv_input_content">
@@ -283,7 +319,7 @@ const Product = () => {
                                                             <Form.Select className="mb-4"
                                                                 value={selectedStockStatus}
                                                                 onChange={handleStockStatusChange}>
-                                                                <option>Select</option>
+                                                                <option value="">Select</option>
                                                                 <option value="In Stock">In Stock</option>
                                                                 <option value="Low Stock">Low Stock</option>
                                                                 <option value="Out of Stock">Out of Stock</option>
