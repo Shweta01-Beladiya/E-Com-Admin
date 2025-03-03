@@ -1,11 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
+import axios from 'axios';
 import * as Yup from 'yup';
 
-const Addoffer = () => {
+const Addoffer = ({ editData }) => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+    const navigate = useNavigate()
+    const [toggle, setToggle] = useState(false)
+
     // State variables
     let [isedit, setisedit] = useState(false);
     // let [name, setname] = useState('');
@@ -48,6 +55,19 @@ const Addoffer = () => {
     const editOffer = location.state?.editOffer;
     console.log(editOffer)
 
+    // Select img
+    let [addimg, setaddimg] = useState("");
+
+    const [brandImagePreview, setBrandImagePreview] = useState(null);
+
+    useEffect(() => {
+        if (editData) {
+            const filename = editData.offerImg.split("\\").pop();
+            setaddimg(filename.substring(filename.indexOf('-') + 1));
+            setBrandImagePreview(`${BaseUrl}/${editData.offerImg}`);
+        }
+    }, [editData]);
+
     // Date function
     let [date, setDate] = useState('Select Date');
     let [date1, setDate1] = useState('Select Date');
@@ -63,30 +83,27 @@ const Addoffer = () => {
         }
     };
 
-    // Select img
-    let [img, setimg] = useState("");
-
     // ******************************* Validation *******************************
     const addofferInit = {
-        mainCategory: "",
-        category: "",
-        subCategory: "",
-        offerType: "",
-        offerName: "",
-        descriptionImg: "",
-        buttonText: "",
-        startDate: "",
-        endDate: "",
-        description: "",
+        mainCategoryId:  editData?.mainCategoryId || "",
+        categoryId:  editData?.categoryId || "",
+        subCategoryId: editData?.subCategoryId || "",
+        offerType: editData?.offerType || "",
+        offerName: editData?.offerName || "",
+        offerImage: "",
+        buttonText: editData?.buttonText || "",
+        startDate: editData?.startDate || "",
+        endDate: editData?.endDate || "",
+        description: editData?.description || "",
     }
 
     const addofferValidate = Yup.object().shape({
-        mainCategory: Yup.string().required("Main Category is required"),
-        category: Yup.string().required("Category is required"),
-        subCategory: Yup.string().required("Sub Category is required"),
+        mainCategoryId: Yup.string().required("Main Category is required"),
+        categoryId: Yup.string().required("Category is required"),
+        subCategoryId: Yup.string().required("Sub Category is required"),
         offerType: Yup.string().required("Product is required"),
         offerName: Yup.string().required("Offer Name is required"),
-        descriptionImg: Yup.string().required("Description Image is required"),
+        offerImage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
         buttonText: Yup.string().required("Discount Price is required"),
         startDate: Yup.string().required("Start Date is required"),
         endDate: Yup.string().required("End Date is required"),
@@ -96,9 +113,61 @@ const Addoffer = () => {
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
         initialValues: addofferInit,
         validationSchema: addofferValidate,
-        onsubmit: (values) => {
+        onsubmit: async (values) => {
             console.log(values);
             // addproductoffer(values)
+
+            const formData = new FormData();
+            formData.append("mainCategoryId", values.mainCategoryId);
+            formData.append("categoryId", values.categoryId);
+            formData.append("subCategoryId", values.subCategoryId);
+            formData.append("offerType", values.offerType);
+            formData.append("offerName", values.offerName);
+            if (values.offerImage) {
+                formData.append("offerImage", values.offerImage);
+            }
+            formData.append("buttonText", values.buttonText);
+            formData.append("startDate", values.startDate);
+            formData.append("endDate", values.endDate);
+            formData.append("description", values.description);
+
+            //************************************** Edit and Add **************************************
+            if (editData) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateOffer/${editData._id}`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+
+                    window.location.href = "./offer"
+                    // navigate("/offer")
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
+            else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createOffer`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+                    console.log("Response:", response?.data);
+
+                    window.location.href = "./offer"
+                    // navigate("/offer")
+
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error submitting form. Please try again.");
+                }
+            }
         }
     })
     // **************************************************************************
@@ -108,11 +177,11 @@ const Addoffer = () => {
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editOffer ? 'Edit Offer' : 'Add Offer'}</p>
+                        <p className='mb-1'>{editData ? 'Edit Offer' : 'Add Offer'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editOffer ? 'Edit Offer' : 'Add Offer'}
+                                {editData ? 'Edit Offer' : 'Add Offer'}
                             </p>
                         </div>
                     </div>
@@ -128,8 +197,8 @@ const Addoffer = () => {
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Main Category</label>
                                                 <Form.Select
-                                                    name="mainCategory"
-                                                    value={values.mainCategory}
+                                                    name="mainCategoryId"
+                                                    value={values.mainCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
@@ -141,15 +210,15 @@ const Addoffer = () => {
                                                     <option value="Home & Kitchen">Home & Kitchen</option>
                                                     <option value="Mobile & Electronics">Mobile & Electronics</option>
                                                 </Form.Select>
-                                                {errors.mainCategory && touched.mainCategory && <div className="text-danger small">{errors.mainCategory}</div>}
+                                                {errors.mainCategoryId && touched.mainCategoryId && <div className="text-danger small">{errors.mainCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
-                                                    name="category"
-                                                    value={values.category}
+                                                    name="categoryId"
+                                                    value={values.categoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
@@ -163,15 +232,15 @@ const Addoffer = () => {
                                                     <option value="Kitchen wear">Kitchen wear</option>
                                                     <option value="Mobile">Mobile</option>
                                                 </Form.Select>
-                                                {errors.category && touched.category && <div className="text-danger small">{errors.category}</div>}
+                                                {errors.categoryId && touched.categoryId && <div className="text-danger small">{errors.categoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
-                                                    name="subCategory"
-                                                    value={values.subCategory}
+                                                    name="subCategoryId"
+                                                    value={values.subCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
@@ -185,7 +254,7 @@ const Addoffer = () => {
                                                     <option value="Pressure Cooker">Pressure Cooker</option>
                                                     <option value="Smart Phone">Smart Phone</option>
                                                 </Form.Select>
-                                                {errors.subCategory && touched.subCategory && <div className="text-danger small">{errors.subCategory}</div>}
+                                                {errors.subCategoryId && touched.subCategoryId && <div className="text-danger small">{errors.subCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -230,27 +299,46 @@ const Addoffer = () => {
                                                         placeholder="Choose Image"
                                                         aria-label=""
                                                         readOnly
-                                                        value={img}
-                                                        name="descriptionImg"
+                                                        value={addimg}
+                                                        name="offerImage"
                                                         onBlur={handleBlur}
                                                     />
                                                     <label className="mv_browse_button">
                                                         Browse
                                                         <input 
-                                                            type="file" 
-                                                            hidden 
+                                                            type="file"
+                                                            hidden
                                                             accept="image/jpeg, image/png, image/jpg"
                                                             onChange={(e) => {
                                                                 const file = e.currentTarget.files[0];
                                                                 if (file) {
-                                                                    setimg(file.name);
-                                                                    setFieldValue("descriptionImg", file);
+                                                                    setaddimg(file.name);
+                                                                    setFieldValue("offerImage", file);
+                                                                    setBrandImagePreview(URL.createObjectURL(file));
                                                                 }
+                                                                setToggle(true)
                                                             }}
                                                         />
                                                     </label>
                                                 </InputGroup>
-                                                {errors.descriptionImg && touched.descriptionImg && <div className="text-danger small">{errors.descriptionImg}</div>}
+                                                {errors.offerImage && touched.offerImage && <div className="text-danger small">{errors.offerImage}</div>}
+                                                {brandImagePreview && (
+                                                    <div className="mt-2">
+                                                        <img
+                                                            className='mv_update_img'
+                                                            src={brandImagePreview}
+                                                            alt="Brand Image Preview"
+                                                            style={{
+                                                                maxWidth: '20px',
+                                                                maxHeight: '20px',
+                                                                objectFit: 'contain',
+                                                                border: '1px solid #ddd',
+                                                                borderRadius: '4px',
+                                                                padding: '2px'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -318,11 +406,11 @@ const Addoffer = () => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button className='border-0 bg-transparent'>
+                                                <button onClick={() => window.location.href = "/offer"} className='border-0 bg-transparent'>
                                                     Cnacel
                                                 </button>
-                                                {editOffer === true ? 
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                {editData?
+                                                    <button type="submit" className='border-0 bg-transparent' onClick={() => setisedit()}>
                                                         Update
                                                     </button> : 
                                                     <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>

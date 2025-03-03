@@ -1,7 +1,64 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
+import axios from 'axios';
 
-const Viewtermsconditions = (props) => {
+const Viewtermsconditions = () => {
+    const [termsData, setTermsData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    useEffect(() => {
+        const fetchTermsData = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(`${BaseUrl}/api/allTerms`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+                console.log("Terms data fetched:", response?.data);
+                setTermsData(response?.data?.terms || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching terms data:", error);
+                setLoading(false);
+            }
+        };
+        
+        fetchTermsData();
+    }, [BaseUrl, token]);
+
+    // Group terms by title category
+    const groupedTerms = termsData.reduce((acc, term) => {
+        if (!acc["Terms of Use"]) acc["Terms of Use"] = [];
+        if (!acc["Conditions"]) acc["Conditions"] = [];
+        
+        const lowerTitle = term.title.toLowerCase();
+        if (lowerTitle.includes("term")) {
+            acc["Terms of Use"].push(term);
+        } else if (lowerTitle.includes("condition")) {
+            acc["Conditions"].push(term);
+        } else {
+            acc["Terms of Use"].push(term);
+        }
+        
+        return acc;
+    }, {});
+
+    // Function to split description into bullet points with title
+    const getDescriptionItems = (title, description) => {
+        if (!description) return [];
+
+        let items = description.split(/\r?\n/).filter(item => item.trim() !== '');
+
+        if (items.length === 0) {
+            return [`${title}: No description available`];
+        }
+
+        return [`${title}:`, ...items];
+    };
 
     return (
         <>
@@ -16,35 +73,60 @@ const Viewtermsconditions = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className='mv_main_view_terms_conditions'>
-                    <div>
-                        <p className='mv_terms_of_heading'>Terms of Use</p>
-                        <ul>
-                            <li className='mv_privacy_policy_text mb-2'>Lorem ipsum dolor sit amet consectetur. Eget congue volutpat sed orci dolor libero. Donec suspendisse mus id nibh eget. Sit feugiat risus mauris nisl. Vitae pulvinar aliquam nunc mauris vehicula pretium. Nunc ipsum nisl integer convallis a quis nec donec ornare. Diam tincidunt elit mi nulla senectus quisque in amet.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Turpis sit dictum id blandit. Ultrices dolor dui viverra magna malesuada laoreet. Ornare amet aliquam imperdiet neque donec. Etiam nisl viverra massa nunc eget fames ullamcorper. Erat vivamus nisl molestie tincidunt cras lacus turpis. Arcu tellus nullam feugiat fermentum venenatis ultricies nec sagittis. Lorem cursus viverra gravida vitae morbi etiam leo nisl mollis.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Mattis magnis sit scelerisque consequat vestibulum. Parturient non ornare quis ornare. Mauris purus risus egestas tortor. Eget orci fames nisi at blandit vitae nibh. </li>
-                            <li className='mv_privacy_policy_text mb-2'>Gravida viverra erat aliquam vitae mattis in duis magna. Morbi senectus adipiscing nisi aliquam amet. Porttitor mattis nunc turpis sit in sagittis ornare in egestas. Urna fringilla nibh tincidunt aliquet facilisis eget faucibus. Turpis integer leo aliquet lectus nunc euismod in vitae. Egestas arcu nisl elit eu amet non in faucibus nibh. Ut donec parturient in mauris. Risus sed ac pulvinar arcu ut accumsan amet semper.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Eget sit bibendum egestas egestas pharetra volutpat penatibus. Adipiscing sit integer sapien mauris pellentesque amet. Nisi bibendum amet elementum amet sit diam placerat lacus. Gravida augue facilisis condimentum parturient aliquam odio facilisis quis. Egestas quisque urna sagittis in risus praesent mauris faucibus nisi. Tincidunt vestibulum morbi libero id volutpat proin vestibulum dolor. Pharetra cursus ullamcorper nunc nisl quis volutpat eget porta ultricies. Ut tellus imperdiet non amet.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Odio fringilla cursus ante arcu pulvinar. Nec urna penatibus elementum sed. Sed consequat ullamcorper nibh nibh ullamcorper luctus id convallis. Vulputate est cras arcu sed neque. Nibh pellentesque enim proin adipiscing id nullam. Facilisis egestas nulla quam fermentum nulla nec in vulputate. Non elementum nascetur gravida auctor eget facilisis tortor. Lacinia elit sit platea turpis eu leo est. Condimentum vestibulum pharetra eu sed. Mi nisl enim fermentum lacus. Amet orci diam aliquam id. At vitae laoreet ac tortor nulla volutpat facilisis nunc purus. Quam scelerisque vitae nunc luctus ac neque id.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Aliquam feugiat rhoncus mauris leo dui pretium. Quisque sed amet nunc nisl venenatis mi aenean consequat. Rhoncus turpis pellentesque nulla dictum aenean neque. Proin id in lorem eget. Vel nulla etiam at placerat netus pretium cras dapibus. Imperdiet felis suscipit tellus duis lacus lacus ullamcorper. Nisl amet neque congue arcu. Non pretium id nam leo eu ultrices id. Sagittis elementum leo cursus integer. Ultrices magna metus amet id nibh.</li>
-                        </ul>
+                
+                {loading ? (
+                    <div className='mv_main_view_terms_conditions'>
+                        <p>Loading terms and conditions...</p>
                     </div>
-                    <div>
-                        <p className='mv_terms_of_heading'>Conditions</p>
-                        <ul className='mb-0'>
-                            <li className='mv_privacy_policy_text mb-2'>Lorem ipsum dolor sit amet consectetur. Eget congue volutpat sed orci dolor libero. Donec suspendisse mus id nibh eget. Sit feugiat risus mauris nisl. Vitae pulvinar aliquam nunc mauris vehicula pretium. Nunc ipsum nisl integer convallis a quis nec donec ornare. Diam tincidunt elit mi nulla senectus quisque in amet. </li>
-                            <li className='mv_privacy_policy_text mb-2'>Turpis sit dictum id blandit. Ultrices dolor dui viverra magna malesuada laoreet. Ornare amet aliquam imperdiet neque donec. Etiam nisl viverra massa nunc eget fames ullamcorper. Erat vivamus nisl molestie tincidunt cras lacus turpis. Arcu tellus nullam feugiat fermentum venenatis ultricies nec sagittis. Lorem cursus viverra gravida vitae morbi etiam leo nisl mollis.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Mattis magnis sit scelerisque consequat vestibulum. Parturient non ornare quis ornare. Mauris purus risus egestas tortor. Eget orci fames nisi at blandit vitae nibh. </li>
-                            <li className='mv_privacy_policy_text mb-2'>Gravida viverra erat aliquam vitae mattis in duis magna. Morbi senectus adipiscing nisi aliquam amet. Porttitor mattis nunc turpis sit in sagittis ornare in egestas. Urna fringilla nibh tincidunt aliquet facilisis eget faucibus. Turpis integer leo aliquet lectus nunc euismod in vitae. Egestas arcu nisl elit eu amet non in faucibus nibh. Ut donec parturient in mauris. Risus sed ac pulvinar arcu ut accumsan amet semper.</li>
-                            <li className='mv_privacy_policy_text mb-2'>Eget sit bibendum egestas egestas pharetra volutpat penatibus. Adipiscing sit integer sapien mauris pellentesque amet. Nisi bibendum amet elementum amet sit diam placerat lacus. Gravida augue facilisis condimentum parturient aliquam odio facilisis quis. Egestas quisque urna sagittis in risus praesent mauris faucibus nisi. Tincidunt vestibulum morbi libero id volutpat proin vestibulum dolor. Pharetra cursus ullamcorper nunc nisl quis volutpat eget porta ultricies. Ut tellus imperdiet non amet.</li>
-                            <li className='mv_privacy_policy_text mb-0'>Odio fringilla cursus ante arcu pulvinar. Nec urna penatibus elementum sed. Sed consequat ullamcorper nibh nibh ullamcorper luctus id convallis. Vulputate est cras arcu sed neque. Nibh pellentesque enim proin adipiscing id nullam.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+                ) : (
+                    <div className='mv_main_view_terms_conditions'>
+                        {/* Terms of Use Section */}
+                        <div>
+                            <p className='mv_terms_of_heading'>Terms of Use</p>
+                            <ul>
+                                {groupedTerms["Terms of Use"] && groupedTerms["Terms of Use"].length > 0 ? (
+                                    groupedTerms["Terms of Use"].map((term, descIndex) => (
+                                        <li key={`terms-${descIndex}`} className='mv_privacy_policy_text mb-3'>
+                                            <p className='mv_term_title'>{term.title}</p>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className='mv_privacy_policy_text mb-3'>
+                                        No terms of use available. Please add them from the Terms & Conditions page.
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
 
+                        
+                        {/* Conditions Section */}
+                        <div>
+                            <p className='mv_terms_of_heading'>Conditions</p>
+                            <ul className='mb-0'>
+                                {groupedTerms["Conditions"] && groupedTerms["Conditions"].length > 0 ? (
+                                    groupedTerms["Conditions"].map((term, descIndex) => (
+                                        <li key={`conditions-${descIndex}`} className='mv_privacy_policy_text mb-3'>
+                                            <p className='mv_condition_title'><strong>{term.title}</strong></p>
+                                            <p className='mv_condition_description'>{term.description}</p>
+                                        </li>
+                                    ))
+                                ) : (
+                                    // If no title available, show description only
+                                    termsData.length > 0 ? (
+                                        termsData.map((term, descIndex) => (
+                                            <li key={`all-conditions-${descIndex}`} className='mv_privacy_policy_text mb-3'>
+                                                <p className='mv_condition_description'>{term.description}</p>
+                                            </li>
+                                        ))
+                                    ) : null
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+                )}
+            </div>
         </>
     );
 };
 
-export default Viewtermsconditions
+export default Viewtermsconditions;

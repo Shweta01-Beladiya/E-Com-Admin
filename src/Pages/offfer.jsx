@@ -7,11 +7,26 @@ import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from 'axios';
+import Addpopularbrands from './add_offer';
 
 const Offer = (props) => {
 
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+    const [deleteToggle, setDeleteToggle] = useState(null)
+    const [toggle, seToggle] = useState(false)
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({
+        brandname: '',
+    });
+    const [tempFilters, setTempFilters] = useState(filters);
+
     // Edit Offer
     const [editstok,setEditOffer] = useState(false);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [selectedBrand, setSelectedBrand] = useState(null);
 
     const navigate = useNavigate();
 
@@ -20,134 +35,101 @@ const Offer = (props) => {
         // navigate('addsize')
     }
 
-    var data = [
-        {   
-            id: 1,
-            productimg: "saree.png",
-            offertype: "Exclusive",
-            offername: "Saree Sale in 20% dis..",
-            description: "Lorem ipsum",
-            buttontext: "Shop Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 2,
-            productimg: "lehenga.png",
-            offertype: "Best Collection",
-            offername: "Best Choli Collection",
-            description: "Lorem ipsum",
-            buttontext: "Explore Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 3,
-            productimg: "saree.png",
-            offertype: "Exclusive",
-            offername: "Saree Sale in 20% dis..",
-            description: "Lorem ipsum",
-            buttontext: "Explore Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 4,
-            productimg: "lehenga.png",
-            offertype: "Exclusive",
-            offername: "Best Choli Collection.",
-            description: "Lorem ipsum",
-            buttontext: "Shop Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 5,
-            productimg: "saree.png",
-            offertype: "Best Collection",
-            offername: "Saree Sale in 20% dis..",
-            description: "Lorem ipsum",
-            buttontext: "Explore Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 6,
-            productimg: "lehenga.png",
-            offertype: "Best Collection",
-            offername: "Best Choli Collection",
-            description: "Lorem ipsum",
-            buttontext: "Shop Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 7,
-            productimg: "saree.png",
-            offertype: "Best Collection",
-            offername: "Saree Sale in 20% dis..",
-            description: "Lorem ipsum",
-            buttontext: "Explore Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 8,
-            productimg: "lehenga.png",
-            offertype: "Exclusive",
-            offername: "Best Choli Collection",
-            description: "Lorem ipsum",
-            buttontext: "Explore Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 9,
-            productimg: "saree.png",
-            offertype: "Exclusive",
-            offername: "Saree Sale in 20% dis..",
-            description: "Lorem ipsum",
-            buttontext: "Shop Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 10,
-            productimg: "lehenga.png",
-            offertype: "Exclusive",
-            offername: "Best Choli Collection",
-            description: "Lorem ipsum",
-            buttontext: "Shop Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 11,
-            productimg: "saree.png",
-            offertype: "Exclusive",
-            offername: "Saree Sale in 20% dis..",
-            description: "Lorem ipsum",
-            buttontext: "Shop Now",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-    ];
+    // Search Data
+    useEffect(() => {
+        let result = data;
+        console.log("hihi" , result);
+        if (filters.offerType) {
+          result = result.filter(user => user.offerType === filters.offerType);
+        }
+        if (filters.offerName) {
+          result = result.filter(user => user.offerName === filters.offerName);
+        }
+        if (filters.startDate) {
+          result = result.filter(user => user.startDate === filters.startDate);
+        }
+        if (filters.endDate) {
+          result = result.filter(user => user.endDate === filters.endDate);
+        }
+        if (filters.status) {
+          result = result.filter(user => user.status === filters.status);
+        }
+    
+        if (searchTerm) {
+          result = result.filter(user =>
+            user.offerType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.offerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.startDate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.endDate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.status?.includes(searchTerm)
+          );
+        }
+    
+        setFilteredData(result);
+        setCurrentPage(1); // Reset to first page when filters change
+    }, [data, filters, searchTerm]);
+
+    // Offcanvas Filter
+    const handleFilterChange = (field, value) => {
+        setTempFilters(prev => ({
+          ...prev,
+          [field]: value
+        }));
+    };
+
+    const handleApplyFilters = () => {
+        setFilters(tempFilters);
+        handleClose();
+    };
+
+    // ************************************** Show Data **************************************
+    const [filteredData, setFilteredData] = useState([]);
+    
+    useEffect(()=>{
+       const fetchBrandData = async () => {
+           try{
+              const response = await axios.get(`${BaseUrl}/api/getAllOffers`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+              })
+            //   console.log("data" , response?.data?.popularBrand);
+              setFilteredData(response?.data?.popularBrand)
+              setData(response?.data?.popularBrand)
+           }catch(error){
+              
+           }
+       }
+
+       fetchBrandData()
+    },[toggle])
+    // ***************************************************************************************
+
+    // ************************************** Delete Item **************************************
+    const handleManage = (id) =>{
+        setModalShow(true)
+        setDeleteToggle(id)
+    }
+
+    const handleDelete = async () => {
+        try{
+           const response = await axios.delete(`${BaseUrl}/api/deleteOffer/${deleteToggle}`,{
+               headers: {
+                   Authorization: `Bearer ${token}`,
+               }
+           })
+           console.log("delete response " , response);
+           setModalShow(false)
+           seToggle((count)=> count + 1)
+        }catch(error){
+            alert(error)
+        }
+    }
+    // ***************************************************************************************
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
  
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     console.log("totalpage",totalPages)
@@ -225,6 +207,22 @@ const Offer = (props) => {
         }
     };
 
+    // Edit data
+    const handleEditClick = (brand) => {
+        setSelectedBrand(brand);
+        setShowAddForm(true);
+    };
+
+    console.log("bran",selectedBrand)
+
+    if (showAddForm) {
+        return (
+            <Addpopularbrands 
+                editData={selectedBrand}
+            />
+        );
+    }
+
     return (
         <>
             <div id='mv_container_fluid'>
@@ -245,8 +243,8 @@ const Offer = (props) => {
                                     <InputGroup>
                                         <Form.Control
                                         placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -268,6 +266,8 @@ const Offer = (props) => {
                                                             <Form.Control
                                                                 placeholder="Enter Offer Type"
                                                                 name='name'
+                                                                value={tempFilters.offerType}
+                                                                onChange={(e) => handleFilterChange('offerType', e.target.value)}
                                                             />
                                                         </InputGroup>
                                                     </div>
@@ -277,6 +277,8 @@ const Offer = (props) => {
                                                             <Form.Control
                                                                 placeholder="Enter Offer Name"
                                                                 name='name1'
+                                                                value={tempFilters.offerName}
+                                                                onChange={(e) => handleFilterChange('offerName', e.target.value)}
                                                             />
                                                         </InputGroup>
                                                     </div>
@@ -285,6 +287,8 @@ const Offer = (props) => {
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                                            value={tempFilters.startDate}
+                                                            onChange={(e) => handleFilterChange('startDate', e.target.value)}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -292,11 +296,14 @@ const Offer = (props) => {
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
                                                             <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
                                                             <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                            value={tempFilters.endDate}
+                                                            onChange={(e) => handleFilterChange('endDate', e.target.value)}
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Status</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
+                                                        <Form.Select className="mb-3" aria-label="Default select example" value={tempFilters.status}
+                                                            onChange={(e) => handleFilterChange('status', e.target.value)}>
                                                             <option>Select Status</option>
                                                             <option value="True">True</option>
                                                             <option value="False">False</option>
@@ -309,7 +316,7 @@ const Offer = (props) => {
                                                             <button type="button" onClick={handleClose}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="button" onClick={handleApplyFilters}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -318,7 +325,8 @@ const Offer = (props) => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <Link to='/addoffer'><button>+ Add</button></Link>
+                                            {/* <Link to='/addoffer'><button onClick={() => setShowAddForm(true)}>+ Add</button></Link> */}
+                                            <button onClick={() => setShowAddForm(true)}>+ Add</button>
                                         </div>
                                     </div>
                                 </div>
@@ -344,7 +352,7 @@ const Offer = (props) => {
                                         <tr key={index}>
                                             <td>{item.id}</td>
                                             <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.productimg}`)}  alt="" />
+                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.offerImage }`}  alt="" />
                                             </td>
                                             <td>{item.offertype}</td>
                                             <td>{item.offername}</td>
@@ -367,12 +375,10 @@ const Offer = (props) => {
                                                         <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={handleditoffer}>
-                                                    <Link to='/addoffer' state={{ editOffer: true }}>
+                                                <div className="mv_pencil_icon"  onClick={() => handleEditClick(item)}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
