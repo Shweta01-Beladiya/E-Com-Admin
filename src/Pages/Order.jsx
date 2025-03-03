@@ -261,8 +261,8 @@ const Order = () => {
                       <tbody>
                         {paginatedData.map((item, index) => (
                           <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{item.userData[0].name}</td>
+                             <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                            <td>{item.userData[0]?.name}</td>
                             <td>{new Date(item.createdAt).toLocaleDateString('en-GB')}</td>
                             <td>{item.totalAmount}</td>
                             <td>

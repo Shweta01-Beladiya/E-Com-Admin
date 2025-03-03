@@ -388,7 +388,7 @@ const Product = () => {
                                             <tbody>
                                                 {paginatedData.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td>{index + 1}</td>
+                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.mainCategoriesData?.[0]?.mainCategoryName || 'N/A'}</td>
                                                         <td>{item.categoriesData?.[0]?.categoryName || 'N/A'}</td>
                                                         <td>

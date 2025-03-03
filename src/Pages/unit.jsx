@@ -255,7 +255,7 @@ const Unit = () => {
                                             <tbody>
                                                 {paginatedData?.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td>{index + 1}</td>
+                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.name}</td>
                                                         <td>{item.shortName}</td>
                                                         <td>

@@ -328,7 +328,7 @@ const SubCategory = () => {
                                     {paginatedData.map((sub, index) => (
                                         <tr key={index}>
                                             {/* {console.log("sub?????????",sub)} */}
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>{mainCategory.find((main) => main._id === sub.mainCategoryId)?.mainCategoryName || ''}</td>
                                             <td>{category.find((main) => main._id === sub.categoryId)?.categoryName || ''}</td>
                                             <td>{sub.subCategoryName}</td>

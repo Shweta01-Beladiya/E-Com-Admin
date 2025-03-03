@@ -225,7 +225,7 @@ const MainCategory = () => {
                       <tbody>
                         {paginatedData.map((cat, index) => (
                           <tr key={cat.id}>
-                            <td>{index + 1}</td>
+                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                             <td>{cat.mainCategoryName}</td>
                             <td >
                               <Form.Check

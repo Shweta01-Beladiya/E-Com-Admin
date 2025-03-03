@@ -192,7 +192,13 @@ const Sidebar = ({ open, handleDrawerClose, theme }) => {
 
       <List className="bg-[#2B221E] h-full">
         {menuItems.map((item, index) => {
-      const isActive = location.pathname === item.path || (item.path === "/dashboard" && location.pathname.startsWith("/view_profile"));
+      const isActive = 
+      location.pathname === item.path || 
+      (item.path === "/dashboard" && location.pathname.startsWith("/view_profile")) ||
+      (item.path === "/product" && location.pathname.includes("/viewProduct"))||
+      (item.path === "/size" && location.pathname.includes("/addsize"))||
+      (item.path === "/stock" && location.pathname.includes("/addstock"))||
+      (item.path === "/coupon" && location.pathname.includes("/addcoupon"));
 
           return (
             <React.Fragment key={item.text || index}>

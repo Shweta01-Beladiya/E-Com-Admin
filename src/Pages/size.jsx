@@ -410,7 +410,7 @@ const Size = () => {
                                             <tbody>
                                                 {paginatedData?.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td>{index + 1}</td>
+                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.mainCategoryData[0]?.mainCategoryName}</td>
                                                         <td>{item.categoryData[0]?.categoryName}</td>
                                                         <td>{item.subCategoryData[0]?.subCategoryName}</td>
