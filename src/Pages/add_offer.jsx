@@ -53,7 +53,7 @@ const Addoffer = ({ editData }) => {
     // Edit Offer
     const location = useLocation();
     const editOffer = location.state?.editOffer;
-    console.log(editOffer)
+    // console.log(editOffer)
 
     // Select img
     let [addimg, setaddimg] = useState("");
@@ -61,27 +61,34 @@ const Addoffer = ({ editData }) => {
     const [brandImagePreview, setBrandImagePreview] = useState(null);
 
     useEffect(() => {
-        if (editData) {
-            const filename = editData.offerImg.split("\\").pop();
-            setaddimg(filename.substring(filename.indexOf('-') + 1));
-            setBrandImagePreview(`${BaseUrl}/${editData.offerImg}`);
+        if (editData && editData.offerImage) {
+            try {
+                const filename = editData.offerImage.split("\\").pop();
+                setaddimg(filename.substring(filename.indexOf('-') + 1));
+                setBrandImagePreview(`${BaseUrl}/${editData.offerImage}`);
+            } catch (error) {
+                console.error("Error processing offerImg:", error);
+                setaddimg("");
+                setBrandImagePreview(null);
+            }
         }
-    }, [editData]);
+    }, [editData, BaseUrl]);
 
     // Date function
     let [date, setDate] = useState('Select Date');
     let [date1, setDate1] = useState('Select Date');
 
     const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
+        const selectedDate = e.target.value;
+        const [year, month, day] = selectedDate.split("-");
         const formattedDate = `${day}-${month}-${year}`;
         
         if (dateType === 'start') {
             setDate(formattedDate); // For UI display
-            setFieldValue("startDate", e.target.value)
+            setFieldValue("startDate", selectedDate)
         } else if (dateType === 'end') {
             setDate1(formattedDate); // For UI display
-            setFieldValue("endDate", e.target.value);
+            setFieldValue("endDate", selectedDate);
         }
     };
 
@@ -92,7 +99,7 @@ const Addoffer = ({ editData }) => {
         subCategoryId: editData?.subCategoryId || "",
         offerType: editData?.offerType || "",
         offerName: editData?.offerName || "",
-        offerImage: "",
+        addpopularbrandimage: "",
         buttonText: editData?.buttonText || "",
         startDate: editData?.startDate || "",
         endDate: editData?.endDate || "",
@@ -105,8 +112,8 @@ const Addoffer = ({ editData }) => {
         subCategoryId: Yup.string().required("Sub Category is required"),
         offerType: Yup.string().required("Product is required"),
         offerName: Yup.string().required("Offer Name is required"),
-        offerImage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
-        buttonText: Yup.string().required("Discount Price is required"),
+        addpopularbrandimage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
+        buttonText: Yup.string().required("Button Text is required"),
         startDate: Yup.string().required("Start Date is required"),
         endDate: Yup.string().required("End Date is required"),
         description: Yup.string().required("Description is required"),
@@ -125,8 +132,8 @@ const Addoffer = ({ editData }) => {
             formData.append("subCategoryId", values.subCategoryId);
             formData.append("offerType", values.offerType);
             formData.append("offerName", values.offerName);
-            if (values.offerImage) {
-                formData.append("offerImage", values.offerImage);
+            if (values.addpopularbrandimage) {
+                formData.append("offerImage", values.addpopularbrandimage);
             }
             formData.append("buttonText", values.buttonText);
             formData.append("startDate", values.startDate);
@@ -230,6 +237,16 @@ const Addoffer = ({ editData }) => {
         fetchCategory();
         fetchsubCategory();
     },[])
+
+    // Set initial selected categories and subcategories when editData is loaded
+    useEffect(() => {
+        if (editData && editData.mainCategoryId) {
+            mCategory(editData.mainCategoryId);
+        }
+        if (editData && editData.categoryId) {
+            sCategory(editData.categoryId);
+        }
+    }, [editData, categories, subcategories]);
     // **************************************************************************
 
     return (
@@ -359,7 +376,7 @@ const Addoffer = ({ editData }) => {
                                                         aria-label=""
                                                         readOnly
                                                         value={addimg}
-                                                        name="offerImage"
+                                                        name="addpopularbrandimage"
                                                         onBlur={handleBlur}
                                                     />
                                                     <label className="mv_browse_button">
@@ -372,7 +389,7 @@ const Addoffer = ({ editData }) => {
                                                                 const file = e.currentTarget.files[0];
                                                                 if (file) {
                                                                     setaddimg(file.name);
-                                                                    setFieldValue("offerImage", file);
+                                                                    setFieldValue("addpopularbrandimage", file);
                                                                     setBrandImagePreview(URL.createObjectURL(file));
                                                                 }
                                                                 setToggle(true)
@@ -380,7 +397,7 @@ const Addoffer = ({ editData }) => {
                                                         />
                                                     </label>
                                                 </InputGroup>
-                                                {errors.offerImage && touched.offerImage && <div className="text-danger small">{errors.offerImage}</div>}
+                                                {errors.addpopularbrandimage && touched.addpopularbrandimage && <div className="text-danger small">{errors.addpopularbrandimage}</div>}
                                                 {brandImagePreview && (
                                                     <div className="mt-2">
                                                         <img
@@ -420,26 +437,35 @@ const Addoffer = ({ editData }) => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>Start Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
-                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                <Form.Control className='' type="date" 
+                                                { 
+                                                    values.startDate ? null : 
+                                                    <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
+                                                }
+                                                <Form.Control
+                                                    className=""
+                                                    type="date"
                                                     name="startDate"
+                                                    placeholder='hello'
                                                     value={values.startDate}
-                                                    // onChange={handleChange}
-                                                    onChange={(e) => handleDateChange(e, 'start')} 
+                                                    onChange={(e) => handleDateChange(e, "start")}
                                                     onBlur={handleBlur}
-                                                 />
-                                                 {errors.startDate && touched.startDate && <div className="text-danger small">{errors.startDate}</div>}
+                                                />
+                                                {errors.startDate && touched.startDate && <div className="text-danger small">{errors.startDate}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>End Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
-                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                <Form.Control className='' type="date" 
+                                                { 
+                                                    values.endDate ? null : 
+                                                    <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
+                                                }
+                                                <Form.Control
+                                                    className=""
+                                                    type="date"
                                                     name="endDate"
                                                     value={values.endDate}
-                                                    // onChange={handleChange}
-                                                    onChange={(e) => handleDateChange(e, 'end')} 
+                                                    onChange={(e) => handleDateChange(e, "end")}
                                                     onBlur={handleBlur}
                                                 />
                                                 {errors.endDate && touched.endDate && <div className="text-danger small">{errors.endDate}</div>}
