@@ -14,7 +14,10 @@ const ViewProduct = () => {
 
     const [product, setProduct] = useState({});
     const [productVariant, setProductVariant] = useState({});
-
+    const [mainCategoryName, setMainCategoryName] = useState('');
+    const [categoryName, setCategoryName] = useState('');
+    const [subCategoryName, setSubCategoryName] = useState('');
+    
 
     const fetchProduct = async () => {
         try {
@@ -32,12 +35,51 @@ const ViewProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getProductVariant/${productVariantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response", response.data.productVariant); 
+            // console.log("response", response.data.productVariant); 
             setProductVariant(response.data.productVariant);
         } catch (error) {
             console.error('Data Fetching Error:', error);
         }
     }
+
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getMainCategory/${product.mainCategoryId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setMainCategoryName(response.data.mainCategory.mainCategoryName); 
+        } catch (error) {
+            console.error('Error fetching main category:', error);
+        }
+    };
+    
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getCategory/${product.categoryId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCategoryName(response.data.category.categoryName);
+        } catch (error) {
+            console.error('Error fetching category:', error);
+        }
+    };
+    
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getSubCategory/${product.subCategoryId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSubCategoryName(response.data.subCategory.subCategoryName);
+        } catch (error) {
+            console.error('Error fetching subcategory:', error);
+        }
+    };
+    useEffect(() => {
+        if (product.mainCategoryId) fetchMainCategory();
+        if (product.categoryId) fetchCategory();
+        if (product.subCategoryId) fetchSubCategory();
+    }, [product]);
+    
     useEffect(() => {
         fetchProduct();
         fetchProductVariant();
@@ -89,9 +131,9 @@ const ViewProduct = () => {
                 </div>
                 {/* Left Column */}
                 <div className="col-md-6 col-12 p-4">
-                    <InfoField label="Main Category" value={product.mainCategory} />
-                    <InfoField label="Category" value={product.category} />
-                    <InfoField label="Sub Category" value={product.subCategory} />
+                    <InfoField label="Main Category" value={mainCategoryName} />
+                    <InfoField label="Category" value={categoryName} />
+                    <InfoField label="Sub Category" value={subCategoryName} />
                     <InfoField label="Product Name" value={product.productName} />
                     <InfoField label="Short Description" value={productVariant.shortDescription} />
                     <InfoField label="Gender" value={product.gender || '-'} />

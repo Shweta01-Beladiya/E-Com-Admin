@@ -667,8 +667,9 @@
     background-repeat: no-repeat !important;
 }
 .mv_user_bgimg img{
-    width: 120px;
-    height: 120px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
     margin-top: 60px !important;
 }
 .mv_main_profile_name_email{
@@ -888,11 +889,11 @@
 }
 .mv_old_pass{
     position: relative;
+    /* margin-bottom: 25px !important; */
 }
 .mv_old_pass input{
     border: 0.75px solid #95908F !important;
     border-radius: 4px !important;
-    margin-bottom: 25px !important;
 }
 .mv_old_pass input:focus{
     outline: none !important;
@@ -903,6 +904,8 @@
     top: 38%;
     right: 15px;
     font-size: 20px;
+    transform: translateY(50%);
+
 }
 .mv_label_old_pass{
     font-size: 14px;
@@ -925,8 +928,8 @@
 @media (max-width: 1199px){
     /* View Profile */
     .mv_user_bgimg img {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
         margin-top: 60px !important;
     }
     .mv_main_profile_name_email{
@@ -1075,8 +1078,8 @@
         height: 80px !important;
     }
     .mv_user_bgimg img {
-        height: 80px;
-        width: 80px;
+        height: 70px;
+        width: 70px;
         margin-top: 40px !important;
     }
     .mv_main_profile_name_email {

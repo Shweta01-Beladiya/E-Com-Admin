@@ -123,7 +123,7 @@ const Header = ({ open, handleDrawerOpen }) => {
           onClick={handleClick}
           sx={{ marginLeft: 'auto' }}
         >
-          <img src={require('../s_img/loginUser.png')} alt="" />
+          <img src={`${BaseUrl}/${data.image}`} alt="" style={{width:'50px', height:'50px', borderRadius:'50%'}} />
         </Button>
         <Menu
           id="basic-menu"
@@ -138,7 +138,7 @@ const Header = ({ open, handleDrawerOpen }) => {
           <MenuItem onClick={handleClose}>
             <div className='d-flex'>
               <div>
-                <img src={require('../s_img/loginUser.png')} alt="" className='w-30 h-30 me-3' />
+                <img src={`${BaseUrl}/${data.image}`} alt="" style={{width:'50px', height:'50px', borderRadius:'50%'}} className='me-3' />
               </div>
               <div>
                 <p className='mb-0'><b>{data.name}</b></p>
