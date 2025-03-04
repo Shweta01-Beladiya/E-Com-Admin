@@ -1,198 +1,75 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
-const Coupon = (props) => {
+const Coupon = () => {
 
-    // Edit Coupon
-    const [editstok,setEditcoupon] = useState(false);
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
-    const navigate = useNavigate();
-
-    const handleditcoupon = () => {
-        setEditcoupon(true);
-        // navigate('addsize')
-    }
-
-    var data = [
-        {   
-            id: 1,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 2,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: false,
-        },
-        {   
-            id: 3,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 4,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 5,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 6,
-            code: "WINTER30",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Percentage",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 7,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 8,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 9,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 10,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 11,
-            code: "NEW100",
-            coupenname: "Lorem ipsum",
-            description: "Lorem ipsum idb..",
-            coupontype: "Fixed",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-    ];
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({
+        startDate: '',
+        endDate: '',
+        status: '',
+    });
+    const [id, setId] = useState(null);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState(data);
- 
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
- 
+    // console.log("totalpage",totalPages)
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-             setCurrentPage(newPage);
+            setCurrentPage(newPage);
         }
     };
- 
+
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-         
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-         
-        // Adjust startPage if we're near the end
+
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
- 
-        // Add first page if not included
+
         if (startPage > 1) {
             buttons.push(1);
             if (startPage > 2) buttons.push('...');
         }
- 
-        // Add main page numbers
+
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
- 
-        // Add last page if not included
+
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) buttons.push('...');
             buttons.push(totalPages);
         }
         return buttons;
     };
- 
+
     const paginatedData = filteredData.slice(
-         (currentPage - 1) * itemsPerPage,
-         currentPage * itemsPerPage
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
+
     // *******************************************************************************
 
     // Modal
@@ -200,24 +77,117 @@ const Coupon = (props) => {
 
     // Offcanvas
     const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
+    useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allSpecialOffer`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("REsposne",response.data.specialOffers);
+                setData(response.data.specialOffers);
+                setFilteredData(response.data.specialOffers);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
         }
+        fetchAllData();
+    }, []);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
     };
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [name]: value
+        }));
+    };
+
+    useEffect(() => {
+        let filtered = data;
+
+        if (searchTerm) {
+            filtered = filtered.filter((item) =>
+                item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.coupenType.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        if (filters.startDate) {
+            filtered = filtered.filter((item) => {
+                const itemDate = new Date(item.startDate);
+                return itemDate >= new Date(filters.startDate);
+            });
+        }
+        
+        if (filters.endDate) {
+            filtered = filtered.filter((item) => {
+                const itemDate = new Date(item.endDate);
+                return itemDate <= new Date(filters.endDate);
+            });
+        }        
+
+        if (filters.status) {
+            const statusBool = filters.status === "true";
+            filtered = filtered.filter((item) => item.status === statusBool);
+        }
+
+        setFilteredData(filtered);
+        setCurrentPage(1);
+    }, [searchTerm, filters, data]);
+
+    const handleReset = () => {
+        setSearchTerm("");
+        setFilters({ startDate: '', endDate: '', status: '' });
+        setFilteredData(data);
+        setShow(false);
+    };
+
+    const handleDelete = (id) => {
+        setModalShow(true);
+        setId(id);
+    }
+
+    const handleCoupen = async () => {
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteSpecialOffer/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response",response.data);
+            if (response.data.status === 200) {
+                setModalShow(false);
+                setData(prevData => prevData.filter(item => item._id !== id));
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const handleStatusChange = async (id, currentStatus) => {
+        try {
+            const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`,{
+                status: !currentStatus
+            } , {
+                headers: {Authorization : `Bearer ${token}`}
+            });
+            if (response.data.status === 200) {
+                setData(prevData => 
+                    prevData.map(item => 
+                        item._id === id ? { ...item, status: !item.status } : item
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
 
     return (
         <>
@@ -238,9 +208,9 @@ const Coupon = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
                                         />
                                     </InputGroup>
                                 </div>
@@ -250,7 +220,7 @@ const Coupon = (props) => {
                                             <img src={require('../mv_img/filter.png')} alt="" />
                                             Filters
                                         </Button>
-                                        <Offcanvas show={show} onHide={handleClose} placement='end' className="mv_offcanvas_filter">
+                                        <Offcanvas show={show} onHide={handleReset} placement='end' className="mv_offcanvas_filter">
                                             <Offcanvas.Header closeButton className='mv_offcanvas_filter_heading'>
                                                 <Offcanvas.Title className='mv_offcanvas_filter_title'>Filters</Offcanvas.Title>
                                             </Offcanvas.Header>
@@ -259,33 +229,33 @@ const Coupon = (props) => {
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>Start Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                                            {/* <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label> */}
+                                                            <Form.Control className='mb-3' type="date" name="startDate" onChange={handleFilterChange} />
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>End Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                            {/* <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label> */}
+                                                            <Form.Control className='mb-3' type="date" name="endDate" onChange={handleFilterChange} />
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Status</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
+                                                        <Form.Select className="mb-3" name="status" onChange={handleFilterChange}>
                                                             <option>Select Status</option>
-                                                            <option value="True">True</option>
-                                                            <option value="False">False</option>
+                                                            <option value="true">Active</option>
+                                                            <option value="false">InActive</option>
                                                         </Form.Select>
                                                     </div>
                                                 </div>
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleClose}>Cancel</button>
+                                                            <button type="button" onClick={handleReset}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="submit" onClick={handleReset}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -299,6 +269,8 @@ const Coupon = (props) => {
                                     </div>
                                 </div>
                             </div>
+                            {paginatedData.length > 0 ? (
+                                <>
                             <div className="mv_product_table_padd">
                                 <table className='mv_product_table justify-content-between'>
                                     <thead>
@@ -317,35 +289,35 @@ const Coupon = (props) => {
                                     </thead>
                                     <tbody>
                                         {paginatedData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.code}</td>
-                                            <td>{item.coupenname}</td>
-                                            <td>{item.description}</td>
-                                            <td>{item.coupontype}</td>
-                                            <td>${item.price}</td>
-                                            <td>{item.startdate}</td>
-                                            <td>{item.enddate}</td>
-                                            <td>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id={`custom-switch-${item.id}`}
-                                                    label=""
-                                                    checked={item.status}
-                                                    className=''
-                                                />
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={handleditcoupon}>
-                                                    <Link to='/addcoupon' state={{ editCoupon: true }}>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
+                                            <tr key={index}>
+                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td>{item.code}</td>
+                                                <td>{item.title}</td>
+                                                <td>{item.description}</td>
+                                                <td>{item.coupenType}</td>
+                                                <td>&#x20b9;{item.offerDiscount}</td>
+                                                <td>{new Date(item.startDate).toLocaleDateString('en-GB')}</td>
+                                                <td>{new Date(item.endDate).toLocaleDateString('en-GB')}</td>
+                                                <td>
+                                                    <Form.Check
+                                                        type="switch"
+                                                        label=""
+                                                        checked={item.status}
+                                                        className=''
+                                                        onChange={()=>handleStatusChange(item._id, item.status)}
+                                                    />
+                                                </td>
+                                                <td className='d-flex align-items-center justify-content-end'>
+                                                    <div className="mv_pencil_icon" >
+                                                        <Link to='/addcoupon' state={{ id: item._id }}>
+                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
+                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -366,13 +338,17 @@ const Coupon = (props) => {
                                     </p>
                                 </div>
                             )}
+                                </>
+                            ) : (
+                                <NoResultsFound/>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Delete Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
                     <p>Are you sure you want to delete <br /> coupon?</p>
@@ -381,7 +357,7 @@ const Coupon = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleCoupen}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
@@ -390,4 +366,4 @@ const Coupon = (props) => {
     );
 };
 
-export default Coupon
+export default Coupon;

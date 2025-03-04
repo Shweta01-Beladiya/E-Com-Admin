@@ -1,42 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Addcoupon = () => {
-    // State variables
-    let [isedit, setisedit] = useState(false);
-    // let [code, setCode] = useState("");
-    // let [couponName, setCouponName] = useState("");
-    // let [description, setDescription] = useState("");
-    // let [couponType, setCouponType] = useState("");
-    // let [price, setPrice] = useState("");
 
-    let change_edit = () => {
-        setisedit(!isedit);
-    };
-
-    // let handlesubmit = (event) => {
-    //     event.preventDefault();
-
-    //     const formData = {
-    //         code,
-    //         couponName,
-    //         description,
-    //         couponType,
-    //         price,
-    //     };
-
-    //     console.log('Form Submitted:', formData);
-    //     setisedit(false);
-    // };
-
-    // Edit Coupon
     const location = useLocation();
-    const editCoupon = location.state?.editCoupon;
-    console.log(editCoupon)
+    const navigate = useNavigate();
+
+    const id = location.state?.id;
+    // console.log("id",id)
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
     // Date function
     const [date, setDate] = useState("Select Date");
@@ -60,20 +38,21 @@ const Addcoupon = () => {
     // ******************************* Validation *******************************
     const couponInit = {
         code: "",
-        couponName: "",
+        title: "",
         description: "",
-        couponType: "",
-        price: "",
+        coupenType: "",
+        offerDiscount: "",
         startDate: "",
         endDate: "",
+        status:true
     }
 
     const couponValidate = Yup.object().shape({
         code: Yup.string().required("Code is required"),
-        couponName: Yup.string().required("Coupon Name is required"),
+        title: Yup.string().required("Coupon Name is required"),
         description: Yup.string().required("Description is required"),
-        couponType: Yup.string().required("CouponType is required"),
-        price: Yup.number().required("Price is required"),
+        coupenType: Yup.string().required("CouponType is required"),
+        offerDiscount: Yup.number().required("Price is required"),
         startDate: Yup.date().required("Start Date is required"),
         endDate: Yup.date().required("End Date is required"),
     });
@@ -81,29 +60,100 @@ const Addcoupon = () => {
     const { values, handleBlur, handleChange, handleSubmit, errors, touched , setFieldValue } = useFormik({
         initialValues: couponInit,
         validationSchema: couponValidate,
-        onsubmit: (values) => {
-            console.log(values);
-            // addcoupen(values)
+        onSubmit:  async(values) => {
+            // console.log(values);
+
+            if(id) {
+                const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, values, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("resposne",response.data);
+                if(response.data.status === 200) {
+                    navigate('/coupon');
+                }
+            } else {
+                const response = await axios.post(`${BaseUrl}/api/createSpecialOffer`, values, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                // console.log("response",response.data);
+                if(response.data.status === 201){
+                    navigate('/coupon');
+                }
+            }
         }
     })
     // **************************************************************************
 
+    const handleCancel = () => {
+        navigate('/coupon');
+    }
+
+    useEffect(() => {
+        const fetchCouponData = async () => {
+            if (id) {
+                try {
+                    const response = await axios.get(`${BaseUrl}/api/getSpecialOffer/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    
+                    const couponData = response.data.specialOffer;
+                    
+                    // Format dates for form display
+                    if (couponData.startDate) {
+                        const startDateObj = new Date(couponData.startDate);
+                        const formattedStartDate = startDateObj.toISOString().split('T')[0];
+                        setFieldValue("startDate", formattedStartDate);
+                        
+                        const day = startDateObj.getDate().toString().padStart(2, '0');
+                        const month = (startDateObj.getMonth() + 1).toString().padStart(2, '0');
+                        const year = startDateObj.getFullYear();
+                        setDate(`${day}-${month}-${year}`);
+                    }
+                    
+                    if (couponData.endDate) {
+                        const endDateObj = new Date(couponData.endDate);
+                        const formattedEndDate = endDateObj.toISOString().split('T')[0];
+                        setFieldValue("endDate", formattedEndDate);
+                        
+                        const day = endDateObj.getDate().toString().padStart(2, '0');
+                        const month = (endDateObj.getMonth() + 1).toString().padStart(2, '0');
+                        const year = endDateObj.getFullYear();
+                        setDate1(`${day}-${month}-${year}`);
+                    }
+                    
+                    // Set all other form values
+                    setFieldValue("code", couponData.code || "");
+                    setFieldValue("title", couponData.title || "");
+                    setFieldValue("description", couponData.description || "");
+                    setFieldValue("coupenType", couponData.coupenType || "");
+                    setFieldValue("offerDiscount", couponData.offerDiscount || "");
+                    setFieldValue("status", couponData.status !== undefined ? couponData.status : true);
+                    
+                } catch (error) {
+                    console.error("Error fetching coupon data:", error);
+                }
+            }
+        };
+    
+        fetchCouponData();
+    }, [id, BaseUrl, token, setFieldValue]);
     return (
         <>
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editCoupon ? 'Edit Coupon' : 'Add Coupon'}</p>
+                        <p className='mb-1'>{id ? 'Edit Coupon' : 'Add Coupon'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editCoupon ? 'Edit Coupon' : 'Add Coupon'}
+                                {id ? 'Edit Coupon' : 'Add Coupon'}
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="mv_main_profile_change h-auto">
-                    {/* Tabs Content */}
                     <div className="tab-content">
                         <div className="mv_view_edit_profile">
                             <div className='mv_profile_type'>
@@ -119,8 +169,6 @@ const Addcoupon = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Code"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
                                                 {errors.code && touched.code && <div className="text-danger small">{errors.code}</div>}
@@ -131,16 +179,14 @@ const Addcoupon = () => {
                                                 <label className='mv_label_input'>Coupon Name</label>
                                                 <InputGroup className="">
                                                     <Form.Control
-                                                        name="couponName"
-                                                        value={values.couponName}
+                                                        name="title"
+                                                        value={values.title}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Coupon Name"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
-                                                {errors.couponName && touched.couponName && <div className="text-danger small">{errors.couponName}</div>}
+                                                {errors.title && touched.title && <div className="text-danger small">{errors.title}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -153,8 +199,6 @@ const Addcoupon = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Description"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
                                                 {errors.description && touched.description && <div className="text-danger small">{errors.description}</div>}
@@ -164,8 +208,8 @@ const Addcoupon = () => {
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Coupon type</label>
                                                 <Form.Select
-                                                    name="couponType"
-                                                    value={values.couponType}
+                                                    name="coupenType"
+                                                    value={values.coupenType}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     aria-label="Default select example"
@@ -174,7 +218,7 @@ const Addcoupon = () => {
                                                     <option value="Fixed">Fixed</option>
                                                     <option value="Percentage">Percentage</option>
                                                 </Form.Select>
-                                                {errors.couponType && touched.couponType && <div className="text-danger small">{errors.couponType}</div>}
+                                                {errors.coupenType && touched.coupenType && <div className="text-danger small">{errors.coupenType}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -182,8 +226,8 @@ const Addcoupon = () => {
                                                 <label className='mv_label_input'>Price</label>
                                                 <InputGroup className="">
                                                     <Form.Control
-                                                        name="price"
-                                                        value={values.price}
+                                                        name="offerDiscount"
+                                                        value={values.offerDiscount}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Price"
@@ -191,7 +235,7 @@ const Addcoupon = () => {
                                                         aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
-                                                {errors.price && touched.price && <div className="text-danger small">{errors.price}</div>}
+                                                {errors.offerDiscount && touched.offerDiscount && <div className="text-danger small">{errors.offerDiscount}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -226,14 +270,14 @@ const Addcoupon = () => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button className='border-0 bg-transparent'>
-                                                    Cnacel
+                                                <button className='border-0 bg-transparent' onClick={handleCancel}>
+                                                    Cancel
                                                 </button>
-                                                {editCoupon === true ? 
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                { id ? 
+                                                    <button type="submit" className='border-0 bg-transparent' >
                                                         Update
                                                     </button> : 
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                    <button type="submit" className='border-0 bg-transparent' >
                                                         Add
                                                     </button>
                                                 }

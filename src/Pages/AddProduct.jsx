@@ -87,9 +87,8 @@ const AddProduct = () => {
             .required('Price is required')
             .positive('Price must be positive')
             .min(0, 'Price must be greater than or equal to 0'),
-        discountPrice: Yup.number()
-            .nullable()
-            .transform((value, originalValue) => originalValue.trim() === '' ? null : value)
+            discountPrice: Yup.number()
+            .required('Discount Price is required')
             .lessThan(Yup.ref('originalPrice'), 'Discount price must be less than regular price'),
         // productOfferId: Yup.array()
         //     .nullable()
@@ -103,8 +102,7 @@ const AddProduct = () => {
             .required('Shipping details are required'),
         returnPolicy: Yup.string()
             .required('Return/Exchange policy is required'),
-        colorName: Yup.string()
-            .required('Color name is required'),
+        colorName: Yup.mixed().required('Color is required'),
         images: Yup.array()
             .min(1, 'At least one image must be uploaded')
             .max(5, 'Maximum 5 images allowed'),
@@ -227,16 +225,16 @@ const AddProduct = () => {
 
                 values.images.forEach((image) => {
                     if (image.file) {
-                        formData.append("images", image.file); 
+                        formData.append("images", image.file);
                     }
                 });
-                
+
                 values.images.forEach((image) => {
                     if (image.existingPath) {
-                        formData.append("images", image.existingPath || image.file); 
+                        formData.append("images", image.existingPath || image.file);
                     }
                 });
-                
+
 
 
                 const specObject = {};
@@ -276,7 +274,7 @@ const AddProduct = () => {
                 });
 
                 if (variantResponse.data.status === 200) {
-                    // navigate('/product');
+                    navigate('/product');
                 }
             } else {
                 // Create new product logic remains the same
@@ -306,9 +304,9 @@ const AddProduct = () => {
                 formData.append("shortDescription", values.shortDescription);
                 formData.append("originalPrice", values.originalPrice);
                 formData.append("discountPrice", values.discountPrice || '');
-                formData.append("colorName", typeof values.colorName === 'string'
-                    ? values.colorName
-                    : (Array.isArray(values.colorName) ? values.colorName.join(',') : values.colorName.toString()));
+                formData.append("colorName", Array.isArray(values.colorName)
+                    ? values.colorName.join(',')
+                    : (typeof values.colorName === 'string' ? values.colorName : colors.join(',')));
                 formData.append("description", values.description);
                 formData.append("shiping", values.shiping);
                 formData.append("returnPolicy", values.returnPolicy);
@@ -338,19 +336,20 @@ const AddProduct = () => {
     };
 
     const handleAddColorClick = (event) => {
+        event.preventDefault();
         const buttonRect = event.currentTarget.getBoundingClientRect();
         setPickerPosition({
-            x: buttonRect.left - 240,
+            x: Math.max(0, buttonRect.left - 240),
             y: buttonRect.bottom + window.scrollY
         });
         setDisplayColorPicker(!displayColorPicker);
     };
 
     const addColor = (setFieldValue) => {
-        if (!colors.includes(currentColor)) {
+        if (currentColor && !colors.includes(currentColor)) {
             const updatedColors = [...colors, currentColor];
             setColors(updatedColors);
-            setFieldValue('colorName', updatedColors.join(','));
+            setFieldValue('colorName', updatedColors);
         }
         setDisplayColorPicker(false);
     };
@@ -358,7 +357,7 @@ const AddProduct = () => {
     const removeColor = (colorToRemove, setFieldValue) => {
         const updatedColors = colors.filter(color => color !== colorToRemove);
         setColors(updatedColors);
-        setFieldValue('colorName', updatedColors.join(','));
+        setFieldValue('colorName', updatedColors);
     };
 
     // Image handlers
@@ -808,12 +807,12 @@ const AddProduct = () => {
                                                         <div className="border rounded p-2 d-flex align-items-center justify-content-between">
                                                             <div className="d-flex flex-wrap gap-3">
                                                                 {selectedImages.map((image, index) => (
-                                                                    <div key={index} className="d-flex align-items-center justify-content-between border rounded p-1" style={{ width: '120px' }}>
+                                                                    <div key={index} className="d-flex align-items-center justify-content-between  rounded-1 p-1" style={{ width: '120px', backgroundColor: '#EAEAEA' }}>
 
                                                                         <div className="text-truncate " style={{ maxWidth: '100px' }}>
                                                                             {image.name}
                                                                         </div>
-                                                                        <IoMdClose style={{ color: '#ff0000' }} onClick={() => removeImage(index, setFieldValue)} />
+                                                                        <IoMdClose style={{ color: '#ff0000', fontSize: '25px', cursor: 'pointer' }} onClick={() => removeImage(index, setFieldValue)} />
                                                                     </div>
                                                                 ))}
                                                             </div>

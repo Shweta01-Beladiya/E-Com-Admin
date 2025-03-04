@@ -13,42 +13,9 @@ const ReviewManagement = () => {
   const BaseUrl = process.env.REACT_APP_BASEURL;
   const token = localStorage.getItem('token');
 
-  const [data,setData] = useState([]);
-
-  // var data = [
-  //   {
-  //     id: 1,
-  //     customerName: "Johan Desai",
-  //     product: 'Smart Watch',
-  //     date: "02/09/2023",
-  //     rate: '4.5',
-  //     description: "Lorem ipsum dolor sit",
-  //   },
-  //   {
-  //     id: 2,
-  //     customerName: "Om Patel",
-  //     product: 'Skin Care',
-  //     date: "12/08/2024",
-  //     rate: '4.0',
-  //     description: "Lorem ipsum dolor sit",
-  //   },
-  //   {
-  //     id: 3,
-  //     customerName: "Nizam Patel",
-  //     product: 'Smart Watch',
-  //     date: "02/10/2024",
-  //     rate: '3.5',
-  //     description: "Lorem ipsum dolor sit",
-  //   },
-  //   {
-  //     id: 5,
-  //     customerName: "Johan Desai",
-  //     product: 'Smart Watch',
-  //     date: "02/09/2023",
-  //     rate: '4.1',
-  //     description: "Lorem ipsum dolor sit",
-  //   },
-  // ];
+  const [data, setData] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [id, setId] = useState(null);
 
   const renderStars = (rating) => {
     const stars = [];
@@ -77,11 +44,11 @@ const ReviewManagement = () => {
     setSearchQuery(query);
 
     const filtered = data.filter(item =>
-      item.customerName.toLowerCase().includes(query) ||
-      item.product.toLowerCase().includes(query) ||
-      item.date.includes(query) ||
-      item.rate.includes(query) ||
-      item.description.toLowerCase().includes(query)
+      (item.customerName && item.customerName.toLowerCase().includes(query)) ||
+      (item.product && item.product.toLowerCase().includes(query)) ||
+      (item.date && item.date.includes(query)) ||
+      (item.rate && item.rate.toString().includes(query)) ||
+      (item.description && item.description.toLowerCase().includes(query))
     );
 
     setFilteredData(filtered);
@@ -138,19 +105,65 @@ const ReviewManagement = () => {
   const [viewModalShow, setViewModalShow] = React.useState(false);
 
   useEffect(() => {
-    const fetchData = async() => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(`${BaseUrl}/api/allratingAndReview`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("repsonse",response.data.ratingAndReview);
+        // console.log("repsonse", response.data.ratingAndReview);
         setData(response.data.ratingAndReview);
+        const formattedData = response.data.ratingAndReview.map(item => {
+          return {
+            id: item._id,
+            customerName: item.userData[0]?.name,
+            product: item.productData[0]?.productName,
+            date: new Date(item.createdAt).toLocaleDateString(),
+            rate: parseFloat(item.rating),
+            description: item.review,
+            userId: item.userId,
+            productId: item.productId,
+            productVariantId: item.productVariantId,
+            productImages: item.productImages
+          };
+        });
+
+        setData(formattedData);
+        setFilteredData(formattedData);
       } catch (error) {
         console.error('Data Fetching Error:', error);
       }
     }
     fetchData();
-  },[]);
+  }, []);
+
+  const handleViewModal = (item) => {
+    setSelectedItem(item);
+    setViewModalShow(true);
+  }
+
+  const handleDelete = (id) => {
+    setId(id);
+    setModalShow(true);
+  }
+
+  const handleConfirm = async() => {
+    try {
+        const response = await axios.delete(`${BaseUrl}/api/deleteRatingAndReview/${id}`, {
+          headers: {Authorization: `Bearer ${token}`}
+        });
+        // console.log("response",response.data);
+        if(response.data.status === 200) {
+          setModalShow(false);
+          setData(prevData => {
+            const updatedData = prevData.filter(review => review.id !== id);
+            setFilteredData(updatedData); 
+            return updatedData;
+          });
+        }
+    } catch (error) {
+        console.error('Data Fetching Error:', error);
+    }
+  }
   return (
     <>
       <div id='mv_container_fluid'>
@@ -165,7 +178,7 @@ const ReviewManagement = () => {
         </div>
         <div className="row mt-4">
           <div className="col-12">
-            <div className="mv_product_table_content" style={{height:'80vh'}}>
+            <div className="mv_product_table_content" style={{ height: '80vh' }}>
               <div className='mv_table_search'>
                 <div className="mv_product_search">
                   <InputGroup>
@@ -196,17 +209,17 @@ const ReviewManagement = () => {
                       <tbody>
                         {paginatedData.map((item, index) => (
                           <tr key={index}>
-                            <td>{index + 1}</td>
+                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                             <td>{item.customerName}</td>
                             <td>{item.product}</td>
                             <td>{item.date}</td>
                             <td>{renderStars(item.rate)}</td>
                             <td>{item.description}</td>
                             <td className='d-flex align-items-center justify-content-end'>
-                              <div className="mv_pencil_icon" onClick={() => setViewModalShow(true)} >
+                              <div className="mv_pencil_icon" onClick={() => handleViewModal(item)} >
                                 <img src={require('../mv_img/eyes_icon.png')} alt="" />
                               </div>
-                              <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                              <div className="mv_pencil_icon" onClick={() => handleDelete(item.id)}>
                                 <img src={require('../mv_img/trust_icon.png')} alt="" />
                               </div>
                             </td>
@@ -233,7 +246,7 @@ const ReviewManagement = () => {
                   )}
                 </>
               ) : (
-                <NoResultsFound/>
+                <NoResultsFound />
               )}
             </div>
           </div>
@@ -250,7 +263,7 @@ const ReviewManagement = () => {
               <button onClick={() => setModalShow(false)}>Cancel</button>
             </div>
             <div className="mv_logout_button">
-              <button>Delete</button>
+              <button onClick={handleConfirm}>Delete</button>
             </div>
           </div>
         </Modal.Body>
@@ -260,35 +273,40 @@ const ReviewManagement = () => {
       <Modal className='mv_logout_dialog' show={viewModalShow} onHide={() => setViewModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
         <Modal.Body className='text-center'>
           <Modal.Header closeButton className="r_modalheader p-0"></Modal.Header>
-          <div>
-            <p className='fw-bold' style={{ fontSize: '18px' }}>View Review</p>
-            <table className='sb_table1' width={'100%'}>
-              <tr>
-                <td>Profile Photo : </td>
-                <td><img src={require('../s_img/profile.png')} alt="" /></td>
-              </tr>
-              <tr>
-                <td>Name : </td>
-                <td>Johan Desai</td>
-              </tr>
-              <tr>
-                <td>Date : </td>
-                <td>09/02/2024</td>
-              </tr>
-              <tr>
-                <td>Rating : </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Description : </td>
-                <td>Lorem ispum dolor sit amet consectetu <br />Lorem ispum dolor sit amet</td>
-              </tr>
-            </table>
-            <Modal.Footer style={{ justifyContent: 'flex-start', borderTop: 'none', padding: '0' }}>
-              <img src={require('../s_img/image1.png')} alt="" style={{ width: '70px', height: '70px' }} />
-              <img src={require('../s_img/image2.png')} alt="" style={{ width: '70px', height: '70px' }} />
-            </Modal.Footer>
-          </div>
+          {selectedItem && (
+            <div>
+              <p className='fw-bold' style={{ fontSize: '18px' }}>View Review</p>
+              <table className='sb_table1' width={'100%'}>
+                <tbody>
+                  <tr>
+                    <td>Profile Photo : </td>
+                    <td><img src={require('../s_img/profile.png')} alt="" /></td>
+                  </tr>
+                  <tr>
+                    <td>Name : </td>
+                    <td>{selectedItem.customerName}</td>
+                  </tr>
+                  <tr>
+                    <td>Date : </td>
+                    <td>{selectedItem.date}</td>
+                  </tr>
+                  <tr>
+                    <td>Rating : </td>
+                    <td>{renderStars(selectedItem.rate)}</td>
+                  </tr>
+                  <tr>
+                    <td>Description : </td>
+                    <td>{selectedItem.description}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <Modal.Footer style={{ justifyContent: 'flex-start', borderTop: 'none', padding: '0' }}>
+                {selectedItem.productImages && selectedItem.productImages.map((img, idx) => (
+                  <img key={idx} src={`${BaseUrl}/${img}`} alt={`Product ${idx}`} style={{ width: '70px', height: '70px' }} />
+                ))}
+              </Modal.Footer>
+            </div>
+          )}
         </Modal.Body>
       </Modal>
     </>

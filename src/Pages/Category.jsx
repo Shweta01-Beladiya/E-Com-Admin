@@ -316,7 +316,7 @@ const Category = () => {
                                 <tbody>
                                     {getCurrentPageData().map((category, index) => (
                                         <tr key={category.id}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td> {mainCategory.find(cat => cat._id === category.mainCategoryId)?.mainCategoryName || ''}</td>
                                             <td>{category.categoryName}</td>
                                             <td>
