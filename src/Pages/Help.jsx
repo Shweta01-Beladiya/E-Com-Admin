@@ -283,7 +283,7 @@ const Help = () => {
                                     <tbody>
                                         {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>{item.helpQuestion}</td>
                                             <td>{item.answer}</td>
                                             <td className='d-flex align-items-center justify-content-end'>

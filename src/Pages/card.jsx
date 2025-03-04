@@ -312,7 +312,7 @@ const Cards = ({ editData }) => {
                                     <tbody>
                                         {paginatedData.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td> 
                                             <td>
                                                 <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.cardImage }`}  alt="" />
                                                 {/* <img className='mv_product_img mv_product_radius_img' src={require(`../mv_img/${item.img}`)}  alt="" /> */}

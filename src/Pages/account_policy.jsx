@@ -276,7 +276,7 @@ const Accountpolicy = (props) => {
                                     <tbody>
                                         {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>{item.policyName}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
                                                 <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>

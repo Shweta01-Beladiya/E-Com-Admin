@@ -281,7 +281,7 @@ const Popularbrands = (props) => {
                                         // console.log(`${BaseUrl}/${item?.brandImage}`);
                                         return(
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>
                                                 <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandLogo }`}  alt="" />
                                                 {item?.brandName}

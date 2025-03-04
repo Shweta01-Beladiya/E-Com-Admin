@@ -285,7 +285,7 @@ const Termsconditions = (props) => {
                                     <tbody>
                                         {paginatedData?.map((item, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                             <td>{item.title}</td>
                                             <td>{item.description}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
