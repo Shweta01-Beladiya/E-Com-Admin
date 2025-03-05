@@ -78,6 +78,7 @@ const ViewProduct = () => {
         if (product.mainCategoryId) fetchMainCategory();
         if (product.categoryId) fetchCategory();
         if (product.subCategoryId) fetchSubCategory();
+            // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product]);
     
     useEffect(() => {

@@ -1,152 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
-const Returnorder = (props) => {
+const Returnorder = () => {
 
-    var data = [
-        {   
-            id: 1,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 2,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 3,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 4,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 5,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 6,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 7,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 8,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 9,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 10,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 11,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-    ];
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+
+    const [data, setData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
- 
+    const [filteredData, setFilteredData] = useState([]);
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
- 
+    // console.log("totalpage",totalPages)
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-             setCurrentPage(newPage);
+            setCurrentPage(newPage);
         }
     };
- 
+
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-         
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-         
+
         // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
- 
+
         // Add first page if not included
         if (startPage > 1) {
             buttons.push(1);
             if (startPage > 2) buttons.push('...');
         }
- 
+
         // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
- 
+
         // Add last page if not included
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) buttons.push('...');
@@ -154,50 +60,60 @@ const Returnorder = (props) => {
         }
         return buttons;
     };
- 
+
     const paginatedData = filteredData.slice(
-         (currentPage - 1) * itemsPerPage,
-         currentPage * itemsPerPage
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     // *******************************************************************************
 
-    // Modal
-    const [modalShow, setModalShow] = React.useState(false);
+    const changeReturnOrderStatus = async (id, status) => {
 
-    // Offcanvas
-    const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
-    // offcanvas price
-    const [priceRange, setPriceRange] = useState([0, 300]);
-    const handleSliderChange = (newRange) => {
-        setPriceRange(newRange);
-    };
-
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
+        try {
+            await axios.put(`${BaseUrl}/api/changeReturnOrderStatus/${id}`,
+                {
+                    returnOrderStatus: status
+                }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            );
+            const updatedOrders = filteredData.filter(order => order._id !== id);
+            setFilteredData(updatedOrders);
+            setData(updatedOrders);
+        } catch (error) {
+            console.error('Error updating return order status:', error);
         }
     };
 
-    // Return Order Status
-    const [selectedStatus, setSelectedStatus] = useState({});
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allReturnOrders`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response", response.data.returnOrder);
+                const pendingOrders = response.data.returnOrder.filter(order => order.returnOrderStatus === "Pending");
 
-    const handleStatusChange = (id, status) => {
-        setSelectedStatus((prev) => ({ ...prev, [id]: status }));
-        console.log(`Status changed for ID: ${id}, Status: ${status}`);
-    };
+                setData(pendingOrders);
+                setFilteredData(pendingOrders);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        const filtered = data.filter(order =>
+            order.userData[0].name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.productData[0].productName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredData(filtered);
+        setCurrentPage(1);
+    }, [searchQuery, data]);
 
     return (
         <>
@@ -218,9 +134,9 @@ const Returnorder = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -230,76 +146,69 @@ const Returnorder = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>    
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Customer name</th>
-                                            <th className=''>Product</th>
-                                            <th className=''>Date</th>
-                                            <th className=''>Status</th>
-                                            <th className=''>Reason</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                            <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.product}</td>
-                                            <td>{item.date}</td>
-                                            <td>
-                                            <div className="d-flex">
-                                                {selectedStatus[item.id] === item.statusone && (
-                                                    <button className="me-3 mv_ro_status_button">
-                                                    <p className="m-0 mv_accept_status">{item.statusone}</p>
-                                                    </button>
-                                                )}
-                                                {selectedStatus[item.id] === item.statustwo && (
-                                                    <button className="mv_ro_status_button">
-                                                    <p className="m-0 mv_reject_status">{item.statustwo}</p>
-                                                    </button>
-                                                )}
-                                                {!selectedStatus[item.id] && (
-                                                    <>
-                                                    <button
-                                                        className="me-3 mv_ro_status_button"
-                                                        onClick={() => handleStatusChange(item.id, item.statusone)}
-                                                    >
-                                                        <p className="m-0 mv_accept_status">{item.statusone}</p>
-                                                    </button>
-                                                    <button
-                                                        className="mv_ro_status_button"
-                                                        onClick={() => handleStatusChange(item.id, item.statustwo)}
-                                                    >
-                                                        <p className="m-0 mv_reject_status">{item.statustwo}</p>
-                                                    </button>
-                                                    </>
-                                                )}
-                                                </div>
-                                            </td>
-                                            <td>{item.reason}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
-                                        </p>
-                                    ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
+                            {paginatedData.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Customer name</th>
+                                                    <th className=''>Product</th>
+                                                    <th className=''>Date</th>
+                                                    <th className=''>Status</th>
+                                                    <th className=''>Reason</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{item.userData[0].name}</td>
+                                                        <td>{item.productData[0].productName}</td>
+                                                        <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+                                                        <td>
+                                                            <div className="d-flex">
+                                                                <button
+                                                                    className="me-3 mv_ro_status_button"
+                                                                    onClick={() => changeReturnOrderStatus(item._id, 'Accepted')}
+                                                                >
+                                                                    <p className="m-0 mv_accept_status">Accepted</p>
+                                                                </button>
+
+                                                                <button
+                                                                    className="mv_ro_status_button"
+                                                                    onClick={() => changeReturnOrderStatus(item._id, 'Cancelled')}
+                                                                >
+                                                                    <p className="m-0 mv_reject_status">Cancelled</p>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td>{item.cancellationData[0]?.reasonName}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                                    onClick={() => handlePageChange(page)}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>

@@ -1,142 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from 'axios';
 
-const Viewstatus = (props) => {
+const Viewstatus = () => {
 
-    var data = [
-        {   
-            id: 1,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 2,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 3,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 4,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 5,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 6,
-            name: "Nizam Patel",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 7,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 8,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 9,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 10,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statustwo: "Reject",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-        {   
-            id: 11,
-            name: "Johan Desai",
-            product: "Smart Watch",
-            date: "02/09/1994",
-            statusone: "Accept",
-            reason: "Lorem ipsum dolor sit amet",
-        },
-    ];
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
+    const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+
+    // Filter state variables
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
+    const [filterDate, setFilterDate] = useState('');
+    const [filterProductName, setFilterProductName] = useState('');
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [filteredData, setFilteredData] = useState(data);
- 
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
- 
+    // console.log("totalpage",totalPages)
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-             setCurrentPage(newPage);
+            setCurrentPage(newPage);
         }
     };
- 
+
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-         
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-         
+
         // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
- 
+
         // Add first page if not included
         if (startPage > 1) {
             buttons.push(1);
             if (startPage > 2) buttons.push('...');
         }
- 
+
         // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
- 
+
         // Add last page if not included
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) buttons.push('...');
@@ -144,10 +63,10 @@ const Viewstatus = (props) => {
         }
         return buttons;
     };
- 
+
     const paginatedData = filteredData.slice(
-         (currentPage - 1) * itemsPerPage,
-         currentPage * itemsPerPage
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     // *******************************************************************************
 
@@ -157,34 +76,78 @@ const Viewstatus = (props) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    // offcanvas price
-    const [priceRange, setPriceRange] = useState([0, 300]);
-    const handleSliderChange = (newRange) => {
-        setPriceRange(newRange);
-    };
+    // Filtering function
+    const applyFilters = () => {
+        let result = data;
 
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
+        // Search across multiple fields
+        if (searchTerm) {
+            const searchTermLower = searchTerm.toLowerCase();
+            result = result.filter(item =>
+                item.userData[0].name.toLowerCase().includes(searchTermLower) ||
+                item.productData[0].productName.toLowerCase().includes(searchTermLower) ||
+                item.returnOrderStatus.toLowerCase().includes(searchTermLower)
+            );
         }
+
+        // Status filter
+        if (filterStatus) {
+            result = result.filter(item => item.returnOrderStatus === filterStatus);
+        }
+
+        // Date filter
+        if (filterDate) {
+            result = result.filter(item =>
+                new Date(item.createdAt).toLocaleDateString() === new Date(filterDate).toLocaleDateString()
+            );
+        }
+
+        // Product Name filter
+        if (filterProductName) {
+            result = result.filter(item =>
+                item.productData[0].productName.toLowerCase().includes(filterProductName.toLowerCase())
+            );
+        }
+
+        setFilteredData(result);
+        setCurrentPage(1); // Reset to first page after filtering
     };
 
-    // Return Order Status
-    const [selectedStatus, setSelectedStatus] = useState({});
-
-    const handleStatusChange = (id, status) => {
-        setSelectedStatus((prev) => ({ ...prev, [id]: status }));
-        console.log(`Status changed for ID: ${id}, Status: ${status}`);
+    // Reset all filters
+    const resetFilters = () => {
+        setSearchTerm('');
+        setFilterStatus('');
+        setFilterDate('');
+        setFilterProductName('');
+        setFilteredData(data);
+        setCurrentPage(1);
+        setShow(false);
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allReturnOrders`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                const pendingOrders = response.data.returnOrder.filter(order => order.returnOrderStatus !== "Pending");
+                // console.log("pendingOrders", pendingOrders);
+
+                setData(pendingOrders);
+                setFilteredData(pendingOrders);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        applyFilters();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchTerm, filterStatus, filterDate, filterProductName]);
 
     return (
         <>
@@ -205,9 +168,9 @@ const Viewstatus = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -228,33 +191,36 @@ const Viewstatus = (props) => {
                                                         <InputGroup className="mb-3">
                                                             <Form.Control
                                                                 placeholder="Enter Product Name"
-                                                                name='name'
+                                                                name='productName'
+                                                                value={filterProductName}
+                                                                onChange={(e) => setFilterProductName(e.target.value)}
                                                             />
                                                         </InputGroup>
                                                     </div>
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                            <Form.Control className='mb-3' type="date" value={filterDate}
+                                                                onChange={(e) => setFilterDate(e.target.value)} />
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Status</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
+                                                        <Form.Select className="mb-3" value={filterStatus}
+                                                            onChange={(e) => setFilterStatus(e.target.value)}>
                                                             <option>Select Status</option>
                                                             <option value="Accepted">Accepted</option>
-                                                            <option value="Rejected">Rejected</option>
+                                                            <option value="Cancelled">Cancelled</option>
                                                         </Form.Select>
                                                     </div>
                                                 </div>
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleClose}>Cancel</button>
+                                                            <button type="button" onClick={resetFilters}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="submit" onClick={handleClose} >Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -278,31 +244,29 @@ const Viewstatus = (props) => {
                                     <tbody>
                                         {paginatedData.map((item, index) => (
                                             <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.product}</td>
-                                            <td>{item.date}</td>
-                                            <td>
-                                                <div className="d-flex">
-                                                {selectedStatus[item.id] !== item.statusone && (
-                                                    <button
-                                                    className="me-3 mv_ro_status_button"
-                                                    onClick={() => handleStatusChange(item.id, item.statusone)}
-                                                    >
-                                                    <p className="m-0 mv_accept_status">{item.statusone}</p>
-                                                    </button>
-                                                )}
-                                                {selectedStatus[item.id] !== item.statustwo && (
-                                                    <button
-                                                    className="mv_ro_status_button"
-                                                    onClick={() => handleStatusChange(item.id, item.statustwo)}
-                                                    >
-                                                    <p className="m-0 mv_reject_status">{item.statustwo}</p>
-                                                    </button>
-                                                )}
-                                                </div>
-                                            </td>
-                                            <td>{item.reason}</td>
+                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td>{item.userData[0].name}</td>
+                                                <td>{item.productData[0].productName}</td>
+                                                <td>
+                                                    {(() => {
+                                                        const date = new Date(item.createdAt);
+                                                        const day = String(date.getDate()).padStart(2, '0');
+                                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                                        const year = date.getFullYear();
+                                                        return `${day}-${month}-${year}`;
+                                                    })()}
+                                                </td>
+                                                <td>
+                                                    <div className="d-flex">
+                                                        <button
+                                                            className="me-3 mv_ro_status_button"
+                                                        >
+                                                            <p className={`m-0 mv_accept_status  ${item.returnOrderStatus === 'Accepted' ? 'mv_accept_status' : 'mv_reject_status'
+                                                                }`}>{item.returnOrderStatus}</p>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>{item.cancellationData[0]?.reasonName}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -333,4 +297,4 @@ const Viewstatus = (props) => {
     );
 };
 
-export default Viewstatus
+export default Viewstatus;

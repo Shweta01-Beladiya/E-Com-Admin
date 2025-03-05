@@ -17,9 +17,8 @@ const Viewproductoffer = () => {
                 const response = await axios.get(`${BaseUrl}/api/getProductOffer/${id}`, {
                     headers:{ Authorization: `Bearer ${token}`}
                 });
-                console.log("response",response.data.productOffer);
+                // console.log("response",response.data.productOffer);
                 setData(response.data.productOffer[0]);
-                console.log("ddata>>>>>>>",data);
                 
             } catch (error) {
                 console.error('Data Fetching Error:', error);
@@ -44,8 +43,8 @@ const Viewproductoffer = () => {
                     <div className="col-xxl-5 col-xl-6 col-lg-8 mv_main_product">
                         <div className="mv_product_info">
                             <div className="row">
-                                <div className="col-sm-4 col-5">
-                                    <img className='mv_view_product_img' src={require('../mv_img/view_product_img.png')}/>
+                                <div className="col-sm-4 col-5">                                 
+                                    <img className='mv_view_product_img' alt='' src={`${BaseUrl}/${data.productVariantData?.[0].images?.[0]}`}/>
                                 </div>
                                 <div className="col-sm-8 col-12 align-content-center">
                                     <div className="row">
