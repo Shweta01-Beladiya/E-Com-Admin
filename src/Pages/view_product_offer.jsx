@@ -1,7 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import '../CSS/vaidik.css';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const Viewproductoffer = () => {
+
+    const {id} = useParams();
+    const [data,setData] = useState({});
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+    
+    useEffect(() => {
+        const fetchData = async() => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/getProductOffer/${id}`, {
+                    headers:{ Authorization: `Bearer ${token}`}
+                });
+                console.log("response",response.data.productOffer);
+                setData(response.data.productOffer[0]);
+                console.log("ddata>>>>>>>",data);
+                
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchData();
+    },[id, BaseUrl, token]);
   return (
     <>
         <div id='mv_container_fluid'>
@@ -31,7 +56,7 @@ const Viewproductoffer = () => {
                                             <p className='mv_view_product_heading'>:</p>
                                         </div>
                                         <div className="col-4">
-                                            <p className='mv_view_product_sub_heading'>Women</p>
+                                            <p className='mv_view_product_sub_heading'>{data.mainCategoriesData?.[0]?.mainCategoryName}</p>
                                         </div>
                                         <div className="col-5">
                                             <p className='mv_view_product_heading'>Category:</p>
@@ -40,7 +65,7 @@ const Viewproductoffer = () => {
                                             <p className='mv_view_product_heading'>:</p>
                                         </div>
                                         <div className="col-4">
-                                            <p className='mv_view_product_sub_heading'>Indian Wear</p>
+                                            <p className='mv_view_product_sub_heading'>{data.categoriesData?.[0].categoryName}</p>
                                         </div>
                                         <div className="col-5">
                                             <p className='mv_view_product_heading'>Sub Category:</p>
@@ -49,7 +74,7 @@ const Viewproductoffer = () => {
                                             <p className='mv_view_product_heading'>:</p>
                                         </div>
                                         <div className="col-4">
-                                            <p className='mv_view_product_sub_heading'>Saree</p>
+                                            <p className='mv_view_product_sub_heading'>{data.subCategoriesData?.[0].subCategoryName}</p>
                                         </div>
                                         <div className="col-5">
                                             <p className='mv_view_product_heading mb-0'>Product ID:</p>
@@ -79,31 +104,31 @@ const Viewproductoffer = () => {
                                     <p className='mv_view_product_heading'>Offer Name :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>lorem Ipsum</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.offerName}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Offer Code :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>NEW201</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.code}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Offer Discount :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>30%</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.discountPrice}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Offer Price :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>$2000</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.price}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading mb-0'>Start Date :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading mb-0'>02/03/2024</p>
+                                    <p className='mv_offer_details_sub_heading mb-0'>{data.startDate}</p>
                                 </div>
                             </div>
                         </div>
@@ -113,25 +138,25 @@ const Viewproductoffer = () => {
                                     <p className='mv_view_product_heading'>End Date :</p>
                                 </div>
                                 <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>02/03/2024</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.endDate}</p>
                                 </div>
                                 <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Minimum Purchase :</p>
                                 </div>
                                 <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>05</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.minimumPurchase}</p>
                                 </div>
                                 <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Maximum Purchase :</p>
                                 </div>
                                 <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>08</p>
+                                    <p className='mv_offer_details_sub_heading'>{data.maximumPurchase}</p>
                                 </div>
                                 <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Description :</p>
                                 </div>
                                 <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>Lorem Ipsum Sdhfgg hgut yoooy shdnvhd gdfs </p>
+                                    <p className='mv_offer_details_sub_heading'>{data.description}</p>
                                 </div>
                             </div>
                         </div>

@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
@@ -93,6 +93,7 @@ const Coupon = () => {
             }
         }
         fetchAllData();
+          // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSearchChange = (e) => {

@@ -1,132 +1,268 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 const Addproductoffer = () => {
-    // State variables
-    let [isedit, setisedit] = useState(false);
-    // let [name, setname] = useState('');
-    // let [mainCategory, setMainCategory] = useState("");
-    // let [category, setCategory] = useState("");
-    // let [subCategory, setSubCategory] = useState("");
-    // let [product, setProduct] = useState("");
-    // let [offerName, setOfferName] = useState("");
-    // let [code, setCode] = useState("");
-    // let [discountPrice, setDiscountPrice] = useState("");
-    // let [price, setPrice] = useState("");
-    // let [startDate, setStartDate] = useState("");
-    // let [endDate, setEndDate] = useState("");
-    // let [minPurchase, setMinPurchase] = useState("");
-    // let [maxPurchase, setMaxPurchase] = useState("");
-    // let [description, setDescription] = useState("");
 
-    let change_edit = () => {
-        setisedit(!isedit);
-    };
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
-    // let handlesubmit = (event) => {
-    //     event.preventDefault();
-    
-    //     const formData = {
-    //         name,
-    //         mainCategory,
-    //         category,
-    //         subCategory,
-    //         product,
-    //         offerName,
-    //         code,
-    //         discountPrice,
-    //         price,
-    //         startDate,
-    //         endDate,
-    //         minPurchase,
-    //         maxPurchase,
-    //         description,
-    //     };
-    
-    //     console.log("Form Submitted:", formData);
-    //     setisedit(false);
-    // };
+    const navigate = useNavigate();
+
+    const [mainCategory, setMainCategory] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [subCategory, setSubCategory] = useState([]);
+    const [product, setProduct] = useState([]);
+
+    // Filtered Lists
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [filteredSubCategories, setFilteredSubCategories] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
     // Edit Product Offer
     const location = useLocation();
-    const editProductoffer = location.state?.editProductoffer;
-    console.log(editProductoffer)
+    const id = location.state?.id;
+    // console.log("id>>>>>>>>>",id);
 
-    // Date function
-    const [date, setDate] = useState("Select Date");
-    const [date1, setDate1] = useState("Select Date");
+    const handleDateChange = (e, type) => {
+        let selectedDate = e.target.value;
 
-    const handleDateChange = (e, dateType) => {
-        const selectedDate = e.target.value;
-        const [year, month, day] = selectedDate.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-
-        if (dateType === "start") {
-            setDate(formattedDate);
-            setFieldValue("startDate", selectedDate);
-        } else if (dateType === "end") {
-            setDate1(formattedDate);
-            setFieldValue("endDate", selectedDate);
-        }
+        setFieldValue(type === "start" ? "startDate" : "endDate", selectedDate);
     };
 
+
+
     // ******************************* Validation *******************************
-    const productofferInit = {
-        mainCategory: "",
-        category: "",
-        subCategory: "",
-        product: "",
+    const [initialValues, setInitialValues] = useState({
+        mainCategoryId: "",
+        categoryId: "",
+        subCategoryId: "",
+        productId: "",
         offerName: "",
         code: "",
         discountPrice: "",
         price: "",
         startDate: "",
         endDate: "",
-        minPurchase: "",
-        maxPurchase: "",
+        minimumPurchase: "",
+        maximumPurchase: "",
         description: "",
-    }
+    })
 
     const productofferValidate = Yup.object().shape({
-        mainCategory: Yup.string().required("Main Category is required"),
-        category: Yup.string().required("Category is required"),
-        subCategory: Yup.string().required("Sub Category is required"),
-        product: Yup.string().required("Product is required"),
+        mainCategoryId: Yup.string().required("Main Category is required"),
+        categoryId: Yup.string().required("Category is required"),
+        subCategoryId: Yup.string().required("Sub Category is required"),
+        productId: Yup.string().required("Product is required"),
         offerName: Yup.string().required("Offer Name is required"),
         code: Yup.string().required("Code is required"),
         discountPrice: Yup.string().required("Discount Price is required"),
         price: Yup.string().required("Price is required"),
         startDate: Yup.date().required("Start Date is required"),
         endDate: Yup.date().required("End Date is required"),
-        minPurchase: Yup.string().required("Min Purchase is required"),
-        maxPurchase: Yup.string().required("Max Purchase is required"),
+        minimumPurchase: Yup.string().required("Min Purchase is required"),
+        maximumPurchase: Yup.string().required("Max Purchase is required"),
         description: Yup.string().required("Description is required"),
     });
 
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
-        initialValues: productofferInit,
+        initialValues: initialValues,
         validationSchema: productofferValidate,
-        onsubmit: (values) => {
-            console.log(values);
-            // addproductoffer(values)
+        enableReinitialize: true,
+        onSubmit: async (values) => {
+            let formattedValues = {
+                ...values,
+                startDate: values.startDate.split("-").reverse().join("-"), // Convert yyyy-mm-dd to dd-mm-yyyy
+                endDate: values.endDate.split("-").reverse().join("-"),
+            };
+
+            if (id) {
+                try {
+                    const response = await axios.put(`${BaseUrl}/api/updateProductOffer/${id}`, formattedValues, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    // console.log("reposne", response.data);
+                    if (response.data.status === 200) {
+                        navigate('/Productoffer');
+                    }
+                } catch (error) {
+                    console.error('Data Fetching Error:', error);
+                }
+            } else {
+                try {
+                    const response = await axios.post(`${BaseUrl}/api/createProductOffer`, formattedValues, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+
+                    // console.log("response",response.data);
+                    if (response.data.status === 200) {
+                        navigate('/Productoffer');
+                    }
+                } catch (error) {
+
+                }
+            }
         }
     })
     // **************************************************************************
+    const fetchMainCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("reposne",response.data.users);
+            setMainCategory(response.data.users);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("reposne",response.data.category);
+            setCategory(response.data.category);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("fetchsubcategory",response.data.subCategory);
+            setSubCategory(response.data.subCategory);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchProduct = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allProduct`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("repsone",response.data.product);
+            setProduct(response.data.product);
+
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchMainCategory();
+        fetchCategory();
+        fetchSubCategory();
+        fetchProduct();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        const fetchSingleData = async () => {
+            if (id) {
+                try {
+                    const response = await axios.get(`${BaseUrl}/api/getProductOffer/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    // console.log("repsonse",response.data.productOffer);
+                    const data = response.data.productOffer;
+                    // console.log("data",data[0].startDate);
+
+                    const formatDateForInput = (date) => {
+                        if (!date) return "";
+                        const [day, month, year] = date.split("-");
+                        return `${year}-${month}-${day}`;
+                    };
+                    setInitialValues({
+                        mainCategoryId: data[0].mainCategoryId,
+                        categoryId: data[0].categoryId,
+                        subCategoryId: data[0].subCategoryId,
+                        productId: data[0].productId,
+                        offerName: data[0].offerName,
+                        code: data[0].code,
+                        discountPrice: data[0].discountPrice,
+                        price: data[0].price,
+                        startDate: formatDateForInput(data[0].startDate),
+                        endDate: formatDateForInput(data[0].endDate),
+                        minimumPurchase: data[0].minimumPurchase,
+                        maximumPurchase: data[0].maximumPurchase,
+                        description: data[0].description,
+                    });
+                } catch (error) {
+                    console.error('Data Fetching Error:', error);
+                }
+            } else {
+                setInitialValues({
+                    mainCategoryId: "",
+                    categoryId: "",
+                    subCategoryId: "",
+                    productId: "",
+                    offerName: "",
+                    code: "",
+                    discountPrice: "",
+                    price: "",
+                    startDate: "",
+                    endDate: "",
+                    minimumPurchase: "",
+                    maximumPurchase: "",
+                    description: "",
+                });
+            }
+        }
+        fetchSingleData();
+    }, []);
+
+    useEffect(() => {
+        if (values.mainCategoryId) {
+            const filtered = category.filter(cat => cat.mainCategoryId === values.mainCategoryId);
+            setFilteredCategories(filtered);
+
+            if (!filtered.some(cat => cat._id === values.categoryId)) {
+                setFieldValue("categoryId", "");
+            }
+        }
+    }, [values.mainCategoryId, category]);
+
+    useEffect(() => {
+        if (values.categoryId) {
+            const filtered = subCategory.filter(subCat => subCat.categoryId === values.categoryId);
+            setFilteredSubCategories(filtered);
+
+            if (!filtered.some(subCat => subCat._id === values.subCategoryId)) {
+                setFieldValue("subCategoryId", "");
+            }
+        }
+    }, [values.categoryId, subCategory]);
+
+    useEffect(() => {
+        if (values.subCategoryId) {
+            const filtered = product.filter(pro => pro.subCategoryId === values.subCategoryId);
+            setFilteredProducts(filtered);
+
+            if (!filtered.some(pro => pro._id === values.productId)) {
+                setFieldValue("productId", "");
+            }
+        }
+    }, [values.subCategoryId, product]);
 
     return (
         <>
             <div>
                 <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <p className='mb-1'>{editProductoffer ? 'Edit Product Offer' : 'Add Product Offer'}</p>
+                        <p className='mb-1'>{id ? 'Edit Product Offer' : 'Add Product Offer'}</p>
                         <div className='d-flex align-items-center'>
                             <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
                             <p className='mv_category_heading mv_subcategory_heading mb-0'>
-                                {editProductoffer ? 'Edit Product Offer' : 'Add Product Offer'}
+                                {id ? 'Edit Product Offer' : 'Add Product Offer'}
                             </p>
                         </div>
                     </div>
@@ -142,86 +278,68 @@ const Addproductoffer = () => {
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Main Category</label>
                                                 <Form.Select
-                                                    name="mainCategory"
-                                                    value={values.mainCategory}
+                                                    name="mainCategoryId"
+                                                    value={values.mainCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
-                                                    <option>Select</option>
-                                                    <option value="Women">Women</option>
-                                                    <option value="Men">Men</option>
-                                                    <option value="Baby & Kids">Baby & Kids</option>
-                                                    <option value="Beauty & Health">Beauty & Health</option>
-                                                    <option value="Home & Kitchen">Home & Kitchen</option>
-                                                    <option value="Mobile & Electronics">Mobile & Electronics</option>
+                                                    <option value="">Select</option>
+                                                    {mainCategory.map((mainCat) => (
+                                                        <option value={mainCat._id} key={mainCat._id}>{mainCat.mainCategoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.mainCategory && touched.mainCategory && <div className="text-danger small">{errors.mainCategory}</div>}
+                                                {errors.mainCategoryId && touched.mainCategoryId && <div className="text-danger small">{errors.mainCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Category</label>
                                                 <Form.Select
-                                                    name="category"
-                                                    value={values.category}
+                                                    name="categoryId"
+                                                    value={values.categoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
-                                                    <option>Select</option>
-                                                    <option value="Jewelry">Jewelry</option>
-                                                    <option value="Western Wear">Western Wear</option>
-                                                    <option value="Baby Care">Baby Care</option>
-                                                    <option value="Skin Care">Skin Care</option>
-                                                    <option value="Electronics">Electronics</option>
-                                                    <option value="Fragrance">Fragrance</option>
-                                                    <option value="Kitchen wear">Kitchen wear</option>
-                                                    <option value="Mobile">Mobile</option>
+                                                    <option value="">Select</option>
+                                                    {filteredCategories.map((cat) => (
+                                                        <option value={cat._id} key={cat._id}>{cat.categoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.category && touched.category && <div className="text-danger small">{errors.category}</div>}
+                                                {errors.categoryId && touched.categoryId && <div className="text-danger small">{errors.categoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Sub Category</label>
                                                 <Form.Select
-                                                    name="subCategory"
-                                                    value={values.subCategory}
+                                                    name="subCategoryId"
+                                                    value={values.subCategoryId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
-                                                    <option>Select</option>
-                                                    <option value="Necklace">Necklace</option>
-                                                    <option value="Blazer">Blazer</option>
-                                                    <option value="Baby Soap">Baby Soap</option>
-                                                    <option value="Facewash">Facewash</option>
-                                                    <option value="Refrigerator">Refrigerator</option>
-                                                    <option value="Perfume">Perfume</option>
-                                                    <option value="Pressure Cooker">Pressure Cooker</option>
-                                                    <option value="Smart Phone">Smart Phone</option>
+                                                    <option value="">Select</option>
+                                                    {filteredSubCategories.map((subCat) => (
+                                                        <option value={subCat._id} key={subCat._id}>{subCat.subCategoryName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.subCategory && touched.subCategory && <div className="text-danger small">{errors.subCategory}</div>}
+                                                {errors.subCategoryId && touched.subCategoryId && <div className="text-danger small">{errors.subCategoryId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Product</label>
                                                 <Form.Select
-                                                    name="product"
-                                                    value={values.product}
+                                                    name="productId"
+                                                    value={values.productId}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
                                                     <option value="">Select</option>
-                                                    <option value="Gold Necklace">Gold Necklace</option>
-                                                    <option value="Black blazer">Black blazer</option>
-                                                    <option value="White Soap">White Soap</option>
-                                                    <option value="vitamin c facewash">vitamin c facewash</option>
-                                                    <option value="265 L fridge">265 L fridge</option>
-                                                    <option value="Denver scent">Denver scent</option>
-                                                    <option value="3 L Coocker">3 L Coocker</option>
-                                                    <option value="Vivo v27 Pro">Vivo v27 Pro</option>
+                                                    {filteredProducts.map((pro) => (
+                                                        <option value={pro._id} key={pro._id}>{pro.productName}</option>
+                                                    ))}
                                                 </Form.Select>
-                                                {errors.product && touched.product && <div className="text-danger small">{errors.product}</div>}
+                                                {errors.productId && touched.productId && <div className="text-danger small">{errors.productId}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -234,8 +352,6 @@ const Addproductoffer = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Offer Name"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
                                                 {errors.offerName && touched.offerName && <div className="text-danger small">{errors.offerName}</div>}
@@ -251,8 +367,6 @@ const Addproductoffer = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Code"
-                                                        aria-label="name1"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
                                                 {errors.code && touched.code && <div className="text-danger small">{errors.code}</div>}
@@ -268,8 +382,6 @@ const Addproductoffer = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Discount Price"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
                                                 {errors.discountPrice && touched.discountPrice && <div className="text-danger small">{errors.discountPrice}</div>}
@@ -285,8 +397,6 @@ const Addproductoffer = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Price"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
                                                 {errors.price && touched.price && <div className="text-danger small">{errors.price}</div>}
@@ -295,10 +405,9 @@ const Addproductoffer = () => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>Start Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
-                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                <Form.Control 
-                                                    className='' 
-                                                    type="date" 
+                                                <Form.Control
+                                                    className=''
+                                                    type="date"
                                                     name="startDate"
                                                     value={values.startDate}
                                                     onChange={(e) => handleDateChange(e, "start")}
@@ -310,10 +419,9 @@ const Addproductoffer = () => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>End Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
-                                                <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                <Form.Control 
-                                                    className='' 
-                                                    type="date" 
+                                                <Form.Control
+                                                    className=''
+                                                    type="date"
                                                     name="endDate"
                                                     value={values.endDate}
                                                     onChange={(e) => handleDateChange(e, "end")}
@@ -327,16 +435,14 @@ const Addproductoffer = () => {
                                                 <label className='mv_label_input'>Minimum Purchase</label>
                                                 <InputGroup className="">
                                                     <Form.Control
-                                                        name="minPurchase"
-                                                        value={values.minPurchase}
+                                                        name="minimumPurchase"
+                                                        value={values.minimumPurchase}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Minimum Purchase"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
-                                                {errors.minPurchase && touched.minPurchase && <div className="text-danger small">{errors.minPurchase}</div>}
+                                                {errors.minimumPurchase && touched.minimumPurchase && <div className="text-danger small">{errors.minimumPurchase}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -344,16 +450,14 @@ const Addproductoffer = () => {
                                                 <label className='mv_label_input'>Maximum Purchase</label>
                                                 <InputGroup className="">
                                                     <Form.Control
-                                                        name="maxPurchase"
-                                                        value={values.maxPurchase}
+                                                        name="maximumPurchase"
+                                                        value={values.maximumPurchase}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Maximum Purchase"
-                                                        aria-label="name"
-                                                        aria-describedby="basic-addon1"
                                                     />
                                                 </InputGroup>
-                                                {errors.maxPurchase && touched.maxPurchase && <div className="text-danger small">{errors.maxPurchase}</div>}
+                                                {errors.maximumPurchase && touched.maximumPurchase && <div className="text-danger small">{errors.maximumPurchase}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12">
@@ -366,9 +470,7 @@ const Addproductoffer = () => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Description"
-                                                        as="textarea" 
-                                                        aria-label="With textarea"
-                                                        aria-describedby="basic-addon1"
+                                                        as="textarea"
                                                     />
                                                 </InputGroup>
                                                 {errors.description && touched.description && <div className="text-danger small">{errors.description}</div>}
@@ -377,13 +479,13 @@ const Addproductoffer = () => {
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
                                                 <button className='border-0 bg-transparent'>
-                                                    Cnacel
+                                                    Cancel
                                                 </button>
-                                                {editProductoffer === true ? 
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                {id ?
+                                                    <button type="submit" className='border-0 bg-transparent'>
                                                         Update
-                                                    </button> : 
-                                                    <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
+                                                    </button> :
+                                                    <button type="submit" className='border-0 bg-transparent' >
                                                         Add
                                                     </button>
                                                 }

@@ -3,56 +3,91 @@ import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { IoEyeSharp } from 'react-icons/io5';
 import { FaEyeSlash } from 'react-icons/fa';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { ErrorMessage, Formik, } from 'formik';
+import * as Yup from 'yup';
 
 const Viewprofile = () => {
-    // State variables
-    let [isedit, setisedit] = useState(false);
-    let [email, setemail] = useState('');
-    let [name, setname] = useState('');
-    let [contact, setcontact] = useState('');
-    let [gender, setgender] = useState('');
-    const [profileImage, setProfileImage] = useState(require('../mv_img/profile_img.png'));
 
-    let handle_onload = () => {
-        let data = JSON.parse(localStorage.getItem('user'));
-        console.log(data);
-        if (data) {
-            setname(data.name);
-            setcontact(data.contact);
-            setemail(data.email);
-            setgender(data.gender);
-        } else {
-            return;
-        }
-    }
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
+    const defaultProfileImage = require('../mv_img/profile_img.png');
+    const navigate = useNavigate();
+
+    const [data, setData] = useState({
+        email: '',
+        name: '',
+        mobileNo: '',
+        image: '',
+        gender: ''
+    });
+
+    const passwordChangeSchema = Yup.object().shape({
+        currentPassword: Yup.string()
+            .required('Current password is required'),
+        newPassword: Yup.string()
+            .required('New password is required'),
+        confirmPassword: Yup.string()
+            .required('Please confirm your password')
+            .oneOf([Yup.ref('newPassword')], 'Passwords must match')
+    });
 
     useEffect(() => {
-        handle_onload();
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/getUser`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // console.log("response",response.data.user);
+                setData(response.data.user);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchData();
     }, []);
 
-    let handlesubmit = (event) => {
-        event.preventDefault();
+    let handlesubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const formData = new FormData();
+            Object.keys(data).forEach(key => {
+                if (key !== 'image' || !selectedFile) {
+                    formData.append(key, data[key]);
+                }
+            });
 
-        const formData = {
-            name,
-            email,
-            contact,
-            gender,
-        };
+            if (selectedFile) {
+                formData.append('image', selectedFile);
+            }
 
-        console.log('Form Submitted:', formData);
-        localStorage.setItem('user', JSON.stringify(formData));
-        setisedit(false);
+            const response = await axios.put(`${BaseUrl}/api/updateUser`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            console.log("response", response.data);
+            if (response.data.status === 200) {
+                navigate('/dashboard');
+            }
+
+        } catch (error) {
+            console.error('Data Update Error:', error);
+        }
     };
 
     // navs & tabs
     const [activeTab, setActiveTab] = useState("edit-profile");
+    const [selectedFile, setSelectedFile] = useState(null);
 
     // change password
     const [showPassword, setShowPassword] = useState({
-        old: false,
-        new: false,
-        confirm: false
+        currentPassword: false,
+        newPassword: false,
+        confirmPassword: false
     });
 
     const togglePasswordVisibility = (field) => {
@@ -72,11 +107,28 @@ const Viewprofile = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-          const imageURL = URL.createObjectURL(file);
-          setProfileImage(imageURL);
+            setSelectedFile(file); // Save the actual file
+            const imageURL = URL.createObjectURL(file);
+            setData(prev => ({ ...prev, image: imageURL })); // For preview only
         }
     };
 
+    const handleCancel = () => {
+        navigate('/dashboard');
+    }
+    const handleChangePassword = async (values) => {
+        try {
+            const response = await axios.put(`${BaseUrl}/api/updatePassword`, values, {
+                headers: { Authorization : `Bearer ${token}` }
+            });
+            console.log("response",response.data);
+            if(response.data.status === 200) {
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
     return (
         <>
             <div>
@@ -88,12 +140,12 @@ const Viewprofile = () => {
                         <div className="mv_main_bg_color">
                             <div className='mv_user_bgimg'>
                                 <div className='d-flex justify-content-center'>
-                                    <img src={require('../mv_img/profile_user_img.png')} alt="" />
+                                    <img src={`${BaseUrl}/${data.image}`} alt="" />
                                 </div>
                             </div>
                             <div className='mv_main_profile_name_email'>
-                                <p className='mv_profile_name'>John Patel</p>
-                                <p className='mv_profile_email mb-4'>example@gmail.com</p>
+                                <p className='mv_profile_name'>{data.name}</p>
+                                <p className='mv_profile_email mb-4'>{data.email}</p>
                             </div>
                             <div className='mv_main_personal_info'>
                                 <p className='mv_personal_info mb-5'>Personal Info</p>
@@ -105,7 +157,7 @@ const Viewprofile = () => {
                                         </div>
                                     </div>
                                     <div className="col-xxl-8 col-xl-12 col-lg-12 col-md-8 col-sm-7 col-7">
-                                        <p className='mv_user_name mb-0'>Johan Patel</p>
+                                        <p className='mv_user_name mb-0'>{data.name}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
@@ -116,7 +168,7 @@ const Viewprofile = () => {
                                         </div>
                                     </div>
                                     <div className="col-xxl-8 col-xl-12 col-lg-12 col-md-8 col-sm-7 col-12">
-                                        <p className='mv_user_name mb-0'>example@gmail.com</p>
+                                        <p className='mv_user_name mb-0'>{data.email}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
@@ -127,13 +179,13 @@ const Viewprofile = () => {
                                         </div>
                                     </div>
                                     <div className="col-xxl-8 col-xl-12 col-lg-12 col-md-8 col-sm-7 col-7">
-                                        <p className='mv_user_name mb-0'>+91 8523698521</p>
+                                        <p className='mv_user_name mb-0'>+91 {data.mobileNo}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-xxl-4 col-xl-12 col-lg-12 col-md-4 col-sm-5 col-5">
                                         <div className='mv_full_name'>
-                                            <div className='mv_heading_full_name'>Gender</div>
+                                            <div className='mv_heading_full_name'>{data.gender}</div>
                                             <div>:</div>
                                         </div>
                                     </div>
@@ -171,7 +223,7 @@ const Viewprofile = () => {
                                             <p className='mv_profile_image_heading'>Profile Image</p>
                                             <div className='mv_main_profile_img'>
                                                 <div className="mv_profile_img">
-                                                    <img src={profileImage} alt="" />
+                                                    <img src={data.image ? `${BaseUrl}/${data.image}` : defaultProfileImage} alt="Profile" />
                                                 </div>
                                                 <div className='mv_main_pro_img_camera' onClick={handleImageClick}>
                                                     <img className='mv_pro_img_camera' src={require('../mv_img/profile_img_camera.png')} alt="" />
@@ -192,8 +244,8 @@ const Viewprofile = () => {
                                                             <label className='mv_label_input'>Name</label>
                                                             <InputGroup className="mb-3">
                                                                 <Form.Control
-                                                                    value={name}
-                                                                    onChange={(e) => setname(e.target.value)}
+                                                                    value={data.name}
+                                                                    onChange={(e) => setData({ ...data, name: e.target.value })}
                                                                     placeholder="Name"
                                                                     aria-label="name"
                                                                     aria-describedby="basic-addon1"
@@ -206,8 +258,8 @@ const Viewprofile = () => {
                                                             <label className='mv_label_input'>Email</label>
                                                             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                                                 <Form.Control
-                                                                    value={email}
-                                                                    onChange={(e) => setemail(e.target.value)}
+                                                                    value={data.email}
+                                                                    onChange={(e) => setData({ ...data, email: e.target.value })}
                                                                     type="email"
                                                                     placeholder="Email" />
                                                             </Form.Group>
@@ -218,11 +270,9 @@ const Viewprofile = () => {
                                                             <label className='mv_label_input'>Phone</label>
                                                             <InputGroup className="mb-3">
                                                                 <Form.Control
-                                                                    value={contact}
-                                                                    onChange={(e) => setcontact(e.target.value)}
+                                                                    value={data.mobileNo}
+                                                                    onChange={(e) => setData({ ...data, mobileNo: e.target.value })}
                                                                     placeholder="+91"
-                                                                    aria-label="Contact"
-                                                                    aria-describedby="basic-addon1"
                                                                     maxLength="10"
                                                                     onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
                                                                 />
@@ -233,8 +283,8 @@ const Viewprofile = () => {
                                                         <div className="mv_input_content">
                                                             <label className='mv_label_input'>Gender</label>
                                                             <Form.Select
-                                                                value={gender}
-                                                                onChange={(e) => setgender(e.target.value)}
+                                                                value={data.gender}
+                                                                onChange={(e) => setData({ ...data, gender: e.target.value })}
                                                                 aria-label="Default select example"
                                                                 className='mv_form_select'>
                                                                 <option value="">Select</option>
@@ -247,7 +297,7 @@ const Viewprofile = () => {
                                                     <div className=' text-center mt-4'>
                                                         <div className="mv_edit_profile">
                                                             <button className='border-0 bg-transparent'>
-                                                                Cnacel
+                                                                Cancel
                                                             </button>
                                                             <button className='border-0 bg-transparent'>
                                                                 Update
@@ -262,63 +312,102 @@ const Viewprofile = () => {
                                 {activeTab === "change-password" && (
                                     // Change Password
                                     <div className="mv_main_change_pass">
-                                        <div className="row">
-                                            <div className="col-12">
-                                                <div className="mv_old_pass">
-                                                    <label className="mv_label_old_pass">Old Password</label>
-                                                    <input
-                                                        type={showPassword.old ? "text" : "password"}
-                                                        placeholder="Enter old password"
-                                                        className="p-2 w-100"
-                                                    />
-                                                    {showPassword.old ? (
-                                                        <IoEyeSharp onClick={() => togglePasswordVisibility("old")} className="mv_change_pass_icon" />
-                                                    ) : (
-                                                        <FaEyeSlash onClick={() => togglePasswordVisibility("old")} className="mv_change_pass_icon" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="col-12">
-                                                <div className="mv_old_pass">
-                                                    <label className="mv_label_old_pass">New Password</label>
-                                                    <input
-                                                        type={showPassword.new ? "text" : "password"}
-                                                        placeholder="Enter new password"
-                                                        className="p-2 w-100"
-                                                    />
-                                                    {showPassword.new ? (
-                                                        <IoEyeSharp onClick={() => togglePasswordVisibility("new")} className="mv_change_pass_icon" />
-                                                    ) : (
-                                                        <FaEyeSlash onClick={() => togglePasswordVisibility("new")} className="mv_change_pass_icon" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="col-12">
-                                                <div className="mv_old_pass">
-                                                    <label className="mv_label_old_pass">Confirm Password</label>
-                                                    <input
-                                                        type={showPassword.confirm ? "text" : "password"}
-                                                        placeholder="Confirm password"
-                                                        className="p-2 w-100"
-                                                    />
-                                                    {showPassword.confirm ? (
-                                                        <IoEyeSharp onClick={() => togglePasswordVisibility("confirm")} className="mv_change_pass_icon" />
-                                                    ) : (
-                                                        <FaEyeSlash onClick={() => togglePasswordVisibility("confirm")} className="mv_change_pass_icon" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className=' text-center mt-4'>
-                                                <div className="mv_edit_profile">
-                                                    <button className='border-0 bg-transparent'>
-                                                        Cnacel
-                                                    </button>
-                                                    <button className='border-0 bg-transparent'>
-                                                        Reset Password
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <Formik
+                                            initialValues={{
+                                                currentPassword: '',
+                                                newPassword: '',
+                                                confirmPassword: ''
+                                            }}
+                                            validationSchema={passwordChangeSchema}
+                                            onSubmit={handleChangePassword}
+                                        >
+                                            {({ values, handleChange, handleSubmit, errors, touched }) => (
+                                                <form onSubmit={handleSubmit}>
+                                                    <div className="row">
+                                                        <div className="col-12 mb-3">
+                                                            <div className="mv_old_pass">
+                                                                <label className="mv_label_old_pass">Old Password</label>
+                                                                <input
+                                                                    type={showPassword.currentPassword ? "text" : "password"}
+                                                                    name="currentPassword"
+                                                                    value={values.currentPassword}
+                                                                    onChange={handleChange}
+                                                                    placeholder="Enter old password"
+                                                                    className="p-2 w-100 "
+                                                                />
+                                                                {showPassword.currentPassword ? (
+                                                                    <IoEyeSharp onClick={() => togglePasswordVisibility("currentPassword")} className="mv_change_pass_icon" />
+                                                                ) : (
+                                                                    <FaEyeSlash onClick={() => togglePasswordVisibility("currentPassword")} className="mv_change_pass_icon" />
+                                                                )}
+                                                                </div>
+                                                            {errors.currentPassword && touched.currentPassword && (
+                                                                <small className="text-danger">{errors.currentPassword}</small>
+                                                            )}
+                                                        </div>
+                                                        <div className="col-12 mb-3">
+                                                            <div className="mv_old_pass">
+                                                                <label className="mv_label_old_pass">New Password</label>
+                                                                <input
+                                                                    type={showPassword.newPassword ? "text" : "password"}
+                                                                    name="newPassword"
+                                                                    value={values.newPassword}
+                                                                    onChange={handleChange}
+                                                                    placeholder="Enter new password"
+                                                                    className="p-2 w-100 "
+                                                                />
+                                                                {showPassword.newPassword ? (
+                                                                    <IoEyeSharp onClick={() => togglePasswordVisibility("newPassword")} className="mv_change_pass_icon" />
+                                                                ) : (
+                                                                    <FaEyeSlash onClick={() => togglePasswordVisibility("newPassword")} className="mv_change_pass_icon" />
+                                                                )}
+                                                                </div>
+                                                            {errors.newPassword && touched.newPassword && (
+                                                                <small className="text-danger">{errors.newPassword}</small>
+                                                            )}
+                                                        </div>
+                                                        <div className="col-12 mb-3">
+                                                            <div className="mv_old_pass">
+                                                                <label className="mv_label_old_pass">Confirm Password</label>
+                                                                <input
+                                                                    type={showPassword.confirmPassword ? "text" : "password"}
+                                                                    name="confirmPassword"
+                                                                    value={values.confirmPassword}
+                                                                    onChange={handleChange}
+                                                                    placeholder="Confirm password"
+                                                                    className="p-2 w-100"
+                                                                />
+                                                                {showPassword.confirmPassword ? (
+                                                                    <IoEyeSharp onClick={() => togglePasswordVisibility("confirmPassword")} className="mv_change_pass_icon" />
+                                                                ) : (
+                                                                    <FaEyeSlash onClick={() => togglePasswordVisibility("confirmPassword")} className="mv_change_pass_icon" />
+                                                                )}
+                                                                    </div>
+                                                                {errors.confirmPassword && touched.confirmPassword && (
+                                                                    <small className="text-danger">{errors.confirmPassword}</small>
+                                                                )}
+                                                        </div>
+                                                        <div className="text-center mt-4">
+                                                            <div className="mv_edit_profile">
+                                                                <button
+                                                                    type="button"
+                                                                    className="border-0 bg-transparent"
+                                                                    onClick={() => handleCancel()}
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                                <button
+                                                                    type="submit"
+                                                                    className="border-0 bg-transparent"
+                                                                >
+                                                                    Reset Password
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            )}
+                                        </Formik>
                                     </div>
                                 )}
                             </div>

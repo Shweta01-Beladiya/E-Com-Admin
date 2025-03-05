@@ -506,7 +506,7 @@ const Stock = () => {
                                                     <td>{item.mainCategoriesData[0].mainCategoryName}</td>
                                                     <td>{item.categoriesData[0].categoryName}</td>
                                                     <td>{item.subCategoriesData[0].subCategoryName}</td>
-                                                    <td>{item.productData[0].productName}</td>
+                                                    <td>{item.productData[0]?.productName}</td>
                                                     <td>
                                                         {
                                                             item.stockStatus === 'In Stock' ? (

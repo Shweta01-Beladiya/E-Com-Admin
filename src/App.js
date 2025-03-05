@@ -91,7 +91,7 @@ function App() {
             <Route path='/addcoupon' element={<Addcoupon />}></Route>
             <Route path='/Productoffer' element={<Productoffer />}></Route>
             <Route path='/addproductoffer' element={<Addproductoffer />}></Route>
-            <Route path='/viewproductoffer' element={<Viewproductoffer />}></Route>
+            <Route path='/viewproductoffer/:id' element={<Viewproductoffer />}></Route>
             <Route path='/offer' element={<Offer />}></Route>
             <Route path='/addoffer' element={<Addoffer />}></Route>
             <Route path='/viewoffer' element={<Viewoffer />}></Route>

@@ -23,13 +23,6 @@ const Addstock = () => {
     const [filteredSubCategories, setFilteredSubCategories] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
 
-    // State variables
-    let [isedit, setisedit] = useState(false);
-
-
-    let change_edit = () => {
-        setisedit(!isedit);
-    };
 
     // Edit Stock
     const location = useLocation();
@@ -211,8 +204,7 @@ const Addstock = () => {
             }
         }
     }, [values.subCategoryId, product]);    
-
-    
+   
     return (
         <>
             <div>

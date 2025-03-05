@@ -1,157 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import {  InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import ReactSlider from 'react-slider';
+import axios from 'axios';
 
-const Productoffer = (props) => {
+const Productoffer = () => {
+
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
     // Edit Product Offer
-    const [editstok,setEditproductoffer] = useState(false);
-
-    const navigate = useNavigate();
-
-    const handleditproductoffer = () => {
-        setEditproductoffer(true);
-        // navigate('addsize')
-    }
-
-    var data = [
-        {   
-            id: 1,
-            subcategory: "Saree",
-            productname: "Premium Saree",
-            code: "NEW301",
-            discount: "20%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 2,
-            subcategory: "Dresses",
-            productname: "Lehenga Choli",
-            code: "WINTER5",
-            discount: "36%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: false,
-        },
-        {   
-            id: 3,
-            subcategory: "Jeans",
-            productname: "Lehenga Choli",
-            code: "NEW301",
-            discount: "10%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 4,
-            subcategory: "Dresses",
-            productname: "Lehenga Choli",
-            code: "NEW301",
-            discount: "36%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 5,
-            subcategory: "Dresses",
-            productname: "Lehenga Choli",
-            code: "WINTER5",
-            discount: "36%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 6,
-            subcategory: "Dresses",
-            productname: "Premium Saree",
-            code: "WINTER5",
-            discount: "20%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 7,
-            subcategory: "Jeans",
-            productname: "Premium Saree",
-            code: "NEW301",
-            discount: "20%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 8,
-            subcategory: "Jeans",
-            productname: "Premium Saree",
-            code: "NEW301",
-            discount: "10%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 9,
-            subcategory: "Jeans",
-            productname: "Lehenga Choli",
-            code: "NEW301",
-            discount: "10%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 10,
-            subcategory: "Dresses",
-            productname: "Lehenga Choli",
-            code: "NEW301",
-            discount: "10%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-        {   
-            id: 11,
-            subcategory: "Saree",
-            productname: "Premium Saree",
-            code: "NEW301",
-            discount: "20%",
-            price: "2000",
-            startdate: "02/09/1994",
-            enddate: "02/09/1994",
-            status: true,
-        },
-    ];
+    const [data,setData] = useState([]);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState(data);
- 
+    const [id,setId]= useState(null);
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
  
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -226,6 +100,41 @@ const Productoffer = (props) => {
         }
     };
 
+    useEffect(() => {
+        const fetchData = async() => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allProductOffer`, {
+                    headers: { Authorization: `Bearer ${token}`}
+                });
+                console.log("reposne",response.data);
+                setData(response.data.productOffer);
+                setFilteredData(response.data.productOffer);
+            } catch (error) {
+                console.error('Data Fetching Error:', error);
+            }
+        }
+        fetchData();
+    },[]);
+
+    const handleDelete = async(id) => {
+        setModalShow(true);
+        setId(id);
+    }
+
+    const handleConfirmDelete = async() => {
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteProductOffer/${id}`, {
+                headers: { Authorization: `Bearer ${token}`}
+            });
+            // console.log("repsonse",response.data);
+            if(response.data.status === 200){
+                setModalShow(false);
+                setFilteredData((prevData) => prevData.filter(item => item._id !== id));
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:',error);
+        }
+    }
     return (
         <>
             <div id='mv_container_fluid'>
@@ -344,10 +253,10 @@ const Productoffer = (props) => {
                                     <thead>
                                         <tr>
                                             <th className=''>ID</th>
+                                            <th className=''>Sub Category</th>
+                                            <th className=''>Product Name</th>
                                             <th className=''>Code</th>
-                                            <th className=''>Coupon Name</th>
-                                            <th className=''>Description</th>
-                                            <th className=''>Coupon Type</th>
+                                            <th className=''>Discount</th>
                                             <th className=''>Price</th>
                                             <th className=''>Start Date</th>
                                             <th className=''>End Date</th>
@@ -358,14 +267,14 @@ const Productoffer = (props) => {
                                     <tbody>
                                        {paginatedData.map((item, index) => (
                                             <tr key={index}>
-                                            <td>{item.id}</td>
-                                            <td>{item.subcategory}</td>
-                                            <td>{item.productname}</td>
+                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                            <td>{item.subCategoriesData[0].subCategoryName}</td>
+                                            <td>{item.productData[0].productName}</td>
                                             <td>{item.code}</td>
-                                            <td>{item.discount}</td>
+                                            <td>{item.discountPrice}%</td>
                                             <td>${item.price}</td>
-                                            <td>{item.startdate}</td>
-                                            <td>{item.enddate}</td>
+                                            <td>{item.startDate}</td>
+                                            <td>{item.endDate}</td>
                                             <td>
                                                 <Form.Check
                                                     type="switch"
@@ -377,16 +286,16 @@ const Productoffer = (props) => {
                                             </td>
                                             <td className='d-flex align-items-center justify-content-end'>
                                                 <div className="mv_pencil_icon">
-                                                    <Link to='/viewproductoffer'>
+                                                    <Link to={`/viewproductoffer/${item._id}`}>
                                                         <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={handleditproductoffer}>
-                                                    <Link to='/addproductoffer' state={{ editProductoffer: true }}>
+                                                <div className="mv_pencil_icon" >
+                                                    <Link to='/addproductoffer' state={{ id: item._id }}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                     </Link>
                                                 </div>
-                                                <div className="mv_pencil_icon" onClick={() => setModalShow(true)}>
+                                                <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                 </div>
                                             </td>
@@ -417,7 +326,7 @@ const Productoffer = (props) => {
             </div>
 
             {/* Delete Product Model */}
-            {/* <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
                     <p>Are you sure you want to delete <br /> coupon?</p>
@@ -426,11 +335,11 @@ const Productoffer = (props) => {
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleConfirmDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
-            </Modal> */}
+            </Modal>
         </>
     );
 };
