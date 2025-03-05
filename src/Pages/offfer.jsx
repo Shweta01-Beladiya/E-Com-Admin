@@ -127,6 +127,12 @@ const Offer = (props) => {
     }
     // ***************************************************************************************
 
+    // Handle View Offer
+    const handleViewOffer = (offer) => {
+        localStorage.setItem('viewOfferData', JSON.stringify(offer));
+        navigate(`/viewoffer/${offer._id}`);
+    }
+    
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -344,42 +350,47 @@ const Offer = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       {paginatedData?.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                            <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.offerImage }`}  alt="" />
-                                            </td>
-                                            <td>{item.offerType}</td>
-                                            <td>{item.offerName}</td>
-                                            <td className='text-trancute'>{item.description}</td>
-                                            <td>{item.buttonText}</td>
-                                            <td>{item.startDate}</td>
-                                            <td>{item.endDate}</td>
-                                            <td>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id={`custom-switch-${item.id}`}
-                                                    label=""
-                                                    checked={item.status}
-                                                    className=''
-                                                />
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon">
-                                                    <Link to='/viewoffer'>
+                                        {paginatedData?.map((item,index)=>{
+                                               const formatDate = (dateString) => {
+                                                if (!dateString) return "";
+                                                const date = new Date(dateString);
+                                                return date.toLocaleDateString("en-GB");
+                                            };
+                                            return (
+                                            <tr key={index}>
+                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td>
+                                                    <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.offerImage }`}  alt="" />
+                                                </td>
+                                                <td>{item.offerType}</td>
+                                                <td>{item.offerName}</td>
+                                                <td className='text-trancute'>{item.description}</td>
+                                                <td>{item.buttonText}</td>
+                                                <td>{formatDate(item.startDate)}</td>
+                                                <td>{formatDate(item.endDate)}</td>
+                                                <td>
+                                                    <Form.Check
+                                                        type="switch"
+                                                        id={`custom-switch-${item.id}`}
+                                                        label=""
+                                                        checked={item.status}
+                                                        className=''
+                                                    />
+                                                </td>
+                                                <td className='d-flex align-items-center justify-content-end'>
+                                                    <div className="mv_pencil_icon" onClick={() => handleViewOffer(item)}>
                                                         <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon"  onClick={() => handleEditClick(item)}>
+                                                    </div>
+                                                    <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
                                                         <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
+                                                    </div>
+                                                    <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            )
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -405,20 +416,20 @@ const Offer = (props) => {
             </div>
 
             {/* Delete Product Model */}
-            {/* <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
-                    <p>Are you sure you want to delete <br /> coupon?</p>
+                    <p>Are you sure you want to delete <br /> this offer?</p>
                     <div className='mv_logout_Model_button d-flex align-items-center justify-content-center'>
                         <div className="mv_logout_cancel">
                             <button onClick={() => setModalShow(false)}>Cancel</button>
                         </div>
                         <div className="mv_logout_button">
-                            <button>Delete</button>
+                            <button onClick={handleDelete}>Delete</button>
                         </div>
                     </div>
                 </Modal.Body>
-            </Modal> */}
+            </Modal>
         </>
     );
 };
