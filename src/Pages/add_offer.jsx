@@ -15,40 +15,10 @@ const Addoffer = ({ editData }) => {
 
     // State variables
     let [isedit, setisedit] = useState(false);
-    // let [name, setname] = useState('');
-    // let [mainCategory, setMainCategory] = useState("");
-    // let [category, setCategory] = useState("");
-    // let [subCategory, setSubCategory] = useState("");
-    // let [offerType, setOfferType] = useState("");
-    // let [offerName, setOfferName] = useState("");
-    // let [buttonText, setButtonText] = useState("");
-    // let [startDate, setStartDate] = useState("");
-    // let [endDate, setEndDate] = useState("");
-    // let [description, setDescription] = useState("");
 
     let change_edit = () => {
         setisedit(!isedit);
     };
-
-    // let handlesubmit = (event) => {
-    //     event.preventDefault();
-    
-    //     const formData = {
-    //         name,
-    //         mainCategory,
-    //         category,
-    //         subCategory,
-    //         offerType,
-    //         offerName,
-    //         buttonText,
-    //         startDate,
-    //         endDate,
-    //         description,
-    //     };
-    
-    //     console.log("Form Submitted:", formData);
-    //     setisedit(false);
-    // };
 
     // Edit Offer
     const location = useLocation();
@@ -226,8 +196,9 @@ const Addoffer = ({ editData }) => {
     }
     function sCategory(value){
         console.log('sub',subcategories);
-        var fliter = subcategories.filter(item=> item.categoriesData[0]._id
-            === value)
+        var fliter = subcategories.filter(item=> item.categoriesData === value)
+        // var fliter = subcategories.filter(item=> item.categoriesData[0]._id
+        //     === value)
         console.log('f123',fliter);
         setselectedSubCategories(fliter)
         // setselectedCategories(fliter)
