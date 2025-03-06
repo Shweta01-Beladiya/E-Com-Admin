@@ -388,6 +388,7 @@
     background-color: #F6F6F6;
     display: inline-block !important;
     padding: 5px 10px;
+    width: 65px;
 }
 /* Sales by Location */
 .mv_sales_by_location_table{

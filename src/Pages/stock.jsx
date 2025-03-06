@@ -503,8 +503,8 @@ const Stock = () => {
                                             {paginatedData.map((item, index) => (
                                                 <tr key={index}>
                                                     <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                                    <td>{item.mainCategoriesData[0].mainCategoryName}</td>
-                                                    <td>{item.categoriesData[0].categoryName}</td>
+                                                    <td>{item.mainCategoriesData[0]?.mainCategoryName}</td>
+                                                    <td>{item.categoriesData[0]?.categoryName}</td>
                                                     <td>{item.subCategoriesData[0].subCategoryName}</td>
                                                     <td>{item.productData[0]?.productName}</td>
                                                     <td>

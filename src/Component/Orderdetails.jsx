@@ -193,15 +193,15 @@ const Order = () => {
                 <tbody>
                   <tr>
                     <td>Name:</td>
-                    <td>{data[0].userData?.[0].name}</td>
+                    <td>{data[0].userData?.[0]?.name}</td>
                   </tr>
                   <tr>
                     <td>Mobile No:</td>
-                    <td>{data[0].userData?.[0].mobileNo}</td>
+                    <td>{data[0].userData?.[0]?.mobileNo}</td>
                   </tr>
                   <tr>
                     <td>Account Status:</td>
-                    <td>{data[0].userData?.[0].active ? "Active" : "Inactive"}</td>
+                    <td>{data[0].userData?.[0]?.active ? "Active" : "Inactive"}</td>
                   </tr>
                 </tbody>
               </table>

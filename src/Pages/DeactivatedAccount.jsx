@@ -3,80 +3,12 @@ import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
+import axios from 'axios';
 
 const DeactivatedAccount = () => {
 
-    var data1 = [
-        {
-            id: 1,
-            customerName: "Mitesh Shah",
-            contactNo: "+91 85555 85555",
-            email: "mitesh@gmail.com",
-        },
-        {
-            id: 2,
-            customerName: "Riya Patel",
-            contactNo: "+91 85555 85555",
-            email: "riya@gmail.com",
-        },
-        {
-            id: 3,
-            customerName: "Mitesh Shah",
-            contactNo: "+91 85555 85555",
-            email: "mitesh@gmail.com",
-        },
-        {
-            id: 4,
-            customerName: "Riya Patel",
-            contactNo: "+91 85555 85555",
-            email: "riya@gmail.com",
-        },
-        {
-            id: 5,
-            customerName: "Abc Shah",
-            contactNo: "+91 85555 85555",
-            email: "abc@gmail.com",
-        },
-        {
-            id: 6,
-            customerName: "Admin Shah",
-            contactNo: "+91 85555 80000",
-            email: "admin@gmail.com",
-        },
-        {
-            id: 7,
-            customerName: "Om Patel",
-            contactNo: "+91 85555 85555",
-            email: "om@gmail.com",
-        },
-        {
-            id: 8,
-            customerName: "Mitesh Shah",
-            contactNo: "+91 85555 85555",
-            email: "mitesh@gmail.com",
-        },
-        {
-            id: 9,
-            customerName: "Om Patel",
-            contactNo: "+91 85555 85555",
-            email: "om@gmail.com",
-        },
-        {
-            id: 10,
-            customerName: "Riya Patel",
-            contactNo: "+91 85555 85555",
-            email: "riya@gmail.com",
-        },
-        {
-            id: 11,
-            customerName: "Om Patel",
-            contactNo: "+91 85555 85555",
-            email: "om@gmail.com",
-        },
-    ];
-
-    localStorage.setItem('data3', JSON.stringify(data1))
-
+    const BaseUrl = process.env.REACT_APP_BASEURL;
+    const token = localStorage.getItem('token');
 
     const itemsPerPage = 10;
     const [data, setData] = useState([]);
@@ -89,43 +21,49 @@ const DeactivatedAccount = () => {
     const handleSearch = (e) => {
         const query = e.target.value.toLowerCase();
         setSearchQuery(query);
-        setCurrentPage(1); // Reset to first page when searching
-
-        const dataFromStorage = JSON.parse(localStorage.getItem('data3'));
-        if (dataFromStorage) {
-            const filtered = dataFromStorage.filter(item =>
-                item.customerName.toLowerCase().includes(query) ||
-                item.email.toLowerCase().includes(query) ||
-                item.contactNo.toLowerCase().includes(query)
-            );
-            
-            setFilteredData(filtered);
-            const total = Math.ceil(filtered.length / itemsPerPage);
-            setTotalPages(total);
-
-            // Update displayed data for first page
-            setData(filtered.slice(0, itemsPerPage));
+        setCurrentPage(1);
+    
+        if (query.trim() === "") {
+            fetchData();
+            return;
         }
-    };
+    
+        const filtered = data.filter(item =>
+            item.name?.toLowerCase().includes(query) ||
+            item.email?.toLowerCase().includes(query) ||
+            item.mobileNo?.toLowerCase().includes(query)
+        );
+    
+        setFilteredData(filtered);
+        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+        setData(filtered.slice(0, itemsPerPage));
+    };    
 
-    const local_data = async () => {
-        const dataFromStorage = await JSON.parse(localStorage.getItem('data3'));
-        if (dataFromStorage) {
-            let dataToUse = searchQuery ? filteredData : dataFromStorage;
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allDeactiveUserAccount`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
-            const total = Math.ceil(dataToUse.length / itemsPerPage);
+            const fetchedData = response.data.deactiveUser || [];
+    
+            const total = Math.ceil(fetchedData.length / itemsPerPage);
             setTotalPages(total);
-
+    
             const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-
-            setData(dataToUse.slice(startIndex, endIndex));
+            const paginatedData = fetchedData.slice(startIndex, startIndex + itemsPerPage);
+    
+            setData(paginatedData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
         }
     };
+    
 
     useEffect(() => {
-        local_data();
-    }, [currentPage, filteredData]);
+        fetchData();
+    }, [currentPage, searchQuery]); 
+    
 
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > totalPages) return;
@@ -190,10 +128,10 @@ const DeactivatedAccount = () => {
                                     <tbody>
                                         {data.map((item, index) => (
                                             <tr key={index}>
-                                                <td className='py-3'>{item.id}</td>
-                                                <td className='py-3'>{item.customerName}</td>
-                                                <td className='py-3'>{item.contactNo}</td>
-                                                <td className='py-3'>{item.email}</td>
+                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td className='py-3'>{item?.name}</td>
+                                                <td className='py-3'>{item?.mobileNo}</td>
+                                                <td className='py-3'>{item?.email}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -203,12 +141,14 @@ const DeactivatedAccount = () => {
                                         <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
                                             <MdOutlineKeyboardArrowLeft />
                                         </p>
-                                        {getPaginationButtons().map((page, index) => (
-                                            <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                        {getPaginationButtons().map((page) => (
+                                            <p key={`page-${page}`}
+                                                className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
                                                 onClick={() => handlePageChange(page)}>
                                                 {page}
                                             </p>
                                         ))}
+
                                         <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
                                             <MdOutlineKeyboardArrowRight />
                                         </p>
