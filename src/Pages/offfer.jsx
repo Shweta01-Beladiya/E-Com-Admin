@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
@@ -19,9 +19,14 @@ const Offer = (props) => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState({
-        brandname: '',
+        offerType: '',
+        offerName: '',
+        startDate: '',
+        endDate: '',
+        status: ''
     });
     const [tempFilters, setTempFilters] = useState(filters);
+    const [getofffer,setOffer] = useState(null);
 
     // Edit Offer
     const [editstok,setEditOffer] = useState(false);
@@ -35,7 +40,7 @@ const Offer = (props) => {
         // navigate('addsize')
     }
 
-    // Search Data
+    // Updated useEffect for filtering
     useEffect(() => {
         let result = data;
         
@@ -46,13 +51,21 @@ const Offer = (props) => {
           result = result.filter(user => user.offerName === filters.offerName);
         }
         if (filters.startDate) {
-          result = result.filter(user => user.startDate === filters.startDate);
+          result = result.filter(user => {
+            const userStartDate = new Date(user.startDate);
+            const filterStartDate = new Date(filters.startDate);
+            return userStartDate >= filterStartDate;
+          });
         }
         if (filters.endDate) {
-          result = result.filter(user => user.endDate === filters.endDate);
+          result = result.filter(user => {
+            const userEndDate = new Date(user.endDate);
+            const filterEndDate = new Date(filters.endDate);
+            return userEndDate <= filterEndDate;
+          });
         }
         if (filters.status) {
-          result = result.filter(user => user.status === filters.status);
+          result = result.filter(user => user.status.toString() === filters.status);
         }
     
         if (searchTerm) {
@@ -61,7 +74,7 @@ const Offer = (props) => {
             user.offerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.startDate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.endDate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.status?.includes(searchTerm)
+            user.status?.toString().includes(searchTerm)
           );
         }
     
@@ -76,12 +89,17 @@ const Offer = (props) => {
           [field]: value
         }));
     };
-
+    
     const handleApplyFilters = () => {
         setFilters(tempFilters);
         handleClose();
     };
 
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    };
     // ************************************** Show Data **************************************
     const [filteredData, setFilteredData] = useState([]);
     
@@ -128,10 +146,10 @@ const Offer = (props) => {
     // ***************************************************************************************
 
     // Handle View Offer
-    const handleViewOffer = (offer) => {
-        localStorage.setItem('viewOfferData', JSON.stringify(offer));
-        navigate(`/viewoffer/${offer._id}`);
-    }
+    // const handleViewOffer = (offer) => {
+    //     localStorage.setItem('viewOfferData', JSON.stringify(offer));
+    //     navigate(`/viewoffer/${offer._id}`);
+    // }
     
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -185,6 +203,24 @@ const Offer = (props) => {
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
+    const [modalShow1, setModalShow1] = React.useState(false);
+
+    const handlepersonaloffer = (id) => {
+        try {
+            axios.get(`${BaseUrl}/api/getOffer/${id}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then((res)=>{
+                console.log('res',res.data.offer);
+                setOffer(res.data.offer);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error submitting form. Please try again.");
+        }
+    }  
 
     // Offcanvas
     const [show, setShow] = useState(false);
@@ -228,6 +264,13 @@ const Offer = (props) => {
             />
         );
     }
+
+    // Format date function
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-GB");
+    }; 
 
     return (
         <>
@@ -291,15 +334,23 @@ const Offer = (props) => {
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>Start Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                                            <Form.Control 
+                                                                type="date" 
+                                                                value={formatDateForInput(tempFilters.startDate)}
+                                                                onChange={(e) => handleFilterChange('startDate', e.target.value)} 
+                                                                className='mb-3' 
+                                                            />
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>End Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                            <Form.Control 
+                                                                type="date" 
+                                                                value={formatDateForInput(tempFilters.endDate)}
+                                                                onChange={(e) => handleFilterChange('endDate', e.target.value)} 
+                                                                className='mb-3' 
+                                                            />
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
@@ -378,7 +429,7 @@ const Offer = (props) => {
                                                     />
                                                 </td>
                                                 <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon" onClick={() => handleViewOffer(item)}>
+                                                    <div className="mv_pencil_icon" onClick={() => {setModalShow1(true); handlepersonaloffer(item._id)}}>
                                                         <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                     </div>
                                                     <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
@@ -427,6 +478,130 @@ const Offer = (props) => {
                         <div className="mv_logout_button">
                             <button onClick={handleDelete}>Delete</button>
                         </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+
+            {/* View Offer Model */}
+            <Modal className='mv_logout_dialog' show={modalShow1} onHide={() => setModalShow1(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+                <Modal.Header className='mv_contect_details_header' closeButton>
+                    <h6 className='fw-bold mb-0'>Contact Details</h6>
+                </Modal.Header>
+                <Modal.Body>
+                    {getofffer?.map((offer) => {
+                        return(
+                            <div className="row mv_main_view_product_con">
+                                <div className="col-12 mv_main_product">
+                                    <div className="mv_product_info">
+                                        <div className="row">
+                                            <div className="col-sm-4 col-5">
+                                                {/* Use the actual offer image */}
+                                                <img 
+                                                    className='mv_view_product_img mb-3' 
+                                                    src={`${process.env.REACT_APP_BASEURL}/${offer.offerImage}`} 
+                                                    alt={offer.offerName}
+                                                />
+                                            </div>
+                                            <div className="col-12 align-content-center">
+                                                <div className="row">
+                                                    <div className="col-5">
+                                                        <p className='mv_view_product_heading'>Main Category</p>
+                                                    </div>
+                                                    <div className="col-1">
+                                                        <p className='mv_view_product_heading'>:</p>
+                                                    </div>  
+                                                    <div className="col-4">
+                                                        <p className='mv_view_product_sub_heading'>{offer.mainCategoriesData?.[0]?.mainCategoryName}</p>
+                                                    </div>
+                                                    
+                                                    <div className="col-5">
+                                                        <p className='mv_view_product_heading'>Category</p>
+                                                    </div>
+                                                    <div className="col-1">
+                                                        <p className='mv_view_product_heading'>:</p>
+                                                    </div>
+                                                    <div className="col-4">
+                                                        <p className='mv_view_product_sub_heading'>{offer.categoriesData?.[0]?.categoryName}</p>
+                                                    </div>
+
+                                                    <div className="col-5">
+                                                        <p className='mv_view_product_heading'>Sub Category</p>
+                                                    </div>
+                                                    <div className="col-1">
+                                                        <p className='mv_view_product_heading'>:</p>
+                                                    </div>
+                                                    <div className="col-4">
+                                                        <p className='mv_view_product_sub_heading'>{offer.subCategoriesData?.[0]?.subCategoryName}</p>
+                                                    </div>
+
+                                                    <div className="col-5">
+                                                        <p className='mv_view_product_heading'>Offer ID</p>
+                                                    </div>
+                                                    <div className="col-1">
+                                                        <p className='mv_view_product_heading'>:</p>
+                                                    </div>
+                                                    <div className="col-4">
+                                                        <p className='mv_view_product_sub_heading'>#{offer._id?.substring(0, 8)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    {/* Offer Details */}
+                    <div className='mv_main_offerdetails_con'>
+                        <div className="">
+                            <p className='mv_offer_details_heading mb-0'>Offer Details</p>
+                        </div>
+                        {getofffer?.map((offer) => {
+                            return(
+                                <div className="row mv_main_view_product_con mv_main_offerdetails mb-0">
+                                    <div className="col-12 mb-2">
+                                        <div className="row">
+                                            <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_view_product_heading'>Offer Type :</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_offer_details_sub_heading'>{offer?.offerType}</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_view_product_heading'>Offer Name :</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_offer_details_sub_heading'>{offer.offerName}</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_view_product_heading'>Button Text :</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_offer_details_sub_heading'>{offer.buttonText}</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_view_product_heading'>Start Date :</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_offer_details_sub_heading'>{formatDate(offer.startDate)}</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_view_product_heading'>End Date :</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_offer_details_sub_heading'>{formatDate(offer.endDate)}</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_view_product_heading'>Description :</p>
+                                            </div>
+                                            <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                                <p className='mv_offer_details_sub_heading'>{offer.description}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 </Modal.Body>
             </Modal>
