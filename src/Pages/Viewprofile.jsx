@@ -5,7 +5,7 @@ import { IoEyeSharp } from 'react-icons/io5';
 import { FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { ErrorMessage, Formik, } from 'formik';
+import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 const Viewprofile = () => {
@@ -46,6 +46,7 @@ const Viewprofile = () => {
             }
         }
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     let handlesubmit = async (e) => {
@@ -119,10 +120,10 @@ const Viewprofile = () => {
     const handleChangePassword = async (values) => {
         try {
             const response = await axios.put(`${BaseUrl}/api/updatePassword`, values, {
-                headers: { Authorization : `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response",response.data);
-            if(response.data.status === 200) {
+            // console.log("response", response.data);
+            if (response.data.status === 200) {
                 navigate('/dashboard');
             }
         } catch (error) {
@@ -340,7 +341,7 @@ const Viewprofile = () => {
                                                                 ) : (
                                                                     <FaEyeSlash onClick={() => togglePasswordVisibility("currentPassword")} className="mv_change_pass_icon" />
                                                                 )}
-                                                                </div>
+                                                            </div>
                                                             {errors.currentPassword && touched.currentPassword && (
                                                                 <small className="text-danger">{errors.currentPassword}</small>
                                                             )}
@@ -361,7 +362,7 @@ const Viewprofile = () => {
                                                                 ) : (
                                                                     <FaEyeSlash onClick={() => togglePasswordVisibility("newPassword")} className="mv_change_pass_icon" />
                                                                 )}
-                                                                </div>
+                                                            </div>
                                                             {errors.newPassword && touched.newPassword && (
                                                                 <small className="text-danger">{errors.newPassword}</small>
                                                             )}
@@ -382,10 +383,10 @@ const Viewprofile = () => {
                                                                 ) : (
                                                                     <FaEyeSlash onClick={() => togglePasswordVisibility("confirmPassword")} className="mv_change_pass_icon" />
                                                                 )}
-                                                                    </div>
-                                                                {errors.confirmPassword && touched.confirmPassword && (
-                                                                    <small className="text-danger">{errors.confirmPassword}</small>
-                                                                )}
+                                                            </div>
+                                                            {errors.confirmPassword && touched.confirmPassword && (
+                                                                <small className="text-danger">{errors.confirmPassword}</small>
+                                                            )}
                                                         </div>
                                                         <div className="text-center mt-4">
                                                             <div className="mv_edit_profile">

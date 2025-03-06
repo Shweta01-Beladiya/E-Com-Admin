@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import {  InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import ReactSlider from 'react-slider';
 import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
 const Productoffer = () => {
 
@@ -16,46 +17,55 @@ const Productoffer = () => {
     const token = localStorage.getItem('token');
 
     // Edit Product Offer
-    const [data,setData] = useState([]);
+    const [data, setData] = useState([]);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState(data);
-    const [id,setId]= useState(null);
-
+    const [id, setId] = useState(null);
+    const [subCategory, setSubCategory] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterCriteria, setFilterCriteria] = useState({
+        subCategory: '',
+        startDate: '',
+        endDate: '',
+        status: '',
+        minPrice: 0,
+        maxPrice: 1200
+    });
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     // console.log("totalpage",totalPages)
- 
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-             setCurrentPage(newPage);
+            setCurrentPage(newPage);
         }
     };
- 
+
     const getPaginationButtons = () => {
         const buttons = [];
         const maxButtonsToShow = 5;
-         
+
         let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-         
+
         // Adjust startPage if we're near the end
         if (endPage - startPage + 1 < maxButtonsToShow) {
             startPage = Math.max(1, endPage - maxButtonsToShow + 1);
         }
- 
+
         // Add first page if not included
         if (startPage > 1) {
             buttons.push(1);
             if (startPage > 2) buttons.push('...');
         }
- 
+
         // Add main page numbers
         for (let i = startPage; i <= endPage; i++) {
             buttons.push(i);
         }
- 
+
         // Add last page if not included
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) buttons.push('...');
@@ -63,10 +73,10 @@ const Productoffer = () => {
         }
         return buttons;
     };
- 
+
     const paginatedData = filteredData.slice(
-         (currentPage - 1) * itemsPerPage,
-         currentPage * itemsPerPage
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     // *******************************************************************************
 
@@ -79,60 +89,174 @@ const Productoffer = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    // offcanvas price
-    const [priceRange, setPriceRange] = useState([0, 300]);
+
+    // Combined filter function
+    const applyFilters = (products) => {
+        let result = products;
+
+        // Search filter
+        if (searchTerm) {
+            result = result.filter(item =>
+                item.productData[0].productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.subCategoriesData[0].subCategoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.code.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Subcategory filter
+        if (filterCriteria.subCategory) {
+            result = result.filter(item =>
+                item.subCategoriesData.some(subCat => subCat._id === filterCriteria.subCategory)
+            );
+        }
+
+        if (filterCriteria.startDate) {
+            result = result.filter(item =>
+                new Date(item.startDate.split("-").reverse().join("-")).getTime() >= new Date(filterCriteria.startDate).getTime()
+            );
+        }
+
+        if (filterCriteria.endDate) {
+            result = result.filter(item =>
+                new Date(item.endDate.split("-").reverse().join("-")).getTime() <= new Date(filterCriteria.endDate).getTime()
+            );
+        }
+
+
+        // Status filter
+        if (filterCriteria.status !== '') {
+            result = result.filter(item =>
+                item.status === JSON.parse(filterCriteria.status)
+            );
+        }
+
+        // Price range filter
+        result = result.filter(item =>
+            item.price >= filterCriteria.minPrice &&
+            item.price <= filterCriteria.maxPrice
+        );
+        console.log("result>>>>>>>>>", result);
+
+        setFilteredData(result);
+        setCurrentPage(1);
+    };
+
+    // Handle search input
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        applyFilters(data);
+    };
+
+    // Handle filter changes
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilterCriteria(prev => {
+            const updatedCriteria = { ...prev, [name]: value };
+            applyFilters(data); // Apply filters immediately
+            return updatedCriteria;
+        });
+    };
+
+    // Handle price slider change
     const handleSliderChange = (newRange) => {
-        setPriceRange(newRange);
+        setFilterCriteria(prev => ({
+            ...prev,
+            minPrice: newRange[0],
+            maxPrice: newRange[1]
+        }));
+        applyFilters(data);
     };
 
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
-        }
+    // Apply filters button handler
+    const handleApplyFilters = () => {
+        applyFilters(data);
+        setShow(false);
     };
 
+    // Reset filters
+    const handleResetFilters = () => {
+        setFilterCriteria({
+            subCategory: '',
+            startDate: '',
+            endDate: '',
+            status: '',
+            minPrice: 0,
+            maxPrice: 1200
+        });
+        setSearchTerm('');
+        applyFilters(data);
+        setShow(false);
+    };
     useEffect(() => {
-        const fetchData = async() => {
-            try {
-                const response = await axios.get(`${BaseUrl}/api/allProductOffer`, {
-                    headers: { Authorization: `Bearer ${token}`}
-                });
-                console.log("reposne",response.data);
-                setData(response.data.productOffer);
-                setFilteredData(response.data.productOffer);
-            } catch (error) {
-                console.error('Data Fetching Error:', error);
-            }
-        }
-        fetchData();
-    },[]);
+        applyFilters(data);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCriteria, searchTerm]);
 
-    const handleDelete = async(id) => {
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allProductOffer`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("reposne",response.data);
+            setData(response.data.productOffer);
+            setFilteredData(response.data.productOffer);
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const fetchAllSubCategory = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/allSubCategory`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data.subCategory);
+            setSubCategory(response.data.subCategory)
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchData();
+        fetchAllSubCategory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleDelete = async (id) => {
         setModalShow(true);
         setId(id);
     }
 
-    const handleConfirmDelete = async() => {
+    const handleConfirmDelete = async () => {
         try {
             const response = await axios.delete(`${BaseUrl}/api/deleteProductOffer/${id}`, {
-                headers: { Authorization: `Bearer ${token}`}
+                headers: { Authorization: `Bearer ${token}` }
             });
             // console.log("repsonse",response.data);
-            if(response.data.status === 200){
+            if (response.data.status === 200) {
                 setModalShow(false);
                 setFilteredData((prevData) => prevData.filter(item => item._id !== id));
             }
         } catch (error) {
-            console.error('Data Fetching Error:',error);
+            console.error('Data Fetching Error:', error);
+        }
+    }
+
+    const handleStatusChange = async (id, currentStatus) => {
+        try {
+            const response = await axios.put(`${BaseUrl}/api/updateProductOffer/${id}`, {
+                status: !currentStatus
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response", response.data);
+            if (response.data.status === 200) {
+
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
         }
     }
     return (
@@ -154,9 +278,9 @@ const Productoffer = () => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
                                         />
                                     </InputGroup>
                                 </div>
@@ -174,33 +298,55 @@ const Productoffer = () => {
                                                 <div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Sub Category</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select Sub Category</option>
-                                                            <option value="Saree">Saree</option>
-                                                            <option value="Dresses">Dresses</option>
-                                                            <option value="Jeans">Jeans</option>
+                                                        <Form.Select
+                                                            name="subCategory"
+                                                            value={filterCriteria.subCategory}
+                                                            onChange={handleFilterChange}
+                                                            className="mb-3"
+                                                            aria-label="Sub Category select"
+                                                        >
+                                                            <option value="">Select Sub Category</option>
+                                                            {subCategory.map((item) => (
+                                                                <option value={item._id} key={item._id}>{item.subCategoryName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>Start Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'start')} />
+                                                            <Form.Control
+                                                                name="startDate"
+                                                                value={filterCriteria.startDate}
+                                                                onChange={handleFilterChange}
+                                                                className='mb-3'
+                                                                type="date"
+                                                            />
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <label className='mv_offcanvas_filter_category'>End Date</label>
                                                         <div className="mv_input_content mv_add_product_date_scheduled">
-                                                            <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
-                                                            <Form.Control className='mb-3' type="date" onChange={(e) => handleDateChange(e, 'end')} />
+                                                            <Form.Control
+                                                                name="endDate"
+                                                                value={filterCriteria.endDate}
+                                                                onChange={handleFilterChange}
+                                                                className='mb-3'
+                                                                type="date"
+                                                            />
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Status</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example">
-                                                            <option>Select Status</option>
-                                                            <option value="True">True</option>
-                                                            <option value="False">False</option>
+                                                        <Form.Select
+                                                            name="status"
+                                                            value={filterCriteria.status}
+                                                            onChange={handleFilterChange}
+                                                            className="mb-3"
+                                                            aria-label="Status select"
+                                                        >
+                                                            <option value="">Select Status</option>
+                                                            <option value="true">Active</option>
+                                                            <option value="false">Inactive</option>
                                                         </Form.Select>
                                                     </div>
                                                     <label className='mv_offcanvas_filter_category'>Price</label>
@@ -210,31 +356,31 @@ const Productoffer = () => {
                                                             thumbClassName="mv_thumb"
                                                             trackClassName="mv_track"
                                                             min={0}
-                                                            max={300}
-                                                            value={priceRange}
+                                                            max={1200}
+                                                            value={[filterCriteria.minPrice, filterCriteria.maxPrice]}
                                                             onChange={handleSliderChange}
-                                                            minDistance={50}
+                                                            minDistance={150}
                                                             withTracks={true}
                                                             pearling
                                                             renderTrack={(props, state) => (
                                                                 <div {...props} className={`mv_track ${state.index === 1 ? 'mv_track_active' : ''}`}></div>
                                                             )}
                                                         />
-                                                        <div className="mv_price_label mv_price_min" style={{ left: `${(priceRange[0] / 300) * 100}%` }}>
-                                                            ${priceRange[0]}
+                                                        <div className="mv_price_label mv_price_min" style={{ left: `${(filterCriteria.minPrice / 1200) * 100}%` }}>
+                                                            ${filterCriteria.minPrice}
                                                         </div>
-                                                        <div className="mv_price_label mv_price_max" style={{ left: `${(priceRange[1] / 300) * 100}%` }}>
-                                                            ${priceRange[1]}
+                                                        <div className="mv_price_label mv_price_max" style={{ left: `${(filterCriteria.maxPrice / 1200) * 100}%` }}>
+                                                            ${filterCriteria.maxPrice}
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleClose}>Cancel</button>
+                                                            <button type="button" onClick={handleResetFilters}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="submit">Apply</button>
+                                                            <button type="submit" onClick={handleApplyFilters}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -248,77 +394,82 @@ const Productoffer = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Sub Category</th>
-                                            <th className=''>Product Name</th>
-                                            <th className=''>Code</th>
-                                            <th className=''>Discount</th>
-                                            <th className=''>Price</th>
-                                            <th className=''>Start Date</th>
-                                            <th className=''>End Date</th>
-                                            <th className=''>Status</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                       {paginatedData.map((item, index) => (
-                                            <tr key={index}>
-                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                            <td>{item.subCategoriesData[0].subCategoryName}</td>
-                                            <td>{item.productData[0].productName}</td>
-                                            <td>{item.code}</td>
-                                            <td>{item.discountPrice}%</td>
-                                            <td>${item.price}</td>
-                                            <td>{item.startDate}</td>
-                                            <td>{item.endDate}</td>
-                                            <td>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id={`custom-switch-${item.id}`}
-                                                    label=""
-                                                    checked={item.status}
-                                                    className=''
-                                                />
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon">
-                                                    <Link to={`/viewproductoffer/${item._id}`}>
-                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" >
-                                                    <Link to='/addproductoffer' state={{ id: item._id }}>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
-                                        </p>
-                                    ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
+                            {paginatedData.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Sub Category</th>
+                                                    <th className=''>Product Name</th>
+                                                    <th className=''>Code</th>
+                                                    <th className=''>Discount</th>
+                                                    <th className=''>Price</th>
+                                                    <th className=''>Start Date</th>
+                                                    <th className=''>End Date</th>
+                                                    <th className=''>Status</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{item.subCategoriesData[0].subCategoryName}</td>
+                                                        <td>{item.productData[0].productName}</td>
+                                                        <td>{item.code}</td>
+                                                        <td>{item.discountPrice}%</td>
+                                                        <td>${item.price}</td>
+                                                        <td>{item.startDate}</td>
+                                                        <td>{item.endDate}</td>
+                                                        <td>
+                                                            <Form.Check
+                                                                type="switch"
+                                                                checked={item.status}
+                                                                className=''
+                                                                onChange={() => handleStatusChange(item._id, item.status)}
+                                                            />
+                                                        </td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon">
+                                                                <Link to={`/viewproductoffer/${item._id}`}>
+                                                                    <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" >
+                                                                <Link to='/addproductoffer' state={{ id: item._id }}>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                                    onClick={() => handlePageChange(page)}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>

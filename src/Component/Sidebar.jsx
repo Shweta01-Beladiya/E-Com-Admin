@@ -195,10 +195,12 @@ const Sidebar = ({ open, handleDrawerClose, theme }) => {
       const isActive = 
       location.pathname === item.path || 
       (item.path === "/dashboard" && location.pathname.startsWith("/view_profile")) ||
-      (item.path === "/product" && location.pathname.includes("/viewProduct"))||
+      (item.path === "/product" && location.pathname.startsWith("/viewProduct"))||
       (item.path === "/size" && location.pathname.includes("/addsize"))||
       (item.path === "/stock" && location.pathname.includes("/addstock"))||
-      (item.path === "/coupon" && location.pathname.includes("/addcoupon"));
+      (item.path === "/coupon" && location.pathname.includes("/addcoupon"))||
+      (item.path === "/returnorder" && location.pathname.includes("/viewstatus"))||
+      (item.path === "/Productoffer" && location.pathname.startsWith("/viewproductoffer"));
 
           return (
             <React.Fragment key={item.text || index}>

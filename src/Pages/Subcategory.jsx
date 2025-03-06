@@ -395,8 +395,7 @@ const SubCategory = () => {
                         }}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Main Category</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={filters.mainCategory}
                                     onChange={(e) => setFilters({ ...filters, mainCategory: e.target.value })}
                                 >
@@ -404,12 +403,11 @@ const SubCategory = () => {
                                     {mainCategory.map((mainCat) => (
                                         <option key={mainCat._id} value={mainCat._id}>{mainCat.mainCategoryName}</option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                             <Form.Group className="mb-3">
                                 <Form.Label>Category</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={filters.category}
                                     onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                                 >
@@ -423,19 +421,18 @@ const SubCategory = () => {
                                             <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
                                         ))
                                     }
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                             <Form.Group className="mb-3">
                                 <Form.Label>Status</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={filters.status}
                                     onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                                 >
                                     <option value="">Select Status</option>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Form>
                     </Offcanvas.Body>
