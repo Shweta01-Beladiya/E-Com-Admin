@@ -34,6 +34,8 @@ const Productoffer = () => {
         minPrice: 0,
         maxPrice: 1200
     });
+    const [getofffer,setOffer] = useState(null);
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     // console.log("totalpage",totalPages)
 
@@ -82,6 +84,24 @@ const Productoffer = () => {
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
+    const [modalShow1, setModalShow1] = React.useState(false);
+
+    const handlepersonaloffer = (id) => {
+        try {
+            axios.get(`${BaseUrl}/api/getProductOffer/${id}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then((res)=>{
+                console.log('res',res.data.productOffer);
+                setOffer(res.data.productOffer);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error submitting form. Please try again.");
+        }
+    }
 
     // Offcanvas
     const [show, setShow] = useState(false);
@@ -432,10 +452,8 @@ const Productoffer = () => {
                                                             />
                                                         </td>
                                                         <td className='d-flex align-items-center justify-content-end'>
-                                                            <div className="mv_pencil_icon">
-                                                                <Link to={`/viewproductoffer/${item._id}`}>
+                                                            <div className="mv_pencil_icon" onClick={() => {setModalShow1(true); handlepersonaloffer(item._id)}}>
                                                                     <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                                </Link>
                                                             </div>
                                                             <div className="mv_pencil_icon" >
                                                                 <Link to='/addproductoffer' state={{ id: item._id }}>
@@ -488,6 +506,91 @@ const Productoffer = () => {
                         <div className="mv_logout_button">
                             <button onClick={handleConfirmDelete}>Delete</button>
                         </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+
+            {/* View Offer Model */}
+            <Modal className='mv_logout_dialog' show={modalShow1} onHide={() => setModalShow1(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+                <Modal.Header className='mv_contect_details_header' closeButton>
+                    <h6 className='fw-bold mb-0'>View Product Offer</h6>
+                </Modal.Header>
+                <Modal.Body>
+                    {getofffer?.map((offer) => {
+                        return(
+                            <div className="row mv_main_view_product_con">
+                        <div className="col-12 mv_main_product">
+                            <div className="mv_product_info">
+                                <div className="row">
+                                    <div className="col-sm-4 col-5">
+                                        <img className='mv_view_product_img' alt='' src={`/${offer.productVariantData?.[0]?.images?.[0]}`} />
+                                    </div>
+                                    <div className="col-12 align-content-center">
+                                        <div className="row">
+                                            <div className="col-5"><p className='mv_view_product_heading'>Main Category</p></div>
+                                            <div className="col-1"><p className='mv_view_product_heading'>:</p></div>
+                                            <div className="col-4"><p className='mv_view_product_sub_heading'>{offer.mainCategoriesData?.[0]?.mainCategoryName}</p></div>
+
+                                            <div className="col-5"><p className='mv_view_product_heading'>Category:</p></div>
+                                            <div className="col-1"><p className='mv_view_product_heading'>:</p></div>
+                                            <div className="col-4"><p className='mv_view_product_sub_heading'>{offer.categoriesData?.[0]?.categoryName}</p></div>
+
+                                            <div className="col-5"><p className='mv_view_product_heading'>Sub Category:</p></div>
+                                            <div className="col-1"><p className='mv_view_product_heading'>:</p></div>
+                                            <div className="col-4"><p className='mv_view_product_sub_heading'>{offer.subCategoriesData?.[0]?.subCategoryName}</p></div>
+
+                                            <div className="col-5"><p className='mv_view_product_heading mb-0'>Product ID:</p></div>
+                                            <div className="col-1"><p className='mv_view_product_heading mb-0'>:</p></div>
+                                            <div className="col-4"><p className='mv_view_product_sub_heading mb-0'>#654782014</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        )
+                    })}
+                    {/* Offer Details */}
+                    <div className='mv_main_offerdetails_con'>
+                        <div className="">
+                            <p className='mv_offer_details_heading mb-0'>Offer Details</p>
+                        </div>
+                        {getofffer?.map((offer) => {
+                            return(
+                                <div className="row mv_main_view_product_con mv_main_offerdetails">
+                                    <div className="col-12">
+                                        <div className="row">
+                                            <div className="col-6"><p className='mv_view_product_heading'>Offer Name :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.offerName}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Offer Code :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.code}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Offer Discount :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.discountPrice}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Offer Price :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.price}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Start Date :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.startDate}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>End Date :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.endDate}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Minimum Purchase :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.minimumPurchase}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Maximum Purchase :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.maximumPurchase}</p></div>
+
+                                            <div className="col-6"><p className='mv_view_product_heading'>Description :</p></div>
+                                            <div className="col-6"><p className='mv_offer_details_sub_heading'>{offer.description}</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 </Modal.Body>
             </Modal>

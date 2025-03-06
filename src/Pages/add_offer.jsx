@@ -196,12 +196,9 @@ const Addoffer = ({ editData }) => {
     }
     function sCategory(value){
         console.log('sub',subcategories);
-        var fliter = subcategories.filter(item=> item.categoriesData === value)
-        // var fliter = subcategories.filter(item=> item.categoriesData[0]._id
-        //     === value)
+        var fliter = subcategories.filter(item=> item.categoryId === value)
         console.log('f123',fliter);
         setselectedSubCategories(fliter)
-        // setselectedCategories(fliter)
     }
     useEffect(()=>{
         fetchMainCategory();
