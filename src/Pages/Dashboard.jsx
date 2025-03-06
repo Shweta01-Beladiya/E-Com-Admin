@@ -1,49 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/vaidik.css';
 import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
 import Chart from "react-apexcharts";
 import { FaStar } from "react-icons/fa";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-// import { TrendingUp, Wallet, ShoppingCart, Users } from 'lucide-react';
+import { LineChart, Line, ResponsiveContainer } from "recharts";
+import axios from 'axios';
 
 const Dashboard = () => {
 
-  // Cahat Box
-  const revenueData = [
-    { 
-      title: "Total Sales", 
-      amount: "1,00,000", 
-      change: "+22%", 
+  const BaseUrl = process.env.REACT_APP_BASEURL;
+  const token = localStorage.getItem('token');
+
+  const [review, setReview] = useState([]);
+  const [topProduct, setTopProduct] = useState([]);
+  const [revenue, setRevenue] = useState({
+    totalSales: 0,
+    totalIncome: 0,
+    totalOrders: 0,
+    totalCustomers: 0
+  });
+
+  // Define the summary cards data with icons and colors
+  const summaryCards = [
+    {
+      id: 'totalSales',
+      title: 'Total Sales',
+      amount: revenue.totalSales,
+      change: '+22%',
       img: "total_save.png",
       color: "#8b5cf6",
       data: [30, 40, 100, 10, 120, 140]
     },
-    { 
-      title: "Total Income", 
-      amount: "12,00,000", 
-      change: "-25%", 
+    {
+      id: 'totalIncome',
+      title: 'Total Income',
+      amount: `₹${revenue.totalIncome.toLocaleString()}`,
+      change: '-25%',
       img: "total_income.png",
       color: "#10b981",
       data: [20, 40, 80, 100, 110, 100, 80, 40, 20, 10]
     },
-    { 
-      title: "Total Orders", 
-      amount: "10,000", 
-      change: "+49%", 
+    {
+      id: 'totalOrders',
+      title: 'Total Orders',
+      amount: revenue.totalOrders,
+      change: '+49%',
       img: "total_orders.png",
       color: "#8b5cf6",
       data: [30, 40, 100, 10, 120, 140]
     },
-    { 
-      title: "Total Customer", 
-      amount: "8,521", 
-      change: "+22%", 
+    {
+      id: 'totalCustomers',
+      title: 'Total Customers',
+      amount: revenue.totalCustomers,
+      change: '+22%',
       img: "total_customer.png",
       color: "#f59e0b",
       data: [30, 40, 100, 10, 120, 140]
-    },
+    }
   ];
+
 
   const getChartData = (data) => {
     return data.map((value, index) => ({ value }));
@@ -130,65 +146,6 @@ const Dashboard = () => {
   const labels = ["On Delivery", "Pending", "Delivered", "Cancelled"];
   const values = [30, 25, 20, 15];
 
-  // Review
-  var review = [
-    {
-      id: 1,
-      name: 'Johan Patel',
-      date: 'April 10, 2024',
-      imgSrc: require('../mv_img/review_img_one.jpg'),
-      rating: 4,
-      reviewText: 'Lorem ipsum dolor sit amet consectetur. Consequat tortor sit id tincid nec euism lectus in diam. Lorem ipsum dolor sit amet consectetur'
-    },
-    {
-      id: 2,
-      name: 'Sophia Lee',
-      date: 'April 12, 2024',
-      imgSrc: require('../mv_img/review_img_two.jpg'),
-      rating: 5,
-      reviewText: 'Lorem ipsum dolor sit amet consectetur. Consequat tortor sit id tincid nec euism lectus in diam. Lorem ipsum dolor sit amet consectetur'
-    },
-    {
-      id: 3,
-      name: 'Michael Smith',
-      date: 'April 15, 2024',
-      imgSrc: require('../mv_img/review_img_one.jpg'),
-      rating: 3,
-      reviewText: 'Lorem ipsum dolor sit amet consectetur. Consequat tortor sit id tincid nec euism lectus in diam. Lorem ipsum dolor sit amet consectetur'
-    }
-  ];
-
-  // Top Product
-  var data = [
-    {
-      name: "Premium L...",
-      price: "$120",
-      category: "Women",
-      subcategory: "Indian Wear",
-      rating: "4.5",
-    },
-    {
-      name: "Premium L...",
-      price: "$120",
-      category: "Women",
-      subcategory: "Indian Wear",
-      rating: "4.5",
-    },
-    {
-      name: "Premium L...",
-      price: "$120",
-      category: "Women",
-      subcategory: "Indian Wear",
-      rating: "4.5",
-    },
-    {
-      name: "Premium L...",
-      price: "$120",
-      category: "Women",
-      subcategory: "Indian Wear",
-      rating: "4.5",
-    },
-  ];
 
   // Sales by Location
   var salesData = [
@@ -234,6 +191,68 @@ const Dashboard = () => {
     },
   ];
 
+  const fetchAllReviews = async () => {
+    try {
+      const response = await axios.get(`${BaseUrl}/api/allReviews`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // console.log("response", response.data.data);
+      setReview(response.data.data);
+    } catch (error) {
+      console.error('Data Fetching Error:', error);
+    }
+  }
+
+  const fetchTopProduct = async () => {
+    try {
+      const response = await axios.get(`${BaseUrl}/api/topProducts`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      // console.log("resposne",response.data.data);
+      setTopProduct(response.data.data);
+    } catch (error) {
+      console.error('Data Fetching Error:', error);
+    }
+  }
+
+  const fetchAllRevenue = async () => {
+    try {
+      const response = await axios.get(`${BaseUrl}/api/dashboardSummury`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.status === 200 && response.data.data) {
+        setRevenue({
+          totalSales: response.data.data.totalSales || 0,
+          totalIncome: response.data.data.totalIncome || 0,
+          totalOrders: response.data.data.totalOrders || 0,
+          totalCustomers: response.data.data.totalCustomers || 0
+        });
+      }
+    } catch (error) {
+      console.error('Data Fetching Error:', error);
+    }
+  }
+
+  const fatchOrderSummary = async () => {
+    try {
+      const response = await axios.get(`${BaseUrl}/api/orderSummary`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log("resposne", response.data.data);
+
+    } catch (error) {
+      console.error('Data Fetching Error:', error);
+    }
+  }
+  useEffect(() => {
+    fetchAllReviews();
+    fetchTopProduct();
+    fetchAllRevenue();
+    fatchOrderSummary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
   return (
     <>
       <div id='mv_container_fluid'>
@@ -243,7 +262,7 @@ const Dashboard = () => {
 
         <div className="row">
           {/* Revenue Cards */}
-          {revenueData.map((item, index) => (
+          {summaryCards.map((item, index) => (
             <div key={index} className="col-xxl-3 col-xl-6 col-md-6 col-sm-12 mv_revenue_item">
               <div className="mv_revenue d-flex justify-content-between align-items-center">
                 <div className="mv_revenue_text d-flex align-items-center">
@@ -353,11 +372,16 @@ const Dashboard = () => {
                     <div className='mv_main_review d-flex justify-content-between'>
                       <div className='d-flex mv_review_name_img'>
                         <div className='mv_review_user_img'>
-                          <img src={item.imgSrc} alt={item.name} />
+                          <img src={`${BaseUrl}/${item?.userData[0]?.image}`} alt={item.name} />
                         </div>
                         <div>
-                          <p className='mv_review_user_name mb-2'>{item.name}</p>
-                          <p className='mv_review_date mb-0'>{item.date}</p>
+                          <p className='mv_review_user_name mb-2'>{item.userData[0]?.name}</p>
+                          <p className='mv_review_date mb-0'>
+                            {new Date(item.createdAt).toLocaleDateString('en-US', {
+                              month: 'long', day: 'numeric', year: 'numeric'
+                            })}
+                          </p>
+
                         </div>
                       </div>
                       <div>
@@ -368,7 +392,7 @@ const Dashboard = () => {
                         </p>
                       </div>
                     </div>
-                    <p className='mv_review_text mb-0'>{item.reviewText}</p>
+                    <p className='mv_review_text mb-0'>{item.review}</p>
                   </div>
                 ))}
               </div>
@@ -397,15 +421,15 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.map((item, index) => (
+                    {topProduct.map((item, index) => (
                       <tr key={index}>
                         <td>
                           <img className='mv_product_img' src={require('../mv_img/lehenga.png')} alt="" />
-                          {item.name}
+                          {item.productName}
                         </td>
                         <td>{item.price}</td>
-                        <td>{item.category}</td>
-                        <td>{item.subcategory}</td>
+                        <td>{item.categoryName}</td>
+                        <td>{item.subCategoryName}</td>
                         <td>
                           <div className='mv_rating_img'>
                             <FaStar className='mv_star_yellow' />
