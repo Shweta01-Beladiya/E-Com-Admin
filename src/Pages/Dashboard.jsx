@@ -13,53 +13,7 @@ const Dashboard = () => {
 
   const [review, setReview] = useState([]);
   const [topProduct, setTopProduct] = useState([]);
-  const [revenue, setRevenue] = useState({
-    totalSales: 0,
-    totalIncome: 0,
-    totalOrders: 0,
-    totalCustomers: 0
-  });
-
-  // Define the summary cards data with icons and colors
-  const summaryCards = [
-    {
-      id: 'totalSales',
-      title: 'Total Sales',
-      amount: revenue.totalSales,
-      change: '+22%',
-      img: "total_save.png",
-      color: "#8b5cf6",
-      data: [30, 40, 100, 10, 120, 140]
-    },
-    {
-      id: 'totalIncome',
-      title: 'Total Income',
-      amount: `₹${revenue.totalIncome.toLocaleString()}`,
-      change: '-25%',
-      img: "total_income.png",
-      color: "#10b981",
-      data: [20, 40, 80, 100, 110, 100, 80, 40, 20, 10]
-    },
-    {
-      id: 'totalOrders',
-      title: 'Total Orders',
-      amount: revenue.totalOrders,
-      change: '+49%',
-      img: "total_orders.png",
-      color: "#8b5cf6",
-      data: [30, 40, 100, 10, 120, 140]
-    },
-    {
-      id: 'totalCustomers',
-      title: 'Total Customers',
-      amount: revenue.totalCustomers,
-      change: '+22%',
-      img: "total_customer.png",
-      color: "#f59e0b",
-      data: [30, 40, 100, 10, 120, 140]
-    }
-  ];
-
+  const [summaryCards, setSummaryCards] = useState([]);
 
   const getChartData = (data) => {
     return data.map((value, index) => ({ value }));
@@ -217,30 +171,71 @@ const Dashboard = () => {
     }
   }
 
-  const fetchAllRevenue = async () => {
+ const fetchAllRevenue = async () => {
     try {
       const response = await axios.get(`${BaseUrl}/api/dashboardSummury`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
       if (response.data.status === 200 && response.data.data) {
-        setRevenue({
-          totalSales: response.data.data.totalSales || 0,
-          totalIncome: response.data.data.totalIncome || 0,
-          totalOrders: response.data.data.totalOrders || 0,
-          totalCustomers: response.data.data.totalCustomers || 0
-        });
+        const monthlyData = response.data.data.currentYear?.monthlyData || [];
+
+        // Extract data points for charts
+        const salesData = monthlyData.map(item => item.sales || 0);
+        const incomeData = monthlyData.map(item => item.income || 0);
+        const ordersData = monthlyData.map(item => item.orders || 0);
+        const customersData = monthlyData.map(item => item.customers || 0);
+
+        setSummaryCards([
+          {
+            id: 'totalSales',
+            title: 'Total Sales',
+            amount: response.data.data.totalSales,
+            change: '+22%',
+            img: "total_save.png",
+            color: "#8b5cf6",
+            data: salesData
+          },
+          {
+            id: 'totalIncome',
+            title: 'Total Income',
+            amount: `₹${response.data.data.totalIncome.toLocaleString()}`,
+            change: '-25%',
+            img: "total_income.png",
+            color: "#10b981",
+            data: incomeData
+          },
+          {
+            id: 'totalOrders',
+            title: 'Total Orders',
+            amount: response.data.data.totalOrders,
+            change: '+49%',
+            img: "total_orders.png",
+            color: "#A0629B",
+            data: ordersData
+          },
+          {
+            id: 'totalCustomers',
+            title: 'Total Customers',
+            amount: response.data.data.totalCustomers,
+            change: '+22%',
+            img: "total_customer.png",
+            color: "#f59e0b",
+            data: customersData
+          }
+        ]);
       }
     } catch (error) {
       console.error('Data Fetching Error:', error);
     }
-  }
+  };
 
   const fatchOrderSummary = async () => {
     try {
       const response = await axios.get(`${BaseUrl}/api/orderSummary`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log("resposne", response.data.data);
+      // console.log("resposne", response.data.data);
 
     } catch (error) {
       console.error('Data Fetching Error:', error);

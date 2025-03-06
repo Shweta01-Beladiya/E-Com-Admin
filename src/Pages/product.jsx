@@ -23,11 +23,11 @@ const Product = () => {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    
+
     // Filter states
     const [selectedMainCategory, setSelectedMainCategory] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [priceRange, setPriceRange] = useState([0, 300]);
+    const [priceRange, setPriceRange] = useState([0, 2000]);
     const [deleteToProduct, setDeleteToProduct] = useState('');
     const [selectedStockStatus, setSelectedStockStatus] = useState('');
 
@@ -38,7 +38,7 @@ const Product = () => {
         // Apply search filter if searchQuery exists
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
-            result = result.filter(item => 
+            result = result.filter(item =>
                 item.productName.toLowerCase().includes(query) ||
                 (item.mainCategoriesData?.[0]?.mainCategoryName.toLowerCase().includes(query)) ||
                 (item.categoriesData?.[0]?.categoryName.toLowerCase().includes(query))
@@ -47,18 +47,18 @@ const Product = () => {
 
         // Filter by main category
         if (selectedMainCategory) {
-            result = result.filter(item => 
-                item.mainCategoriesData && 
-                item.mainCategoriesData[0] && 
+            result = result.filter(item =>
+                item.mainCategoriesData &&
+                item.mainCategoriesData[0] &&
                 item.mainCategoriesData[0]._id === selectedMainCategory
             );
         }
 
         // Filter by category
         if (selectedCategory) {
-            result = result.filter(item => 
-                item.categoriesData && 
-                item.categoriesData[0] && 
+            result = result.filter(item =>
+                item.categoriesData &&
+                item.categoriesData[0] &&
                 item.categoriesData[0]._id === selectedCategory
             );
         }
@@ -68,11 +68,16 @@ const Product = () => {
             result = result.filter(item => item.stockStatus === selectedStockStatus);
         }
 
+
         // Filter by price range
-        // result = result.filter(item => {
-        //     const price = item.productVariantData?.[0]?.originalPrice;
-        //     return price && parseFloat(price) >= priceRange[0] && parseFloat(price) <= priceRange[1];
-        // });
+        result = result.filter(item => {
+            let priceStr = item.productVariantData?.[0]?.originalPrice;
+
+            if (!priceStr) return true;
+            let price = parseFloat(priceStr.toString().replace(/[^0-9.-]+/g, ''));
+
+            return !isNaN(price) && price >= priceRange[0] && price <= priceRange[1];
+        });
 
         setFilteredData(result);
         setCurrentPage(1); // Reset to first page after filtering
@@ -95,7 +100,7 @@ const Product = () => {
     const handleStockStatusChange = (e) => {
         setSelectedStockStatus(e.target.value);
     };
-    
+
     const handleSliderChange = (newRange) => {
         setPriceRange(newRange);
     };
@@ -125,9 +130,9 @@ const Product = () => {
         setSelectedMainCategory('');
         setSelectedCategory('');
         setSelectedStockStatus('');
-        setPriceRange([0, 300]);
+        setPriceRange([0, 2000]);
         setSearchQuery('');
-        
+
         // Reset filteredData to original data
         setFilteredData(data);
         handleClose();
@@ -212,7 +217,7 @@ const Product = () => {
             console.error('Data Fetching Error:', error);
         }
     }
-    
+
     const fetchMainCategory = async () => {
         try {
             const response = await axios.get(`${BaseUrl}/api/allMainCategory`, {
@@ -224,7 +229,7 @@ const Product = () => {
             console.error('Data Fetching Error:', error);
         }
     }
-    
+
     useEffect(() => {
         fetchData();
         fetchMainCategory();
@@ -332,10 +337,10 @@ const Product = () => {
                                                                 thumbClassName="mv_thumb"
                                                                 trackClassName="mv_track"
                                                                 min={0}
-                                                                max={300}
+                                                                max={2000}
                                                                 value={priceRange}
                                                                 onChange={handleSliderChange}
-                                                                minDistance={50}
+                                                                minDistance={250}
                                                                 withTracks={true}
                                                                 pearling
                                                                 renderTrack={(props, state) => (
@@ -345,7 +350,7 @@ const Product = () => {
                                                             <div className="mv_price_label mv_price_min" style={{ left: `${(priceRange[0] / 300) * 100}%` }}>
                                                                 ${priceRange[0]}
                                                             </div>
-                                                            <div className="mv_price_label mv_price_max" style={{ left: `${(priceRange[1] / 300) * 100}%` }}>
+                                                            <div className="mv_price_label mv_price_max" style={{ left: `${(priceRange[1] / 2000) * 100}%` }}>
                                                                 ${priceRange[1]}
                                                             </div>
                                                         </div>
@@ -388,7 +393,7 @@ const Product = () => {
                                             <tbody>
                                                 {paginatedData.map((item, index) => (
                                                     <tr key={index}>
-                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.mainCategoriesData?.[0]?.mainCategoryName || 'N/A'}</td>
                                                         <td>{item.categoriesData?.[0]?.categoryName || 'N/A'}</td>
                                                         <td>
