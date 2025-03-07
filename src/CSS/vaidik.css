@@ -60,6 +60,7 @@
     justify-content: center;
     align-items: center;
 }
+
 .mv_daily_order_percan{
     background-color: #E9F7FF;
     color: #EB7017;
@@ -440,15 +441,15 @@
 
 
 @media (max-width: 1800px){
-    .mv_revenue{
+    /* .mv_revenue{
         display: block !important;
-    }
+    } */
     .mv_revenue_text{
         margin-bottom: 20px;
         justify-content: center;
     }
     .mv_chart_per{
-        display: flex;
+        /* display: flex; */
         justify-content: center;
     }
 }
@@ -482,6 +483,16 @@
     .mv_chart_custom_legend{
         width:350px;
     }
+    .mv_product_table_padd{
+        padding: 0px 0px !important;
+        /* height: 65vh; */
+    }
+    .mv_product_table{
+        width: 90% !important;
+    }
+    .mv_revenue{
+        padding: 10px !important;
+    }
 }
 @media (max-width: 1200px){
     .mv_product_table thead tr th {
@@ -511,6 +522,13 @@
     /* product list table */
     .mv_product_table_content{
         margin-bottom: 20px;
+    }
+    .mv_product_table_padd{
+        padding: 0px 20px !important;
+        /* height: 65vh; */
+    }
+    .mv_product_table{
+        width: 100% !important;
     }
 }
 @media (max-width: 991px){
@@ -605,17 +623,17 @@
     }
     /* Order Summary */
     .mv_chart_custom_legend {
-        width: 250px;
+        width: 345px;
     }
-    .mv_revenue{
+    /* .mv_revenue{
         display: block !important;
-    }
+    } */
     .mv_revenue_text{
         margin-bottom: 20px;
         justify-content: center;
     }
     .mv_chart_per {
-        display: flex;
+        /* display: flex; */
         justify-content: center;
         align-items: center;
     }
@@ -642,10 +660,21 @@
     .mv_mainus_sales_per {
         margin-left: 15px;
     }
+    .apexcharts-canvas{
+        margin: 0 auto !important;
+    }
 }
 @media (max-width: 375px){
     .mv_chart_custom_legend {
-        width: 220px;
+        width: 300px;
+    }
+}
+@media (max-width: 320px){
+    .mv_chart_custom_legend {
+        width: 255px;
+    }
+    .mv_on_deli_con{
+        padding: 10px;
     }
 }
 /* ********************************************** */

@@ -129,7 +129,7 @@ const AddProduct = () => {
             const preResponse = await axios.get(`${BaseUrl}/api/getProductVariant/${variantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("preResponse", preResponse.data.productVariant);
+            // console.log("preResponse", preResponse.data.productVariant);
 
             if (response.data && response.data.product) {
                 const product = response.data.product;
@@ -168,7 +168,7 @@ const AddProduct = () => {
                         }));
                         setSelectedImages(imageObjects);
                     }
-                    console.log("productName", product.productName);
+                    // console.log("productName", product.productName);
 
                     // Set form values for Formik
                     const initialData = {
@@ -192,7 +192,7 @@ const AddProduct = () => {
                             ? Object.entries(variant.specifications).map(([key, value]) => ({ key, value }))
                             : [{ key: '', value: '' }]
                     };
-                    console.log("initialData", initialData);
+                    // console.log("initialData", initialData);
 
                     setInitialValues(initialData);
                 }
@@ -205,6 +205,8 @@ const AddProduct = () => {
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
             if (id) {
+                console.log("Images Before Sending:", values.images);
+
                 // Update existing product
                 await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
                     mainCategoryId: values.mainCategoryId,
@@ -228,17 +230,6 @@ const AddProduct = () => {
                         formData.append("images", image.file);
                     }
                 });
-
-                const existingImages = values.images
-                    .filter(image => image.existingPath)
-                    .map(image => image.existingPath);
-
-                    console.log("existingImages",existingImages );
-                    
-                if (existingImages.length > 0) {
-                    formData.append("images", JSON.stringify(existingImages));
-                }
-
                 const specObject = {};
                 values.specifications.forEach(spec => {
                     if (spec.key && spec.value) {
