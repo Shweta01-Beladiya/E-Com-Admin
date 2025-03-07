@@ -87,7 +87,7 @@ const AddProduct = () => {
             .required('Price is required')
             .positive('Price must be positive')
             .min(0, 'Price must be greater than or equal to 0'),
-            discountPrice: Yup.number()
+        discountPrice: Yup.number()
             .required('Discount Price is required')
             .lessThan(Yup.ref('originalPrice'), 'Discount price must be less than regular price'),
         // productOfferId: Yup.array()
@@ -229,13 +229,15 @@ const AddProduct = () => {
                     }
                 });
 
-                values.images.forEach((image) => {
-                    if (image.existingPath) {
-                        formData.append("images", image.existingPath || image.file);
-                    }
-                });
+                const existingImages = values.images
+                    .filter(image => image.existingPath)
+                    .map(image => image.existingPath);
 
-
+                    console.log("existingImages",existingImages );
+                    
+                if (existingImages.length > 0) {
+                    formData.append("images", JSON.stringify(existingImages));
+                }
 
                 const specObject = {};
                 values.specifications.forEach(spec => {
@@ -288,9 +290,11 @@ const AddProduct = () => {
                 });
 
                 const formData = new FormData();
+
                 values.images.forEach((image) => {
                     formData.append("images", image.file);
                 });
+               
                 const specObject = {};
                 values.specifications.forEach(spec => {
                     if (spec.key && spec.value) {

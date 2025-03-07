@@ -17,7 +17,7 @@ const ViewProduct = () => {
     const [mainCategoryName, setMainCategoryName] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [subCategoryName, setSubCategoryName] = useState('');
-    
+    const [unitName,setUnitName] = useState('');
 
     const fetchProduct = async () => {
         try {
@@ -69,17 +69,34 @@ const ViewProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getSubCategory/${product.subCategoryId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            // console.log("response>>>>>>>>>",response.data);
+            
             setSubCategoryName(response.data.subCategory.subCategoryName);
         } catch (error) {
             console.error('Error fetching subcategory:', error);
         }
     };
+
+    const fetchUnit = async () => {
+        try {
+            const response = await axios.get(`${BaseUrl}/api/getUnit/${productVariant.unitId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("esponse.data.unit",response.data.unit.name);
+            
+            setUnitName(response.data.unit.name);
+        } catch (error) {
+            console.error('Error Fetching Error:', error);
+        }
+    }
+
     useEffect(() => {
         if (product.mainCategoryId) fetchMainCategory();
         if (product.categoryId) fetchCategory();
         if (product.subCategoryId) fetchSubCategory();
+        if (productVariant.unitId) fetchUnit();
             // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [product]);
+    }, [product,productVariant]);
     
     useEffect(() => {
         fetchProduct();
@@ -160,7 +177,7 @@ const ViewProduct = () => {
 
                 <div className="col-md-6 col-12 p-4">
                     <InfoField label="Rating" value={`⭐ ${product.rating}` || '-'} />
-                    <InfoField label="Unit" value={productVariant.unitId} />
+                    <InfoField label="Unit" value={unitName} />
                     <InfoField label="Brand" value={productVariant.specifications?.Brand || '-'} />
                     <InfoField label="Fabric" value={productVariant.specifications?.Fabric || '-'} />
                     <InfoField label="Pattern" value={productVariant.specifications?.Pattern || '-'} />
