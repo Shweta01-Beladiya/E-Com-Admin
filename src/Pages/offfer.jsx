@@ -485,7 +485,7 @@ const Offer = (props) => {
             {/* View Offer Model */}
             <Modal className='mv_logout_dialog' show={modalShow1} onHide={() => setModalShow1(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Header className='mv_contect_details_header' closeButton>
-                    <h6 className='fw-bold mb-0'>Contact Details</h6>
+                    <h6 className='fw-bold mb-0'>View Offer</h6>
                 </Modal.Header>
                 <Modal.Body>
                     {getofffer?.map((offer) => {
