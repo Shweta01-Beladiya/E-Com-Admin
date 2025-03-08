@@ -43,14 +43,15 @@ const Order = () => {
       );
     }
 
-    // Apply date filter
-    if (filterDate) {
-      const formattedFilterDate = formatDateForComparison(filterDate);
-      results = results.filter(item => {
-        const orderDate = formatDateForComparison(item.createdAt);
-        return orderDate === formattedFilterDate;
-      });
-    }
+  // Date filter
+  if (filterDate) {
+    const selectedDate = new Date(filterDate).setHours(0, 0, 0, 0);
+
+    results = results.filter(item => {
+      const orderDate = new Date(item.createdAt).setHours(0, 0, 0, 0);
+      return orderDate === selectedDate;
+    });
+  }
 
     // Apply status filter
     if (filterStatus && filterStatus !== 'Select') {
@@ -60,16 +61,6 @@ const Order = () => {
     }
 
     setFilteredData(results);
-  };
-  const formatDateForComparison = (dateString) => {
-    if (!dateString) return '';
-
-    if (dateString.includes('-')) {
-      const [year, month, day] = dateString.split('-');
-      return `${day}/${month}/${year}`;
-    }
-
-    return dateString;
   };
 
   const handleSearchChange = (e) => {
@@ -226,6 +217,7 @@ const Order = () => {
                               <option value="Delivered">Order Delivered</option>
                               <option value="Confirmed">Order Confirmed</option>
                               <option value="Cancelled">Order Cancelled</option>
+                              <option value="outForDelivery">Order Out For Delivered</option>
                             </Form.Select>
                           </div>
                         </div>
@@ -273,6 +265,8 @@ const Order = () => {
                                   <p className='m-0 mv_pending_padd'>{item.orderStatus}</p>
                                 ) : item.orderStatus === 'Cancelled' ? (
                                   <p className='m-0 mv_cancelled_padd'>{item.orderStatus}</p>
+                                ) : item.orderStatus === 'outForDelivery' ? (
+                                  <p className='m-0 mv_ondelivery_padd'>{item.orderStatus}</p>
                                 ) : null
                               }
                             </td>

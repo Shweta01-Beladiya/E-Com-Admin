@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -330,9 +330,10 @@ const Addstock = () => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button className='border-0 bg-transparent'>
-                                                    Cancel
+                                                <Link to={'/stock'} >
+                                                <button className='border-0 bg-transparent' >Cancel
                                                 </button>
+                                                </Link>
                                                 {id ?
                                                     <button type="submit" className='border-0 bg-transparent' >
                                                         Update

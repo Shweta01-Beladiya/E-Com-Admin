@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form,  Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
+import { Button, Modal, Form, Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
 import { FaFilter } from "react-icons/fa6";
 import "../CSS/riya.css";
 import { FaSearch } from 'react-icons/fa';
@@ -95,7 +95,7 @@ const SubCategory = () => {
                         categoryId: subcategoryData.categoryId,
                         subCategoryName: subcategoryData.subCategoryName
                     });
-                    
+
                     // When editing, filter categories based on the mainCategoryId
                     filterCategoriesByMainCategory(subcategoryData.mainCategoryId);
                 } catch (error) {
@@ -120,7 +120,7 @@ const SubCategory = () => {
             setFilteredCategories([]);
             return;
         }
-        
+
         const relatedCategories = category.filter(cat => cat.mainCategoryId === mainCatId);
         setFilteredCategories(relatedCategories);
     };
@@ -299,7 +299,7 @@ const SubCategory = () => {
                     <Col xs={12} md={6} lg={8}>
                         <div className="d-flex justify-content-end gap-2">
                             <Button className="r_filterbtn" onClick={() => setShowFilter(true)} >
-                                <FaFilter className='me-2' /> Filter
+                                <img src={require('../mv_img/filter.png')} alt="" style={{ width: '18px', height: '18px', marginRight: '5px' }} /> Filter
                             </Button>
                             <Button onClick={() => {
                                 // setCurrentSubCategory(null);
@@ -345,7 +345,7 @@ const SubCategory = () => {
                                                     setId(sub._id);
                                                     setShowAddEditModal(true);
                                                 }}>
-                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                 </div>
                                                 <div className="mv_pencil_icon" onClick={() => {
                                                     setId(sub._id);
@@ -412,7 +412,7 @@ const SubCategory = () => {
                                     onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                                 >
                                     <option value="">Select Category</option>
-                                    {filters.mainCategory ? 
+                                    {filters.mainCategory ?
                                         filteredCategories.map((cat) => (
                                             <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
                                         ))
@@ -436,14 +436,14 @@ const SubCategory = () => {
                             </Form.Group>
                         </Form>
                     </Offcanvas.Body>
-                    <div className="p-3 mt-auto">
-                        <div className="d-flex gap-5">
-                            <Button className="flex-grow-1 r_outlinebtn" onClick={handleClearFilters}>
-                                Cancel
-                            </Button>
-                            <Button className="flex-grow-1 r_bgbtn" type="submit" onClick={handleApplyFilters}>
-                                Apply
-                            </Button>
+                    <div class="mv_offcanvas_bottom_button">
+                        <div class="mv_logout_Model_button d-flex align-items-center justify-content-center">
+                            <div class="mv_logout_cancel">
+                                <button type="button" onClick={handleClearFilters}>Cancel</button>
+                            </div>
+                            <div class="mv_logout_button">
+                                <button type="submit" onClick={handleApplyFilters}>Apply</button>
+                            </div>
                         </div>
                     </div>
                 </Offcanvas>

@@ -20,6 +20,9 @@ const Addoffer = ({ editData }) => {
         setisedit(!isedit);
     };
 
+    const handleNavigate = () => {
+        navigate('/offer');
+    }
     // Edit Offer
     const location = useLocation();
     const editOffer = location.state?.editOffer;
@@ -121,8 +124,10 @@ const Addoffer = ({ editData }) => {
                     });
                     console.log("Response:", response?.data);
 
-                    window.location.href = "./offer"
-                    // navigate("/offer")
+                    if(response.data.status === 201) {
+                        navigate("/offer");
+                    }
+                    // window.location.href = "./offer"
 
                 } catch (error) {
                     console.error("Error:", error);
@@ -138,9 +143,10 @@ const Addoffer = ({ editData }) => {
                         }
                     });
                     console.log("Response:", response?.data);
-
-                    window.location.href = "./offer"
-                    // navigate("/offer")
+                    if(response.data.status === 200) {
+                        navigate("/offer")
+                    }
+                    // window.location.href = "./offer"
 
                 } catch (error) {
                     console.error("Error:", error);
@@ -459,8 +465,8 @@ const Addoffer = ({ editData }) => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button onClick={() => window.location.href = "/offer"} className='border-0 bg-transparent'>
-                                                    Cnacel
+                                                <button onClick={handleNavigate} className='border-0 bg-transparent'>
+                                                    Cancel
                                                 </button>
                                                 {editData?
                                                     <button type="submit" className='border-0 bg-transparent' onClick={() => setisedit()}>

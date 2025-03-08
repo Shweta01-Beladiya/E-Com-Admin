@@ -464,10 +464,7 @@ const Stock = () => {
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleResetFilters}>Reset</button>
-                                                        </div>
-                                                        <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleClose}>Cancel</button>
+                                                            <button type="button" onClick={handleResetFilters}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
                                                             <button type="button" onClick={handleApplyFilters}>Apply</button>
@@ -505,7 +502,7 @@ const Stock = () => {
                                                     <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                     <td>{item.mainCategoriesData[0]?.mainCategoryName}</td>
                                                     <td>{item.categoriesData[0]?.categoryName}</td>
-                                                    <td>{item.subCategoriesData[0].subCategoryName}</td>
+                                                    <td>{item.subCategoriesData[0]?.subCategoryName}</td>
                                                     <td>{item.productData[0]?.productName}</td>
                                                     <td>
                                                         {

@@ -851,6 +851,17 @@
     margin: 0px 14px;
     color: #fff;
 }
+.mv_edit_profile button:first-child{
+    width: 180px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 21.78px;
+    padding: 7px 0px;
+    border-radius: 4px;
+    background-color: transparent !important;
+    margin: 0px 14px;
+    color: #2B221E;
+}
 .mv_profile_type{
     padding: 30px;
 }
@@ -986,6 +997,9 @@
     .mv_edit_profile button:last-child {
         width: 140px;
     }
+    .mv_edit_profile button:first-child {
+        width: 140px;
+    }
 }
 @media (max-width: 991px){
     .mv_update_profile button{
@@ -1021,6 +1035,11 @@
         font-size: 13px;
     }
     .mv_edit_profile button:last-child {
+        width: 110px;
+        margin: 0px 10px;
+        font-size: 13px;
+    }
+    .mv_edit_profile button:first-child {
         width: 110px;
         margin: 0px 10px;
         font-size: 13px;
@@ -1093,6 +1112,11 @@
         font-size: 11px;
     }
     .mv_edit_profile button:last-child {
+        width: 85px;
+        margin: 0px 5px;
+        font-size: 11px;
+    }
+    .mv_edit_profile button:first-child {
         width: 85px;
         margin: 0px 5px;
         font-size: 11px;

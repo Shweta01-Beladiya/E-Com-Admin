@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -325,7 +325,8 @@ const Addsize = () => {
                                     <div className='text-center mt-5'>
                                         <div className="mv_edit_profile">
                                             <button type="button" className='border-0 bg-transparent'>
-                                                Cancel
+                                            <Link to={'/size'} style={{ color: '#2B221E', textDecoration: 'none' }}>Cancel
+                                            </Link>
                                             </button>
                                             {id ?
                                                 <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
