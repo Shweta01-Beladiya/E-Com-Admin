@@ -70,7 +70,7 @@ const Viewprofile = () => {
                 }
             });
 
-            console.log("response", response.data);
+            // console.log("response", response.data);
             if (response.data.status === 200) {
                 navigate('/dashboard');
             }

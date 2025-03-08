@@ -172,19 +172,13 @@ const Popularbrands = (props) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    // offcanvas price
-    const [priceRange, setPriceRange] = useState([0, 300]);
-    const handleSliderChange = (newRange) => {
-        setPriceRange(newRange);
-    };
-    
     // Edit data
     const handleEditClick = (brand) => {
         setSelectedBrand(brand);
         setShowAddForm(true);
     };
 
-    console.log("bran",selectedBrand)
+    // console.log("bran",selectedBrand)
 
     if (showAddForm) {
         return (

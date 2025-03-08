@@ -40,7 +40,7 @@ const Addpopularbrands = ({ editData }) => {
     // Edit Popularbrands
     const location = useLocation();
     const editPopularbrands = location.state?.editPopularbrands;
-    console.log(editPopularbrands)
+    // console.log(editPopularbrands)
 
     // Select img
     let [brandimg, setbrandimg] = useState("");
@@ -108,11 +108,11 @@ const Addpopularbrands = ({ editData }) => {
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                    console.log("Response:", response?.data);
-
-                    window.location.href = "./popularbrands"
-                    // navigate("/popularbrands")
-
+                    // console.log("Response:", response?.data);
+                    if(response.data.status === 200){
+                        navigate("/popularbrands")
+                    }
+                    // window.location.href = "./popularbrands"
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");
@@ -126,11 +126,11 @@ const Addpopularbrands = ({ editData }) => {
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                    console.log("Response:", response?.data);
-
-                    window.location.href = "./popularbrands"
-                    // navigate("/popularbrands")
-
+                    // console.log("Response:", response?.data);
+                    if(response.data.status === 201) {
+                        navigate("/popularbrands")
+                    }
+                    // window.location.href = "./popularbrands"
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");

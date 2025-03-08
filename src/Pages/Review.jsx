@@ -178,7 +178,7 @@ const ReviewManagement = () => {
         </div>
         <div className="row mt-4">
           <div className="col-12">
-            <div className="mv_product_table_content" style={{ height: '80vh' }}>
+            <div className="mv_product_table_content" >
               <div className='mv_table_search'>
                 <div className="mv_product_search">
                   <InputGroup>

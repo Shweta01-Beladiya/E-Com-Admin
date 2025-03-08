@@ -181,7 +181,7 @@ const Order = () => {
         </div>
         <div className="row mt-4">
           <div className="col-12">
-            <div className="mv_product_table_content" style={{ height: '80vh' }}>
+            <div className="mv_product_table_content">
               <div className='mv_table_search'>
                 <div className="mv_product_search">
                   <InputGroup>
@@ -317,7 +317,7 @@ const Order = () => {
       </div>
 
       {/* Delete Product Model */}
-      <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+      <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg"  centered >
         <Modal.Body className='text-center mv_logout'>
           <h5 className='mb-2'>Delete</h5>
           <p>Are you sure you want to <br /> delete? </p>
