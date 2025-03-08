@@ -6,13 +6,11 @@ import { useFormik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
 
-const Addpopularbrands = ({ editData }) => {
+const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
     const navigate = useNavigate()
-    const [toggle, setToggle] = useState(false)
-    const [myToggle, setMyToggle] = useState(false)
 
     // State variables
     let [isedit, setisedit] = useState(false);
@@ -48,6 +46,7 @@ const Addpopularbrands = ({ editData }) => {
 
     const [brandLogoPreview, setBrandLogoPreview] = useState(null);
     const [brandImagePreview, setBrandImagePreview] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (editData) {
@@ -82,62 +81,54 @@ const Addpopularbrands = ({ editData }) => {
         initialValues: addpopularbrandInit,
         validationSchema: addpopularbrandValidate,
         onSubmit: async (values) => {
-            console.log(values);
+            setIsSubmitting(true);
+            
+            try {
+                const formData = new FormData();
+                formData.append("brandName", values.brandname);
+                formData.append("offer", values.offer);
+                formData.append("title", values.title);
+                
+                if (values.brandLogo) {
+                    formData.append("brandLogo", values.brandLogo);
+                }
+                if (values.addpopularbrandimage) {
+                    formData.append("brandImage", values.addpopularbrandimage);
+                }
 
-            // addpopularbrand(values)
-            const formData = new FormData();
-            formData.append("brandName", values.brandName);
-            formData.append("offer", values.offer);
-            formData.append("title", values.title);
-            // formData.append("brandLogo", values.brandLogo);  
-            // formData.append("brandImage", values.addpopularbrandimage);
-
-            if (values.brandLogo) {
-                formData.append("brandLogo", values.brandLogo);
-            }
-            if (values.addpopularbrandimage) {
-                formData.append("brandImage", values.addpopularbrandimage);
-            }
-
-            //************************************** Edit and Add **************************************
-            if (editData) {
-                try {
-                    const response = await axios.put(`${BaseUrl}/api/updateBrand/${editData._id}`, formData, {
+                let response;
+                if (editData) {
+                    // Update existing brand
+                    response = await axios.put(`${BaseUrl}/api/updateBrand/${editData._id}`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                    // console.log("Response:", response?.data);
-                    if(response.data.status === 200){
-                        navigate("/popularbrands")
-                    }
-                    // window.location.href = "./popularbrands"
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
-                }
-            }
-            else {
-                try {
-                    const response = await axios.post(`${BaseUrl}/api/createPopularBrand`, formData, {
+                } else {
+                    // Create new brand
+                    response = await axios.post(`${BaseUrl}/api/createPopularBrand`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                    // console.log("Response:", response?.data);
-                    if(response.data.status === 201) {
-                        navigate("/popularbrands")
-                    }
-                    // window.location.href = "./popularbrands"
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
                 }
+
+                if (response.data.status === 200 || response.data.status === 201) {
+                    // Call the success callback provided by parent component
+                    if (onSubmitSuccess) {
+                        onSubmitSuccess();
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error submitting form. Please try again.");
+            } finally {
+                setIsSubmitting(false);
             }
         }
-    })
+    });
     // **************************************************************************
 
     return (
@@ -238,7 +229,6 @@ const Addpopularbrands = ({ editData }) => {
                                                                     setFieldValue("brandLogo", file);
                                                                     setBrandLogoPreview(URL.createObjectURL(file));
                                                                 }
-                                                                setMyToggle(true)
                                                             }}
                                                         />
                                                     </label>
@@ -288,7 +278,6 @@ const Addpopularbrands = ({ editData }) => {
                                                                     setFieldValue("addpopularbrandimage", file);
                                                                     setBrandImagePreview(URL.createObjectURL(file));
                                                                 }
-                                                                setToggle(true)
                                                             }}
                                                         />
                                                     </label>
@@ -315,7 +304,7 @@ const Addpopularbrands = ({ editData }) => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button onClick={() => window.location.href = "/popularbrands"} className='border-0 bg-transparent'>
+                                                <button onClick={onCancel} className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
                                                 {editData ?
