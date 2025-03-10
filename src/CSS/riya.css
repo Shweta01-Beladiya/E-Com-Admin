@@ -40,11 +40,21 @@ tr th{
     width: 250px !important;
   }
   .r_filterbtn{
-    border-radius: 5px !important;
-    border: 1px solid #95908F !important;
-    color: black !important;
-    padding: 5px 30px !important;
+    width: 120px;
+    background-color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 19.36px;
+    border: 1px solid #95908F;
+    border-radius: 4px;
+    padding: 6px 15px !important;
+    margin-right: 15px;
+    color: #2B221E;
+  }
+  .r_filterbtn:hover{
     background-color: transparent !important;
+    color: #2B221E !important;
+    border-color: #2B221E !important;
   }
   .r_deleticon{
     border: 1px solid #95908F !important;

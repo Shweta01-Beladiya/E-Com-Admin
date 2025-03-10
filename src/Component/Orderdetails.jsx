@@ -43,13 +43,14 @@ const Order = () => {
         </div>
         <div>
           <p
-            className={`mb-0 fs-6 mt-md-0 mt-3 ${
-              data.orderStatus === "Delivered"
+            className={`mb-0 fs-6 mt-md-0 mt-3 ${data.orderStatus === "Delivered"
                 ? "mv_delivered_padd"
                 : data.orderStatus === "Confirmed"
-                ? "mv_pending_padd"
-                : "mv_cancelled_padd"
-            }`}
+                  ? "mv_pending_padd"
+                  : data.orderStatus === "Cancelled"
+                    ? "mv_cancelled_padd"
+                    : "mv_ondelivery_padd"
+              }`}
           >
             {data[0].orderStatus}
           </p>

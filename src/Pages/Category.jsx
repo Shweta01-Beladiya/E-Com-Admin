@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {Button, Offcanvas, Modal, Form, Row,  Col, InputGroup } from 'react-bootstrap';
+import { Button, Offcanvas, Modal, Form, Row, Col, InputGroup } from 'react-bootstrap';
 import { FiFilter } from 'react-icons/fi';
-import { FaSearch } from 'react-icons/fa';
+import { FaFilter, FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
 import axios from 'axios';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-icons/md';
@@ -290,7 +290,7 @@ const Category = () => {
                                 className="r_filterbtn"
                                 onClick={() => setShowFilter(true)}
                             >
-                                <FiFilter className="me-2" /> Filter
+                                <img src={require('../mv_img/filter.png')} alt="" style={{ width: '18px', height: '18px', marginRight: '5px' }} /> Filter
                             </Button>
                             <Button onClick={() => setShowAddModal(true)} className="r_add">
                                 + Add
@@ -405,15 +405,14 @@ const Category = () => {
                         </Form.Group>
                     </Form>
                 </Offcanvas.Body>
-                <div className="p-3 mt-auto">
-                    <div className="d-flex gap-5">
-                        <Button className="flex-grow-1 r_outlinebtn" onClick={clearFilters}>
-                            Cancel
-                        </Button>
-                        <Button className="flex-grow-1 r_bgbtn" onClick={applyFilters}>
-                            Apply
-                        </Button>
-
+                <div class="mv_offcanvas_bottom_button">
+                    <div class="mv_logout_Model_button d-flex align-items-center justify-content-center">
+                        <div class="mv_logout_cancel">
+                            <button type="button" onClick={clearFilters}>Cancel</button>
+                        </div>
+                        <div class="mv_logout_button">
+                            <button type="submit" onClick={applyFilters}>Apply</button>
+                        </div>
                     </div>
                 </div>
             </Offcanvas>

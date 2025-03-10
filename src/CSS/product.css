@@ -217,7 +217,7 @@
     padding: 5px 10px;
     color: #0D894F;
     background-color: #EDFBE3;
-    width: 120px;
+    width: 130px;
     text-align: center;
     font-weight: 600;
 }
@@ -225,7 +225,7 @@
     padding: 5px 10px;
     color: #DF8600;
     background-color: #EDFBE3;
-    width: 120px;
+    width: 130px;
     text-align: center;
     font-weight: 600;
 }
@@ -233,7 +233,15 @@
     padding: 5px 10px;
     color: #FF0000;
     background-color: #EDFBE3;
-    width: 120px;
+    width: 130px;
+    text-align: center;
+    font-weight: 600;
+}
+.mv_ondelivery_padd{
+    padding: 5px 10px;
+    color: #191188;
+    background-color: #EDFBE3;
+    width: 130px;
     text-align: center;
     font-weight: 600;
 }

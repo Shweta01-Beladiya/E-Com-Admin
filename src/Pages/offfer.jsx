@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 import Addpopularbrands from './add_offer';
 
-const Offer = (props) => {
+const Offer = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
@@ -111,7 +111,7 @@ const Offer = (props) => {
                     Authorization: `Bearer ${token}`,
                 }
               })
-              console.log("data" , response?.data);
+            //   console.log("data" , response?.data);
               setFilteredData(response?.data?.offers )
               setData(response?.data?.offers)
            }catch(error){
@@ -156,7 +156,7 @@ const Offer = (props) => {
     const [currentPage, setCurrentPage] = useState(1);
  
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
  
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -213,7 +213,7 @@ const Offer = (props) => {
                     "Content-Type": "multipart/form-data"
                 }
             }).then((res)=>{
-                console.log('res',res.data.offer);
+                // console.log('res',res.data.offer);
                 setOffer(res.data.offer);
             });
         } catch (error) {
@@ -228,34 +228,13 @@ const Offer = (props) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    // offcanvas price
-    const [priceRange, setPriceRange] = useState([0, 300]);
-    const handleSliderChange = (newRange) => {
-        setPriceRange(newRange);
-    };
-
-    // Date function
-    let [date, setDate] = useState('Select Date');
-    let [date1, setDate1] = useState('Select Date');
-
-    const handleDateChange = (e, dateType) => {
-        const [year, month, day] = e.target.value.split("-");
-        const formattedDate = `${day}-${month}-${year}`;
-        
-        if (dateType === 'start') {
-            setDate(formattedDate);
-        } else if (dateType === 'end') {
-            setDate1(formattedDate);
-        }
-    };
-
     // Edit data
     const handleEditClick = (brand) => {
         setSelectedBrand(brand);
         setShowAddForm(true);
     };
 
-    console.log("bran",selectedBrand)
+    // console.log("bran",selectedBrand)
 
     if (showAddForm) {
         return (

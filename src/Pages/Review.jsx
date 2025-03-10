@@ -111,11 +111,12 @@ const ReviewManagement = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         // console.log("repsonse", response.data.ratingAndReview);
-        setData(response.data.ratingAndReview);
+        // setData(response.data.ratingAndReview);
         const formattedData = response.data.ratingAndReview.map(item => {
           return {
             id: item._id,
             customerName: item.userData[0]?.name,
+            customerImage: item.userData[0]?.image,
             product: item.productData[0]?.productName,
             date: new Date(item.createdAt).toLocaleDateString(),
             rate: parseFloat(item.rating),
@@ -137,6 +138,7 @@ const ReviewManagement = () => {
   }, []);
 
   const handleViewModal = (item) => {
+    
     setSelectedItem(item);
     setViewModalShow(true);
   }
@@ -270,7 +272,7 @@ const ReviewManagement = () => {
       </Modal>
 
       {/* view Review Model */}
-      <Modal className='mv_logout_dialog' show={viewModalShow} onHide={() => setViewModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+      <Modal className='mv_logout_dialog' show={viewModalShow} onHide={() => setViewModalShow(false)} size="lg"  centered >
         <Modal.Body className='text-center'>
           <Modal.Header closeButton className="r_modalheader p-0"></Modal.Header>
           {selectedItem && (
@@ -280,7 +282,7 @@ const ReviewManagement = () => {
                 <tbody>
                   <tr>
                     <td>Profile Photo : </td>
-                    <td><img src={require('../s_img/profile.png')} alt="" /></td>
+                    <td><img src={`${BaseUrl}/${selectedItem.customerImage}`} alt=""  style={{width:'50px', height:'50px', objectFit:'cover'}}/></td>
                   </tr>
                   <tr>
                     <td>Name : </td>

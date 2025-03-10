@@ -155,7 +155,7 @@ const Productoffer = () => {
             item.price >= filterCriteria.minPrice &&
             item.price <= filterCriteria.maxPrice
         );
-        console.log("result>>>>>>>>>", result);
+        // console.log("result>>>>>>>>>", result);
 
         setFilteredData(result);
         setCurrentPage(1);
