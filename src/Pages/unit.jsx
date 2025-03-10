@@ -104,7 +104,7 @@ const Unit = () => {
         shortName: Yup.string().required("Short Name is required")
     })
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm } = useFormik({
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm, setFieldError } = useFormik({
         initialValues: { name: selectedUnit.name, shortName: selectedUnit.shortName },
         validationSchema: validate,
         enableReinitialize: true,
@@ -145,6 +145,9 @@ const Unit = () => {
                 }
             } catch (error) {
                 console.error('Data Add and Upadte Error:', error);
+                if (error.response && error.response.status === 409) {
+                    setFieldError('name', 'Unit name already exists');
+                }
             }
         }
     })
@@ -255,7 +258,7 @@ const Unit = () => {
                                             <tbody>
                                                 {paginatedData?.map((item, index) => (
                                                     <tr key={index}>
-                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.name}</td>
                                                         <td>{item.shortName}</td>
                                                         <td>
@@ -297,7 +300,7 @@ const Unit = () => {
                                     )}
                                 </>
                             ) : (
-                              <NoResultsFound/>  
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>
@@ -356,17 +359,17 @@ const Unit = () => {
                             </InputGroup>
                             {errors.shortName && touched.shortName && <div className="text-danger small">{errors.shortName}</div>}
                         </div>
-                        <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
-                            <div className="mv_logout_cancel">
-                                <button type="button" onClick={() => { setModalShow1(false); setSelectedUnit({ name: '', shortName: '' }); }}>
-                                    Cancel</button>
+                            <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
+                                <div className="mv_logout_cancel">
+                                    <button type="button" onClick={() => { setModalShow1(false); setSelectedUnit({ name: '', shortName: '' }); }}>
+                                        Cancel</button>
+                                </div>
+                                <div className="mv_logout_button">
+                                    <button type="submit">
+                                        {id ? 'Update' : 'Add'}
+                                    </button>
+                                </div>
                             </div>
-                            <div className="mv_logout_button">
-                                <button type="submit">
-                                    {id ? 'Update' : 'Add'}
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </Modal.Body>
             </Modal>
