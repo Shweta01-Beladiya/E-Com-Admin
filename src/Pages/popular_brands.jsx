@@ -19,7 +19,7 @@ const Popularbrands = (props) => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState({
-        brandname: '',
+        brandName: '',
     });
     const [tempFilters, setTempFilters] = useState(filters);
 
@@ -27,6 +27,7 @@ const Popularbrands = (props) => {
     const [editpopularbrands,setEditPopularbrands] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
+    const [refreshData, setRefreshData] = useState(false);
 
     const navigate = useNavigate();
 
@@ -88,7 +89,7 @@ const Popularbrands = (props) => {
        }
 
        fetchBrandData()
-    },[toggle])
+    },[toggle, refreshData])
     // ***************************************************************************************
 
     // ************************************** Delete Item **************************************
@@ -106,7 +107,7 @@ const Popularbrands = (props) => {
            })
            console.log("delete response " , response);
            setModalShow(false)
-           seToggle((count)=> count + 1)
+           seToggle(prev => !prev);
         }catch(error){
             alert(error)
         }
@@ -180,10 +181,22 @@ const Popularbrands = (props) => {
 
     // console.log("bran",selectedBrand)
 
+    // Handle form submission callback
+    const handleFormSubmit = () => {
+        setShowAddForm(false);
+        setSelectedBrand(null);
+        setRefreshData(prev => !prev);
+    };
+
     if (showAddForm) {
         return (
             <Addpopularbrands 
                 editData={selectedBrand}
+                onCancel={() => {
+                    setShowAddForm(false);
+                    setSelectedBrand(null);
+                }}
+                onSubmitSuccess={handleFormSubmit}
             />
         );
     }
@@ -287,8 +300,7 @@ const Popularbrands = (props) => {
                                             <td>{item?.title}</td>
                                             <td className='d-flex align-items-center justify-content-end'>
                                                 <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    
+                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                 </div>
                                                 <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />
