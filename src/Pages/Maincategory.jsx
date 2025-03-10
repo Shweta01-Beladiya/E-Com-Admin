@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import '../CSS/riya.css';
@@ -141,33 +140,20 @@ const MainCategory = () => {
   };
 
   const getPaginationButtons = () => {
+    if (totalPages <= 4) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+  
     const buttons = [];
-    const maxButtonsToShow = 5;
-
-    let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-    // Adjust startPage if we're near the end
-    if (endPage - startPage + 1 < maxButtonsToShow) {
-      startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+  
+    if (currentPage <= 2) {
+      buttons.push(1, 2, 3, "...");
+    } else if (currentPage >= totalPages - 1) {
+      buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
     }
-
-    // Add first page if not included
-    if (startPage > 1) {
-      buttons.push(1);
-      if (startPage > 2) buttons.push('...');
-    }
-
-    // Add main page numbers
-    for (let i = startPage; i <= endPage; i++) {
-      buttons.push(i);
-    }
-
-    // Add last page if not included
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) buttons.push('...');
-      buttons.push(totalPages);
-    }
+  
     return buttons;
   };
 
@@ -253,17 +239,24 @@ const MainCategory = () => {
                     </table>
                   </div>
                   {totalPages > 1 && (
-                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                      <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                    <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                      {/* Previous Button */}
+                      <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                        onClick={() => handlePageChange(currentPage - 1)}>
                         <MdOutlineKeyboardArrowLeft />
                       </p>
+                      {/* Pagination Buttons */}
                       {getPaginationButtons().map((page, index) => (
-                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                          onClick={() => handlePageChange(page)}>
+                        <p key={index}
+                          className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                          onClick={() => typeof page === "number" && handlePageChange(page)}
+                          style={{ cursor: page === "..." ? "default" : "pointer" }}>
                           {page}
                         </p>
                       ))}
-                      <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                      {/* Next Button */}
+                      <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                        onClick={() => handlePageChange(currentPage + 1)} >
                         <MdOutlineKeyboardArrowRight />
                       </p>
                     </div>
@@ -283,22 +276,33 @@ const MainCategory = () => {
         }}
         centered
       >
-        <Modal.Header closeButton className="r_modalheader" />
+        <Modal.Header className='mv_edit_profile_header' closeButton>
+
+        </Modal.Header>
+        <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
+          <p className="mb-0">Add Main Category</p>
+        </Modal.Title>
         <Modal.Body className="r_modalbody">
-          <p className="text-center fw-bold">Add Main Category</p>
           <Formik
             validationSchema={categorySchema}
             onSubmit={handleSubmit}
             initialValues={initialValues}
           >
-            {({ handleChange, handleSubmit, values, setFieldError , touched }) => (
+            {({ handleBlur, handleChange, handleSubmit, values, setFieldError , touched }) => (
               <Form className="r_form" onSubmit={handleSubmit}>
-                <Form.Group>
-                  <Form.Label>Main Category</Form.Label>
-                  <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category " value={values.mainCategoryName}
-                    onChange={handleChange} />
+                <div className="mv_input_content mb-5">
+                  <label className='mv_label_input'>Main Category</label>
+                  <InputGroup className="">
+                    <Form.Control
+                      placeholder="Enter main category"
+                      name='mainCategoryName'
+                      value={values.mainCategoryName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    </InputGroup>
                   <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
-                </Form.Group>
+                </div>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button
                     variant="secondary"
@@ -325,10 +329,13 @@ const MainCategory = () => {
         onHide={() => setShowEditModal(false)}
         centered
       >
-        <Modal.Header closeButton className="r_modalheader">
+        <Modal.Header className='mv_edit_profile_header' closeButton>
+
         </Modal.Header>
+        <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
+          <p className="mb-0">Add Main Category</p>
+        </Modal.Title>
         <Modal.Body className="r_modalbody">
-          <p className="text-center fw-bold">Edit Main Category</p>
           <Formik
             validationSchema={categorySchema}
             onSubmit={handleSubmit}
@@ -337,14 +344,21 @@ const MainCategory = () => {
             }}
             enableReinitialize
           >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
+            {({ handleBlur, handleChange, handleSubmit, values, errors, touched }) => (
               <Form className="r_form" onSubmit={handleSubmit}>
-                <Form.Group>
-                  <Form.Label>Main Category</Form.Label>
-                  <Field type="text" name="mainCategoryName" className="form-control" placeholder="Enter main category " value={values.mainCategoryName}
-                    onChange={handleChange} />
-                  <ErrorMessage name="mainCategoryName" component="div" className="text-danger small" />
-                </Form.Group>
+                <div className="mv_input_content mb-5">
+                  <label className='mv_label_input'>Main Category</label>
+                  <InputGroup className="">
+                    <Form.Control
+                      placeholder="Enter main category"
+                      name='mainCategoryName'
+                      value={values.mainCategoryName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    />
+                    </InputGroup>
+                  <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
+                </div>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button onClick={() => setShowEditModal(false)} className="r_cancel">
                     Cancel

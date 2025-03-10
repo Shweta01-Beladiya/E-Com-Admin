@@ -413,7 +413,7 @@
 }
 .mv_view_product_img{
     width: 100%;
-    height: auto;
+    height: 122px;
 }
 .mv_view_product_heading{
     font-weight: 600;
@@ -469,6 +469,16 @@
     .mv_offer_details_sub_heading{
         font-size: 12px;
         margin-bottom: 10px;
+    }
+}
+@media(max-width:575px){
+    .mv_view_product_img{
+        height: 104px;
+    }
+}
+@media(max-width:375px){
+    .mv_view_product_img{
+        height: 84px;
     }
 }
 /* ************************************************ */

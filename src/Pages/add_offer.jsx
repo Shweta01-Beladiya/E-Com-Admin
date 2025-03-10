@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef, use } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
 
-const Addoffer = ({ editData }) => {
+const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
@@ -20,19 +20,12 @@ const Addoffer = ({ editData }) => {
         setisedit(!isedit);
     };
 
-    const handleNavigate = () => {
-        navigate('/offer');
-    }
-    // Edit Offer
-    const location = useLocation();
-    const editOffer = location.state?.editOffer;
-    // console.log(editOffer)
-
     // Select img
     let [addimg, setaddimg] = useState("");
 
     const [brandImagePreview, setBrandImagePreview] = useState(null);
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     useEffect(() => {
         if (editData && editData.offerImage) {
             try {
@@ -96,65 +89,56 @@ const Addoffer = ({ editData }) => {
         initialValues: addofferInit,
         validationSchema: addofferValidate,
         onSubmit: async (values) => {
-            console.log(values);
-            // addproductoffer(values)
+            setIsSubmitting(true);
 
-            const formData = new FormData();
-            formData.append("mainCategoryId", values.mainCategoryId);
-            formData.append("categoryId", values.categoryId);
-            formData.append("subCategoryId", values.subCategoryId);
-            formData.append("offerType", values.offerType);
-            formData.append("offerName", values.offerName);
-            if (values.addpopularbrandimage) {
-                formData.append("offerImage", values.addpopularbrandimage);
-            }
-            formData.append("buttonText", values.buttonText);
-            formData.append("startDate", values.startDate);
-            formData.append("endDate", values.endDate);
-            formData.append("description", values.description);
+            try {
+                const formData = new FormData();
+                formData.append("mainCategoryId", values.mainCategoryId);
+                formData.append("categoryId", values.categoryId);
+                formData.append("subCategoryId", values.subCategoryId);
+                formData.append("offerType", values.offerType);
+                formData.append("offerName", values.offerName);
+                if (values.addpopularbrandimage) {
+                    formData.append("offerImage", values.addpopularbrandimage);
+                }
+                formData.append("buttonText", values.buttonText);
+                formData.append("startDate", values.startDate);
+                formData.append("endDate", values.endDate);
+                formData.append("description", values.description);
 
-            //************************************** Edit and Add **************************************
-            if (editData) {
-                try {
-                    const response = await axios.put(`${BaseUrl}/api/updateOffer/${editData._id}`, formData, {
+                let response;
+                //************************************** Edit and Add **************************************
+                if (editData) {
+                    response = await axios.put(`${BaseUrl}/api/updateOffer/${editData._id}`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                    console.log("Response:", response?.data);
-
-                    if(response.data.status === 201) {
-                        navigate("/offer");
-                    }
-                    // window.location.href = "./offer"
-
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
-                }
-            }
-            else {
-                try {
-                    const response = await axios.post(`${BaseUrl}/api/createOffer`, formData, {
+                }else {
+                    response = await axios.post(`${BaseUrl}/api/createOffer`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                    console.log("Response:", response?.data);
-                    if(response.data.status === 200) {
-                        navigate("/offer")
-                    }
-                    // window.location.href = "./offer"
-
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
                 }
+                
+                if (response.data.status === 200 || response.data.status === 201) {
+                    // Call the success callback provided by parent component
+                    if (onSubmitSuccess) {
+                        onSubmitSuccess();
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error submitting form. Please try again.");
+            } finally {
+                setIsSubmitting(false);
             }
         }
-    })
+    });
+
     const [mainCategory, setMainCategory] = useState([]);
     const [categories, setCategories] = useState([]);
     const [subcategories, setsubCategories] = useState([]);
@@ -210,6 +194,7 @@ const Addoffer = ({ editData }) => {
         fetchMainCategory();
         fetchCategory();
         fetchsubCategory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
     // Set initial selected categories and subcategories when editData is loaded
@@ -220,6 +205,7 @@ const Addoffer = ({ editData }) => {
         if (editData && editData.categoryId) {
             sCategory(editData.categoryId);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editData, categories, subcategories]);
     // **************************************************************************
 
@@ -465,7 +451,7 @@ const Addoffer = ({ editData }) => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button onClick={handleNavigate} className='border-0 bg-transparent'>
+                                                <button onClick={onCancel} className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
                                                 {editData?

@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
@@ -10,35 +9,13 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
-    const navigate = useNavigate()
 
     // State variables
     let [isedit, setisedit] = useState(false);
-    // let [brandName, setBrandName] = useState("");
-    // let [offer, setOffer] = useState("");
-    // let [title, setTitle] = useState("");
 
     let change_edit = () => {
         setisedit(!isedit);
     };
-
-    // let handlesubmit = (event) => {
-    //     event.preventDefault();
-
-    //     const formData = {
-    //         brandName,
-    //         offer,
-    //         title,
-    //     };
-
-    //     console.log("Form Submitted:", formData);
-    //     setisedit(false);
-    // };
-
-    // Edit Popularbrands
-    const location = useLocation();
-    const editPopularbrands = location.state?.editPopularbrands;
-    // console.log(editPopularbrands)
 
     // Select img
     let [brandimg, setbrandimg] = useState("");
@@ -58,6 +35,7 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
             setaddimg(filename.substring(filename.indexOf('-') + 1));
             setBrandImagePreview(`${BaseUrl}/${editData.brandImage}`);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editData]);
 
     // ******************************* Validation *******************************

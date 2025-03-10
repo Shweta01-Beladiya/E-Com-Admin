@@ -48,17 +48,17 @@ const Viewtermsconditions = () => {
     }, {});
 
     // Function to split description into bullet points with title
-    const getDescriptionItems = (title, description) => {
-        if (!description) return [];
+    // const getDescriptionItems = (title, description) => {
+    //     if (!description) return [];
 
-        let items = description.split(/\r?\n/).filter(item => item.trim() !== '');
+    //     let items = description.split(/\r?\n/).filter(item => item.trim() !== '');
 
-        if (items.length === 0) {
-            return [`${title}: No description available`];
-        }
+    //     if (items.length === 0) {
+    //         return [`${title}: No description available`];
+    //     }
 
-        return [`${title}:`, ...items];
-    };
+    //     return [`${title}:`, ...items];
+    // };
 
     return (
         <>

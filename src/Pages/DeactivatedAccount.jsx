@@ -15,8 +15,7 @@ const DeactivatedAccount = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredData, setFilteredData] = useState([]);
-
+    // const [filteredData, setFilteredData] = useState([]);
 
     const handleSearch = (e) => {
         const query = e.target.value.toLowerCase();
@@ -34,7 +33,7 @@ const DeactivatedAccount = () => {
             item.mobileNo?.toLowerCase().includes(query)
         );
     
-        setFilteredData(filtered);
+        // setFilteredData(filtered);
         setTotalPages(Math.ceil(filtered.length / itemsPerPage));
         setData(filtered.slice(0, itemsPerPage));
     };    
@@ -62,6 +61,7 @@ const DeactivatedAccount = () => {
 
     useEffect(() => {
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, searchQuery]); 
     
 
@@ -71,21 +71,22 @@ const DeactivatedAccount = () => {
     };
 
     const getPaginationButtons = () => {
+        if (totalPages <= 4) {
+          return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+      
         const buttons = [];
-        const maxButtonsToShow = 3;
-        let startPage = Math.max(currentPage - 1, 1);
-        let endPage = Math.min(startPage + maxButtonsToShow - 1, totalPages);
-
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(endPage - maxButtonsToShow + 1, 1);
+      
+        if (currentPage <= 2) {
+          buttons.push(1, 2, 3, "...");
+        } else if (currentPage >= totalPages - 1) {
+          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
+      
         return buttons;
-    };
+      };
 
     return (
         <>
@@ -137,19 +138,24 @@ const DeactivatedAccount = () => {
                                     </tbody>
                                 </table>
                                 {totalPages > 1 && (
-                                    <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                    <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                        {/* Previous Button */}
+                                        <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                            onClick={() => handlePageChange(currentPage - 1)}>
                                             <MdOutlineKeyboardArrowLeft />
                                         </p>
-                                        {getPaginationButtons().map((page) => (
-                                            <p key={`page-${page}`}
-                                                className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                onClick={() => handlePageChange(page)}>
-                                                {page}
+                                        {/* Pagination Buttons */}
+                                        {getPaginationButtons().map((page, index) => (
+                                            <p key={index}
+                                            className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                            onClick={() => typeof page === "number" && handlePageChange(page)}
+                                            style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                            {page}
                                             </p>
                                         ))}
-
-                                        <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                        {/* Next Button */}
+                                        <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                            onClick={() => handlePageChange(currentPage + 1)} >
                                             <MdOutlineKeyboardArrowRight />
                                         </p>
                                     </div>

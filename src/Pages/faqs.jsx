@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import { Dropdown, DropdownButton, InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
@@ -34,33 +34,20 @@ const Faqs = (props) => {
     };
 
     const getPaginationButtons = () => {
+        if (totalPages <= 4) {
+          return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+      
         const buttons = [];
-        const maxButtonsToShow = 5;
-        
-        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-        
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+      
+        if (currentPage <= 2) {
+          buttons.push(1, 2, 3, "...");
+        } else if (currentPage >= totalPages - 1) {
+          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-
-        // Add first page if not included
-        if (startPage > 1) {
-            buttons.push(1);
-            if (startPage > 2) buttons.push('...');
-        }
-
-        // Add main page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
-        // Add last page if not included
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) buttons.push('...');
-            buttons.push(totalPages);
-        }
+      
         return buttons;
     };
 
@@ -160,14 +147,14 @@ const Faqs = (props) => {
                  }
                })
                console.log("data" , response?.data);
-               setFilteredData(response?.data?.
-                faqs)
+               setFilteredData(response?.data?.faqs)
                setData(response?.data?.faqs)
             }catch(error){
                console.error("Error fetching data:", error);
             }
         }
         fetchBrandData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[toggle])
     // ***************************************************************************************
  
@@ -301,17 +288,24 @@ const Faqs = (props) => {
                                 </table>
                             </div>
                             {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                    {/* Previous Button */}
+                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                        onClick={() => handlePageChange(currentPage - 1)}>
                                         <MdOutlineKeyboardArrowLeft />
                                     </p>
+                                    {/* Pagination Buttons */}
                                     {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
+                                        <p key={index}
+                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                        onClick={() => typeof page === "number" && handlePageChange(page)}
+                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                        {page}
                                         </p>
                                     ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                    {/* Next Button */}
+                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                        onClick={() => handlePageChange(currentPage + 1)} >
                                         <MdOutlineKeyboardArrowRight />
                                     </p>
                                 </div>
@@ -322,7 +316,7 @@ const Faqs = (props) => {
             </div>
 
             {/* Delete FAQ’s Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
                     <p>Are you sure you want to delete FAQ’s?</p>

@@ -465,7 +465,7 @@
         display: block;
     }
 }
-@media (max-width: 1400px){
+@media (max-width: 1440px){
     /* product list table */
     .mv_product_table_padd{
         overflow-x: scroll !important;
