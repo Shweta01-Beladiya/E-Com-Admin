@@ -167,6 +167,7 @@ const Unit = () => {
                 }
                 
                 setData(newData);
+                setId(null);
             }
         } catch (error) {
             console.error('Data Delete Error:', error);

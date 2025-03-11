@@ -11,7 +11,7 @@ import NoResultsFound from '../Component/Noresult';
 
 
 const ContactUs = () => {
-   
+
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
@@ -22,7 +22,7 @@ const ContactUs = () => {
     const [id, setId] = useState(null);
     const [viewData, setViewData] = useState({});
     const [selectedSubject, setSelectedSubject] = useState("");
-    const [data,setData] = useState([]);
+    const [data, setData] = useState([]);
     // const [filteredData, setFilteredData] = useState(data);
     // const [viewModal, setViewModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -57,10 +57,10 @@ const ContactUs = () => {
         const filtered = sourceData.filter(filterFunction);
         const total = Math.ceil(filtered.length / itemsPerPage);
         setTotalPages(total);
-        
+
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        
+
         setData(filtered.slice(startIndex, endIndex));
     };
 
@@ -77,7 +77,7 @@ const ContactUs = () => {
     }, [currentPage, searchQuery, selectedSubject]);
 
     useEffect(() => {
-        if(id) {
+        if (id) {
             const fetchdata = async () => {
                 try {
                     const response = await axios.get(`${BaseUrl}/api/getContactUs/${id}`, {
@@ -85,7 +85,7 @@ const ContactUs = () => {
                     });
                     // console.log("response", response.data.contactUs);
                     setViewData(response.data.contactUs);
-    
+
                 } catch (error) {
                     console.error('Data Fetching Error:', error);
                 }
@@ -116,7 +116,7 @@ const ContactUs = () => {
 
         return matchesSearch && matchesSubject;
     };
-    
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
@@ -125,22 +125,22 @@ const ContactUs = () => {
 
     const getPaginationButtons = () => {
         if (totalPages <= 4) {
-          return Array.from({ length: totalPages }, (_, i) => i + 1);
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
-      
+
         const buttons = [];
-      
+
         if (currentPage <= 2) {
-          buttons.push(1, 2, 3, "...");
+            buttons.push(1, 2, 3, "...");
         } else if (currentPage >= totalPages - 1) {
-          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
         } else {
-          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-      
+
         return buttons;
     };
-
+    const paginatedData = data;
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [viewModal, setViewModal] = useState(false);
@@ -179,13 +179,13 @@ const ContactUs = () => {
             const response = await axios.delete(`${BaseUrl}/api/deleteContactUs/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log("response",response.data);
-            if(response.data.status === 200) {
-                setAllData(prevData => prevData.filter(item => item._id !== id)); 
-                
+            console.log("response", response.data);
+            if (response.data.status === 200) {
+                setAllData(prevData => prevData.filter(item => item._id !== id));
+
                 const updatedAllData = allData.filter(item => item._id !== id);
                 updateDisplayedData(updatedAllData);
-                
+
                 setModalShow(false);
                 setId(null);
             }
@@ -213,11 +213,11 @@ const ContactUs = () => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
-                                        value={searchQuery}
-                                        onChange={handleSearch}
+                                            placeholder="Search..."
+                                            aria-label="Username"
+                                            aria-describedby="basic-addon1"
+                                            value={searchQuery}
+                                            onChange={handleSearch}
                                         />
                                     </InputGroup>
                                 </div>
@@ -232,15 +232,15 @@ const ContactUs = () => {
                                         </Offcanvas.Header>
                                         <Offcanvas.Body className=''>
                                             <div>
-                                                
+
                                                 <div className="mv_input_content">
                                                     <label className='mv_offcanvas_filter_category'>Subject</label>
                                                     <Form.Select className="mb-4" aria-label="Default select example" value={selectedSubject} onChange={handleSubjectChange}>
-                                                                <option>Select Subject</option>
-                                                                <option value="General Inquiry">General Inquiry</option>
-                                                                <option value="Payment related">Payment Related</option>
-                                                                <option value="Product related">Product Related</option>
-                                                            </Form.Select>
+                                                        <option>Select Subject</option>
+                                                        <option value="General Inquiry">General Inquiry</option>
+                                                        <option value="Payment related">Payment Related</option>
+                                                        <option value="Product related">Product Related</option>
+                                                    </Form.Select>
                                                 </div>
                                             </div>
                                             <div className='mv_offcanvas_bottom_button'>
@@ -259,67 +259,67 @@ const ContactUs = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                <div className="mv_product_table_padd">
-                                    <table className='mv_product_table justify-content-between'>
-                                        <thead>
-                                            <tr>
-                                                <th className=''>ID</th>
-                                                <th className=''>Name</th>
-                                                <th className=''>Email</th>
-                                                <th className=''>Contact No.</th>
-                                                <th className=''>Subject</th>
-                                                <th className=''>Message</th>
-                                                <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {paginatedData.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{index + 1}</td>
-                                                <td>{item.name}</td>
-                                                <td>{item.email}</td>
-                                                <td>{item.contactNo}</td>
-                                                <td>{item.subject}</td>
-                                                <td>{item.message}</td>
-                                                <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => handleViewShow(item._id)}>
-                                                            <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                        </div>
-                                                        <div className="mv_pencil_icon" onClick={() => { setModalShow(true); setId(item._id) }}>
-                                                            <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                        </div>
-                                                </td>
-                                            </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {totalPages > 1 && (
-                                    <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
-                                        {/* Previous Button */}
-                                        <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
-                                            onClick={() => handlePageChange(currentPage - 1)}>
-                                            <MdOutlineKeyboardArrowLeft />
-                                        </p>
-                                        {/* Pagination Buttons */}
-                                        {getPaginationButtons().map((page, index) => (
-                                            <p key={index}
-                                            className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                            onClick={() => typeof page === "number" && handlePageChange(page)}
-                                            style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                            {page}
-                                            </p>
-                                        ))}
-                                        {/* Next Button */}
-                                        <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
-                                            onClick={() => handlePageChange(currentPage + 1)} >
-                                            <MdOutlineKeyboardArrowRight />
-                                        </p>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Name</th>
+                                                    <th className=''>Email</th>
+                                                    <th className=''>Contact No.</th>
+                                                    <th className=''>Subject</th>
+                                                    <th className=''>Message</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{item.name}</td>
+                                                        <td>{item.email}</td>
+                                                        <td>{item.contactNo}</td>
+                                                        <td>{item.subject}</td>
+                                                        <td>{item.message}</td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon" onClick={() => handleViewShow(item._id)}>
+                                                                <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => { setModalShow(true); setId(item._id) }}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                )}
+                                    {totalPages > 1 && (
+                                        <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                            {/* Previous Button */}
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {/* Pagination Buttons */}
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index}
+                                                    className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                    onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                    style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            {/* Next Button */}
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage + 1)} >
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
                                 </>
                             ) : (
-                                <NoResultsFound/>
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>
@@ -343,13 +343,13 @@ const ContactUs = () => {
             </Modal>
 
             {/* View Contact Us Model */}
-            <Modal className='mv_logout_dialog' show={viewModal} onHide={() => handleViewClose(false)}  centered >
+            <Modal className='mv_logout_dialog' show={viewModal} onHide={() => handleViewClose(false)} centered >
                 <Modal.Header className='mv_contect_details_header' closeButton>
                     <h6 className='fw-bold mb-0'>Contact Details</h6>
                 </Modal.Header>
                 <Modal.Body>
                     <table className='sb_table'>
-                    <tr>
+                        <tr>
                             <td>Name:</td>
                             <td>{viewData.name}</td>
                         </tr>

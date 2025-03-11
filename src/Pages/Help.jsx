@@ -27,7 +27,7 @@ const Help = () => {
     const [filteredData, setFilteredData] = useState();
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -219,7 +219,7 @@ const Help = () => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
+        // console.log("" , result);
     
         if (searchTerm) {
           result = result.filter(user =>
@@ -272,7 +272,7 @@ const Help = () => {
                                     </div>
                                 </div>
                             </div>
-                            {paginatedData.length > 0 ? (
+                            {paginatedData?.length > 0 ? (
                                 <>
                                     <div className="mv_product_table_padd">
                                         <table className='mv_product_table mv_help_table justify-content-between'>

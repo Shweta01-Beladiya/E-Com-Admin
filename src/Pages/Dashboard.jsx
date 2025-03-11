@@ -5,6 +5,7 @@ import Chart from "react-apexcharts";
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
 
@@ -178,8 +179,11 @@ const Dashboard = () => {
 
           // console.log("previousSum",previousSum);
 
-          // Calculate percentage change
-          if (previousSum === 0) return '+100%'; // Handle case where previous year was zero
+          if (previousSum === 0 && currentSum === 0) {
+            return '0%'; 
+          } else if (previousSum === 0) {
+            return '+100%'; 
+          }
 
           const changePercent = ((currentSum - previousSum) / previousSum) * 100;
           // console.log("changePercent",changePercent);
@@ -576,7 +580,7 @@ const Dashboard = () => {
                     <p className='mb-0 mv_heading_order_sum'>Review</p>
                   </div>
                   <div>
-                    <p className='mb-0 mv_review_view_all'>View all</p>
+                    <p className='mb-0 mv_review_view_all'><Link to={'/review'}>View all</Link></p>
                   </div>
                 </div>
               </div>
