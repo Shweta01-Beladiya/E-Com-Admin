@@ -28,6 +28,8 @@ const Order = () => {
 
   useEffect(() => {
     applyFilters();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [searchTerm, filterDate, filterStatus]);
 
   const applyFilters = () => {

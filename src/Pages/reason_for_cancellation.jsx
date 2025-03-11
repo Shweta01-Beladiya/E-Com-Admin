@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
 const Reasonforcancellation = () => {
 
@@ -34,7 +35,7 @@ const Reasonforcancellation = () => {
         }
     };
 
-   const getPaginationButtons = () => {
+    const getPaginationButtons = () => {
         if (totalPages <= 4) {
             return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
@@ -76,8 +77,8 @@ const Reasonforcancellation = () => {
     const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
-        onSubmit: async (values) => {
-            console.log(values);
+        onSubmit: async (values, { setFieldError }) => {
+            // console.log(values);
             // reasonforcancellation(values)
 
             const reasonforcancel = {
@@ -110,13 +111,15 @@ const Reasonforcancellation = () => {
                             "Content-Type": "application/json"
                         }
                     });
-                    console.log("Response:", response?.data);
+                    // console.log("Response:", response?.data);
                     setModalShow1(false);
                     setToggle(!toggle);
                     resetForm();
                 } catch (error) {
                     console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
+                    if (error.response && error.response.status === 409) {
+                        setFieldError('reasonName', 'Reason name already exists');
+                    }
                 }
             }
         }
@@ -128,20 +131,21 @@ const Reasonforcancellation = () => {
     // ************************************** Show Data **************************************
     useEffect(() => {
         const fetchBrandData = async () => {
-            try{
-               const response = await axios.get(`${BaseUrl}/api/allReasons`,{
-                 headers: {
-                     Authorization: `Bearer ${token}`,
-                 }
-               })
-               console.log("data" , response?.data);
-               setFilteredData(response?.data?.reasons)
-               setData(response?.data?.reasons)
-            }catch(error){
-               console.error("Error fetching data:", error);
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allReasons`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                // console.log("data", response?.data);
+                setFilteredData(response?.data?.reasons)
+                setData(response?.data?.reasons)
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
         }
         fetchBrandData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toggle])
     // ***************************************************************************************
 
@@ -158,11 +162,14 @@ const Reasonforcancellation = () => {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            console.log("delete response ", response);
-            setModalShow(false)
-            setToggle(!toggle)
+            // console.log("delete response ", response);
+            if (response.data.status === 200) {
+                setModalShow(false)
+                setData((prevData) => prevData.filter((item) => item._id !== deleteToggle));
+                setFilteredData((prevData) => prevData.filter((item) => item._id !== deleteToggle));
+            }
         } catch (error) {
-            alert(error)
+            console.error('Data Fetching Error:', error);
         }
     }
     // ***************************************************************************************
@@ -262,66 +269,72 @@ const Reasonforcancellation = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table mv_help_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Reason</th>
-                                            <th className=''>Status</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData?.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                                <td>{item.reasonName}</td>
-                                                <td>
-                                                    <Form.Check
-                                                        type="switch"
-                                                        checked={item.status}
-                                                        className=''
-                                                        onChange={() => handleStatusChange(item._id, item.status)}
-                                                    />
-                                                </td>
-                                                <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
-                                                        <Link>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
-                                    {/* Previous Button */}
-                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {/* Pagination Buttons */}
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index}
-                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                        onClick={() => typeof page === "number" && handlePageChange(page)}
-                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                        {page}
-                                        </p>
-                                    ))}
-                                    {/* Next Button */}
-                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage + 1)} >
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
+                            {paginatedData?.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table mv_help_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Reason</th>
+                                                    <th className=''>Status</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData?.map((item, index) => (
+
+                                                    <tr key={index}>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{item.reasonName}</td>
+                                                        <td>
+                                                            <Form.Check
+                                                                type="switch"
+                                                                checked={item.status}
+                                                                onChange={() => handleStatusChange(item._id, item.status)}
+                                                            />
+                                                        </td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                                <Link>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                            {/* Previous Button */}
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {/* Pagination Buttons */}
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index}
+                                                    className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                    onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                    style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            {/* Next Button */}
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage + 1)} >
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>

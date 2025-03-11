@@ -8,8 +8,9 @@ import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
-const Termsconditions = (props) => {
+const Termsconditions = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
@@ -25,7 +26,7 @@ const Termsconditions = (props) => {
     const [filteredData, setFilteredData] = useState();
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -35,41 +36,31 @@ const Termsconditions = (props) => {
 
     const getPaginationButtons = () => {
         if (totalPages <= 4) {
-          return Array.from({ length: totalPages }, (_, i) => i + 1);
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
-      
+
         const buttons = [];
-      
+
         if (currentPage <= 2) {
-          buttons.push(1, 2, 3, "...");
+            buttons.push(1, 2, 3, "...");
         } else if (currentPage >= totalPages - 1) {
-          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
         } else {
-          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-      
+
         return buttons;
-      };
+    };
 
     const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
     // *******************************************************************************
-    
+
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
-
-    // const [values, setValues] = useState({
-    //     name: "",
-    //     name1: ""
-    // });
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setValues({ ...values, [name]: value });
-    // };
 
     // ******************************* Validation *******************************
     const [id, setId] = useState(null);
@@ -78,22 +69,22 @@ const Termsconditions = (props) => {
         title: "",
         description: "",
     };
-    
+
     const validate = Yup.object().shape({
         title: Yup.string().required("Title is required"),
         description: Yup.string().required("Description is required")
     });
-    
+
     const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
         onSubmit: async (values) => {
-            console.log(values);
+            // console.log(values);
             // termsconditions(values)
 
             const termsconditions = {
-                title:values?.title,
-                description:values?.description
+                title: values?.title,
+                description: values?.description
             }
 
             //************************************** Edit and Add **************************************
@@ -122,10 +113,12 @@ const Termsconditions = (props) => {
                             "Content-Type": "application/json"
                         }
                     });
-                    console.log("Response:", response?.data);
-                    setModalShow1(false);
-                    setToggle(!toggle);
-                    resetForm();
+                    // console.log("Response:", response?.data);
+                    if (response.data.status === 201) {
+                        setModalShow1(false);
+                        setToggle(!toggle);
+                        resetForm();
+                    }
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");
@@ -134,62 +127,66 @@ const Termsconditions = (props) => {
         }
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm, setValues } = formik;
     // ***************************************************************************
 
     // ************************************** Show Data **************************************
-    useEffect(()=>{
+    useEffect(() => {
         const fetchBrandData = async () => {
-            try{
-               const response = await axios.get(`${BaseUrl}/api/allTerms`,{
-                 headers: {
-                     Authorization: `Bearer ${token}`,
-                 }
-               })
-               console.log("data" , response?.data);
-               setFilteredData(response?.data?.terms)
-               setData(response?.data?.terms)
-            }catch(error){
-               console.error("Error fetching data:", error);
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allTerms`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                //    console.log("data" , response?.data);
+                setFilteredData(response?.data?.terms)
+                setData(response?.data?.terms)
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
         }
         fetchBrandData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[toggle])
+    }, [toggle])
     // ***************************************************************************************
- 
+
     // ************************************** Delete Item **************************************
-    const handleManage = (id) =>{
+    const handleManage = (id) => {
         setModalShow(true)
         setDeleteToggle(id)
     }
- 
+
     const handleDelete = async () => {
-        try{
-            const response = await axios.delete(`${BaseUrl}/api/deleteTerm/${deleteToggle}`,{
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteTerm/${deleteToggle}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            console.log("delete response " , response);
-            setModalShow(false)
-            setToggle(!toggle)
-        }catch(error){
-            alert(error)
+            // console.log("delete response " , response);
+            if (response.data.status === 200) {
+                setModalShow(false);
+                setData((prevData) => prevData.filter((item) => item._id !== deleteToggle));
+                setFilteredData((prevData) => prevData.filter((item) => item._id !== deleteToggle));
+            }
+        } catch (error) {
+            // alert(error)
+            console.error('Data Deleting Error', error);
         }
-     }
+    }
     // ***************************************************************************************
 
     // Edit
     const handleEdit = (item) => {
         setId(item._id);
-        
+
         // Set form values with the selected item data
         setValues({
             title: item.title || "",
             description: item.description || "",
         });
-        
+
         setModalShow1(true);
     };
 
@@ -210,15 +207,15 @@ const Termsconditions = (props) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
-    
+        // console.log("", result);
+
         if (searchTerm) {
-          result = result.filter(user =>
-            user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.description?.toLowerCase().includes(searchTerm.toLowerCase())
-          );
+            result = result.filter(user =>
+                user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.description?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
-    
+
         setFilteredData(result);
         setCurrentPage(1);
     }, [data, searchTerm]);
@@ -242,9 +239,9 @@ const Termsconditions = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -259,59 +256,65 @@ const Termsconditions = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table mv_help_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Title</th>
-                                            <th className=''>Description</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData?.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                            <td>{item.title}</td>
-                                            <td>{item.description}</td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
-                                    {/* Previous Button */}
-                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {/* Pagination Buttons */}
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index}
-                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                        onClick={() => typeof page === "number" && handlePageChange(page)}
-                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                        {page}
-                                        </p>
-                                    ))}
-                                    {/* Next Button */}
-                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage + 1)} >
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
+                            {paginatedData?.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table mv_help_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Title</th>
+                                                    <th className=''>Description</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData?.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{item.title}</td>
+                                                        <td>{item.description}</td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                                <Link>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                            {/* Previous Button */}
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {/* Pagination Buttons */}
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index}
+                                                    className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                    onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                    style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            {/* Next Button */}
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage + 1)} >
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <NoResultsFound/>
                             )}
                         </div>
                     </div>
@@ -337,7 +340,7 @@ const Termsconditions = (props) => {
             {/* Add Terms & Condition Model */}
             <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
-                    
+
                 </Modal.Header>
                 <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
                     {id ? 'Edit Terms & Condition' : 'Add Terms & Condition'}
@@ -366,7 +369,7 @@ const Termsconditions = (props) => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter Description"
-                                    as="textarea" 
+                                    as="textarea"
                                     aria-label="With textarea"
                                     aria-describedby="basic-addon1"
                                 />

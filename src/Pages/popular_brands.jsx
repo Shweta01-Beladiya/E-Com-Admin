@@ -10,7 +10,7 @@ import axios from 'axios';
 import Addpopularbrands from './add_popularbrands';
 import NoResultsFound from "../Component/Noresult";
 
-const Popularbrands = (props) => {
+const Popularbrands = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');

@@ -22,13 +22,14 @@ const Aboutus = ({ editData }) => {
     const [currentEditItem, setCurrentEditItem] = useState(null);
     const [shouldResetPage, setShouldResetPage] = useState(false);
 
+
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState([]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    console.log("totalpage", totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -38,28 +39,28 @@ const Aboutus = ({ editData }) => {
 
     const getPaginationButtons = () => {
         if (totalPages <= 4) {
-          return Array.from({ length: totalPages }, (_, i) => i + 1);
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
-      
+
         const buttons = [];
-      
+
         if (currentPage <= 2) {
-          buttons.push(1, 2, 3, "...");
+            buttons.push(1, 2, 3, "...");
         } else if (currentPage >= totalPages - 1) {
-          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
         } else {
-          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-      
+
         return buttons;
-      };
+    };
 
     const paginatedData = filteredData.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
     // *******************************************************************************
-    
+
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
@@ -83,13 +84,13 @@ const Aboutus = ({ editData }) => {
         description: "",
         addaboutimage: "",
     };
-    
+
     const validate = Yup.object().shape({
         title: Yup.string().required("Title is required"),
         description: Yup.string().required("Description is required"),
         addaboutimage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
     });
-    
+
     const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
@@ -146,36 +147,36 @@ const Aboutus = ({ editData }) => {
     // *******************************************************************************
 
     // ************************************** Show Data **************************************
-    useEffect(()=>{
+    useEffect(() => {
         const fetchBrandData = async () => {
-            try{
-               const response = await axios.get(`${BaseUrl}/api/allAboutUs`,{
-                 headers: {
-                     Authorization: `Bearer ${token}`,
-                 }
-               })
-               console.log("data" , response?.data);
-               setFilteredData(response?.data?.aboutUs)
-               setData(response?.data?.aboutUs)
-            }catch(error){
-               console.error("Error fetching data:", error);
+            try {
+                const response = await axios.get(`${BaseUrl}/api/allAboutUs`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                console.log("data", response?.data);
+                setFilteredData(response?.data?.aboutUs)
+                setData(response?.data?.aboutUs)
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
         }
- 
+
         fetchBrandData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[toggle])
+    }, [toggle])
     // ***************************************************************************************
- 
+
     // ************************************** Delete Item **************************************
-    const handleManage = (id) =>{
+    const handleManage = (id) => {
         setModalShow(true)
         setDeleteToggle(id)
     }
- 
+
     const handleDelete = async () => {
-        try{
-            const response = await axios.delete(`${BaseUrl}/api/deleteAboutUs/${deleteToggle}`,{
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteAboutUs/${deleteToggle}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
@@ -187,30 +188,30 @@ const Aboutus = ({ editData }) => {
             if (updatedData.length === 0) {
                 setCurrentPage(1);
             }
-            
+
             setModalShow(false)
             setToggle(!toggle)
-        }catch(error){
+        } catch (error) {
             alert(error)
         }
-     }
+    }
     // ***************************************************************************************
 
     // Edit
     const handleEdit = (item) => {
         setId(item._id);
         setCurrentEditItem(item);
-        console.log("item" , item?.aboutUsImage.split("\\").pop());
-        
+        console.log("item", item?.aboutUsImage.split("\\").pop());
+
         // Set form values with the selected item data
         setValues({
             title: item.title || "",
             description: item.description || "",
             addaboutimage: ""  // Don't set the file input
         });
-        
+
         // Set image preview
-        if(item.aboutUsImage) {
+        if (item.aboutUsImage) {
             let fileimg = item.aboutUsImage.split("\\").pop();
             setBrandImagePreview(`${BaseUrl}/${item.aboutUsImage}`);
             setaddimg(fileimg.substring(fileimg.indexOf('-') + 1)); // Show some text to indicate there's an existing image
@@ -218,7 +219,7 @@ const Aboutus = ({ editData }) => {
             setBrandImagePreview(null);
             setaddimg("");
         }
-        
+
         setModalShow1(true);
     };
 
@@ -235,13 +236,13 @@ const Aboutus = ({ editData }) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
-    
+        console.log("", result);
+
         if (searchTerm) {
-          result = result.filter(user =>
-            user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.description?.includes(searchTerm)
-          );
+            result = result.filter(user =>
+                user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.description?.includes(searchTerm)
+            );
         }
     
         if (shouldResetPage) {
@@ -253,7 +254,12 @@ const Aboutus = ({ editData }) => {
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         }
+      setFilteredData(result);
+        setCurrentPage(1);
     }, [data, searchTerm, shouldResetPage]);
+
+        
+
 
     // Reset form when modal closes
     const handleCloseModal = () => {
@@ -284,9 +290,9 @@ const Aboutus = ({ editData }) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -361,6 +367,7 @@ const Aboutus = ({ editData }) => {
                                     )}
                                 </>
                             ) : (<NoResultsFound />)}
+                     
                         </div>
                     </div>
                 </div>
@@ -385,7 +392,7 @@ const Aboutus = ({ editData }) => {
             {/* Add Edit About Us Modal */}
             <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
-                    
+
                 </Modal.Header>
                 <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
                     {id ? 'Edit About Us' : 'Add About Us'}
@@ -418,54 +425,67 @@ const Aboutus = ({ editData }) => {
                             </InputGroup>
                             {errors.description && touched.description && <div className="text-danger small">{errors.description}</div>}
                         </div>
-                        <div className="mv_input_content mb-5">
+                        <div className="mv_input_content mb-3">
                             <label className='mv_label_input'>Image</label>
-                            <InputGroup className="">
-                                <Form.Control
-                                    placeholder="Choose Image"
-                                    aria-label=""
-                                    readOnly
-                                    value={addimg}
-                                    name="addaboutimage"
-                                    onBlur={handleBlur}
-                                />
-                                <label className="mv_browse_button">
-                                    Browse
-                                    <input type="file" 
-                                        hidden 
-                                        accept="image/jpeg, image/png, image/jpg"
-                                        onChange={(e) => {
-                                            const file = e.currentTarget.files[0];
-                                            if (file) {
-                                                setaddimg(file.name);
-                                                setFieldValue("addaboutimage", file);
-                                                setBrandImagePreview(URL.createObjectURL(file));
-                                            }
-                                        }}
-                                    />
-                                </label>
-                            </InputGroup>
-                            {errors.addaboutimage && touched.addaboutimage && <div className="text-danger small">{errors.addaboutimage}</div>}
-                            {brandImagePreview && (
-                                <div className="mt-2">
-                                    <img
-                                        className='mv_update_img'
-                                        src={typeof brandImagePreview === 'string' && brandImagePreview.startsWith('http') 
-                                            ? brandImagePreview 
-                                            : `${typeof brandImagePreview === 'string' && !brandImagePreview.startsWith('blob:') 
-                                                ? `${BaseUrl}/${brandImagePreview}` 
-                                                : brandImagePreview}`}
-                                        alt="Brand Image Preview"
-                                        style={{
-                                            maxWidth: '20px',
-                                            maxHeight: '20px',
-                                            objectFit: 'contain',
-                                            border: '1px solid #ddd',
-                                            borderRadius: '4px',
-                                            padding: '2px'
-                                        }}
-                                    />
+                            <div className="position-relative">
+                                <div className="border border-black rounded w-100 p-1 d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' :'transparent',width:'50%' }}>
+                                        {addimg && (
+                                            <>
+                                                <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                    <img
+                                                        src={brandImagePreview || `${BaseUrl}/${editData?.addaboutimage}`}
+                                                        alt="Preview"
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                                <span className='text-truncate' style={{width:'100%'}}>{addimg}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn text-danger p-0 ms-2"
+                                                    style={{ fontSize: '1.25rem', lineHeight: 1 }}
+                                                    onClick={() => {
+                                                        setaddimg("");
+                                                        setBrandImagePreview(null);
+                                                        setFieldValue("addpopularbrandimage", "");
+                                                    }}
+                                                >
+                                                    ×
+                                                </button>
+                                            </>
+                                        )}
+                                        {!addimg && (
+                                            <span className="text-muted">Choose Image</span>
+                                        )}
+                                    </div>
+                                    <label className="btn" style={{
+                                        backgroundColor: '#3A2C2C',
+                                        color: 'white',
+                                        borderRadius: '4px',
+                                        padding: '4px 16px',
+                                        marginLeft: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}>
+                                        Browse
+                                        <input
+                                            type="file"
+                                            hidden
+                                            accept="image/jpeg, image/png, image/jpg"
+                                            onChange={(e) => {
+                                                const file = e.currentTarget.files[0];
+                                                if (file) {
+                                                    setaddimg(file.name);
+                                                    setFieldValue("addaboutimage", file);
+                                                    setBrandImagePreview(URL.createObjectURL(file));
+                                                }
+                                            }}
+                                        />
+                                    </label>
                                 </div>
+                            </div>
+                            {errors.addaboutimage && touched.addaboutimage && (
+                                <div className="text-danger small">{errors.addaboutimage}</div>
                             )}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>

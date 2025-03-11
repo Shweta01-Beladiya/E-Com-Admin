@@ -60,13 +60,13 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
         validationSchema: addpopularbrandValidate,
         onSubmit: async (values) => {
             setIsSubmitting(true);
-            
+
             try {
                 const formData = new FormData();
                 formData.append("brandName", values.brandname);
                 formData.append("offer", values.offer);
                 formData.append("title", values.title);
-                
+
                 if (values.brandLogo) {
                     formData.append("brandLogo", values.brandLogo);
                 }
@@ -185,99 +185,127 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Brand Logo</label>
-                                                <InputGroup className="">
-                                                    <Form.Control
-                                                        placeholder="Choose Image"
-                                                        aria-label=""
-                                                        readOnly
-                                                        value={brandimg}
-                                                        name="brandLogo"
-                                                        onBlur={handleBlur}
-                                                    />
-                                                    <label className="mv_browse_button">
-                                                        Browse
-                                                        <input
-                                                            type="file"
-                                                            hidden
-                                                            accept="image/jpeg, image/png, image/jpg"
-                                                            onChange={(e) => {
-                                                                const file = e.currentTarget.files[0];
-                                                                if (file) {
-                                                                    setbrandimg(file.name);
-                                                                    setFieldValue("brandLogo", file);
-                                                                    setBrandLogoPreview(URL.createObjectURL(file));
-                                                                }
-                                                            }}
-                                                        />
-                                                    </label>
-                                                </InputGroup>
-                                                {errors.brandLogo && touched.brandLogo && <div className="text-danger small">{errors.brandLogo}</div>}
-                                                {brandLogoPreview && (
-                                                    <div className="mt-2">
-                                                        <img
-                                                            className='mv_update_img'
-                                                            src={brandLogoPreview}
-                                                            alt="Brand Logo Preview"
-                                                            style={{
-                                                                maxWidth: '20px',
-                                                                maxHeight: '20px',
-                                                                objectFit: 'contain',
-                                                                border: '1px solid #ddd',
-                                                                borderRadius: '4px',
-                                                                padding: '2px'
-                                                            }}
-                                                        />
+                                                <div className="position-relative">
+                                                    <div className="border border-black rounded w-100 p-1 d-flex align-items-center justify-content-between">
+                                                        <div className="d-flex align-items-center p-1" style={{ backgroundColor: brandimg ? '#EAEAEA' : 'transparent', width:'50%' }}>
+                                                            {brandimg && (
+                                                                <>
+                                                                    <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                                        <img
+                                                                            src={brandLogoPreview}
+                                                                            alt="Preview"
+                                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className='text-truncate' style={{width:'100%'}}>{brandimg}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn text-danger p-0 ms-2"
+                                                                        style={{ fontSize: '1.25rem', lineHeight: 1 }}
+                                                                        onClick={() => {
+                                                                            setbrandimg("");
+                                                                            setBrandLogoPreview(null);
+                                                                            setFieldValue("brandLogo", "");
+                                                                        }}
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {!brandimg && (
+                                                                <span className="text-muted">Choose Image</span>
+                                                            )}
+                                                        </div>
+                                                        <label className="btn" style={{
+                                                            backgroundColor: '#3A2C2C',
+                                                            color: 'white',
+                                                            borderRadius: '4px',
+                                                            padding: '3px 16px',
+                                                            marginLeft: '8px',
+                                                            cursor: 'pointer',
+                                                            fontSize: '12px'
+                                                        }}>
+                                                            Browse
+                                                            <input
+                                                                type="file"
+                                                                hidden
+                                                                accept="image/jpeg, image/png, image/jpg"
+                                                                onChange={(e) => {
+                                                                    const file = e.currentTarget.files[0];
+                                                                    if (file) {
+                                                                        setbrandimg(file.name);
+                                                                        setFieldValue("brandLogo", file);
+                                                                        setBrandLogoPreview(URL.createObjectURL(file));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
                                                     </div>
-                                                )}
+                                                </div>
+                                                {errors.brandLogo && touched.brandLogo && <div className="text-danger small">{errors.brandLogo}</div>}
                                             </div>
                                         </div>
                                         <div className="col-xxl-6 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Image</label>
-                                                <InputGroup className="">
-                                                    <Form.Control
-                                                        placeholder="Choose Image"
-                                                        aria-label=""
-                                                        readOnly
-                                                        value={addimg}
-                                                        name="addpopularbrandimage"
-                                                        onBlur={handleBlur}
-                                                    />
-                                                    <label className="mv_browse_button">
-                                                        Browse
-                                                        <input
-                                                            type="file"
-                                                            hidden
-                                                            accept="image/jpeg, image/png, image/jpg"
-                                                            onChange={(e) => {
-                                                                const file = e.currentTarget.files[0];
-                                                                if (file) {
-                                                                    setaddimg(file.name);
-                                                                    setFieldValue("addpopularbrandimage", file);
-                                                                    setBrandImagePreview(URL.createObjectURL(file));
-                                                                }
-                                                            }}
-                                                        />
-                                                    </label>
-                                                </InputGroup>
-                                                {errors.addpopularbrandimage && touched.addpopularbrandimage && <div className="text-danger small">{errors.addpopularbrandimage}</div>}
-                                                {brandImagePreview && (
-                                                    <div className="mt-2">
-                                                        <img
-                                                            className='mv_update_img'
-                                                            src={brandImagePreview}
-                                                            alt="Brand Image Preview"
-                                                            style={{
-                                                                maxWidth: '20px',
-                                                                maxHeight: '20px',
-                                                                objectFit: 'contain',
-                                                                border: '1px solid #ddd',
-                                                                borderRadius: '4px',
-                                                                padding: '2px'
-                                                            }}
-                                                        />
+                                                <div className="position-relative">
+                                                    <div className="border border-black rounded w-100 p-1 d-flex align-items-center justify-content-between">
+                                                        <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' : 'transparent', width:'50%' }}>
+                                                            {addimg && (
+                                                                <>
+                                                                    <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                                        <img
+                                                                            src={brandImagePreview}
+                                                                            alt="Preview"
+                                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className='text-truncate' style={{width:'100%'}}>{addimg}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn text-danger p-0 ms-2"
+                                                                        style={{ fontSize: '1.25rem', lineHeight: 1 }}
+                                                                        onClick={() => {
+                                                                            setaddimg("");
+                                                                            setBrandImagePreview(null);
+                                                                            setFieldValue("addpopularbrandimage", "");
+                                                                        }}
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {!addimg && (
+                                                                <span className="text-muted">Choose Image</span>
+                                                            )}
+                                                        </div>
+                                                        <label className="btn" style={{
+                                                            backgroundColor: '#3A2C2C',
+                                                            color: 'white',
+                                                            borderRadius: '4px',
+                                                            padding: '3px 16px',
+                                                            marginLeft: '8px',
+                                                            cursor: 'pointer',
+                                                            fontSize: '12px'
+                                                        }}>
+                                                            Browse
+                                                            <input
+                                                                type="file"
+                                                                hidden
+                                                                accept="image/jpeg, image/png, image/jpg"
+                                                                onChange={(e) => {
+                                                                    const file = e.currentTarget.files[0];
+                                                                    if (file) {
+                                                                        setaddimg(file.name);
+                                                                        setFieldValue("addpopularbrandimage", file);
+                                                                        setBrandImagePreview(URL.createObjectURL(file));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
                                                     </div>
-                                                )}
+                                                </div>
+                                                {errors.addpopularbrandimage && touched.addpopularbrandimage && <div className="text-danger small">{errors.addpopularbrandimage}</div>}
                                             </div>
                                         </div>
                                         <div className='text-center mt-5'>
