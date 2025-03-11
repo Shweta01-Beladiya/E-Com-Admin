@@ -39,29 +39,20 @@ const Coupon = () => {
     };
 
     const getPaginationButtons = () => {
+        if (totalPages <= 4) {
+          return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+      
         const buttons = [];
-        const maxButtonsToShow = 5;
-
-        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+      
+        if (currentPage <= 2) {
+          buttons.push(1, 2, 3, "...");
+        } else if (currentPage >= totalPages - 1) {
+          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-
-        if (startPage > 1) {
-            buttons.push(1);
-            if (startPage > 2) buttons.push('...');
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) buttons.push('...');
-            buttons.push(totalPages);
-        }
+      
         return buttons;
     };
 
@@ -274,73 +265,80 @@ const Coupon = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                                    <div className="mv_product_table_padd">
-                                        <table className='mv_product_table justify-content-between'>
-                                            <thead>
-                                                <tr>
-                                                    <th className=''>ID</th>
-                                                    <th className=''>Code</th>
-                                                    <th className=''>Coupon Name</th>
-                                                    <th className=''>Description</th>
-                                                    <th className=''>Coupon Type</th>
-                                                    <th className=''>Price</th>
-                                                    <th className=''>Start Date</th>
-                                                    <th className=''>End Date</th>
-                                                    <th className=''>Status</th>
-                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {paginatedData.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                                        <td>{item.code}</td>
-                                                        <td>{item.title}</td>
-                                                        <td>{item.description}</td>
-                                                        <td>{item.coupenType}</td>
-                                                        <td>&#x20b9;{item.offerDiscount}</td>
-                                                        <td>{new Date(item.startDate).toLocaleDateString('en-GB')}</td>
-                                                        <td>{new Date(item.endDate).toLocaleDateString('en-GB')}</td>
-                                                        <td>
-                                                            <Form.Check
-                                                                type="switch"
-                                                                label=""
-                                                                checked={item.status}
-                                                                className=''
-                                                                onChange={() => handleStatusChange(item._id, item.status)}
-                                                            />
-                                                        </td>
-                                                        <td className='d-flex align-items-center justify-content-end'>
-                                                            <div className="mv_pencil_icon" >
-                                                                <Link to='/addcoupon' state={{ id: item._id }}>
-                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                                </Link>
-                                                            </div>
-                                                            <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
-                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    {totalPages > 1 && (
-                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                                <MdOutlineKeyboardArrowLeft />
-                                            </p>
-                                            {getPaginationButtons().map((page, index) => (
-                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                    onClick={() => handlePageChange(page)}>
-                                                    {page}
-                                                </p>
-                                            ))}
-                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                                <MdOutlineKeyboardArrowRight />
-                                            </p>
-                                        </div>
-                                    )}
+                            <div className="mv_product_table_padd">
+                                <table className='mv_product_table justify-content-between'>
+                                    <thead>
+                                        <tr>
+                                            <th className=''>ID</th>
+                                            <th className=''>Code</th>
+                                            <th className=''>Coupon Name</th>
+                                            <th className=''>Description</th>
+                                            <th className=''>Coupon Type</th>
+                                            <th className=''>Price</th>
+                                            <th className=''>Start Date</th>
+                                            <th className=''>End Date</th>
+                                            <th className=''>Status</th>
+                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {paginatedData.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td>{item.code}</td>
+                                                <td>{item.title}</td>
+                                                <td>{item.description}</td>
+                                                <td>{item.coupenType}</td>
+                                                <td>&#x20b9;{item.offerDiscount}</td>
+                                                <td>{new Date(item.startDate).toLocaleDateString('en-GB')}</td>
+                                                <td>{new Date(item.endDate).toLocaleDateString('en-GB')}</td>
+                                                <td>
+                                                    <Form.Check
+                                                        type="switch"
+                                                        label=""
+                                                        checked={item.status}
+                                                        className=''
+                                                        onChange={()=>handleStatusChange(item._id, item.status)}
+                                                    />
+                                                </td>
+                                                <td className='d-flex align-items-center justify-content-end'>
+                                                    <div className="mv_pencil_icon" >
+                                                        <Link to='/addcoupon' state={{ id: item._id }}>
+                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
+                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {totalPages > 1 && (
+                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                    {/* Previous Button */}
+                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                        onClick={() => handlePageChange(currentPage - 1)}>
+                                        <MdOutlineKeyboardArrowLeft />
+                                    </p>
+                                    {/* Pagination Buttons */}
+                                    {getPaginationButtons().map((page, index) => (
+                                        <p key={index}
+                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                        onClick={() => typeof page === "number" && handlePageChange(page)}
+                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                        {page}
+                                        </p>
+                                    ))}
+                                    {/* Next Button */}
+                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                        onClick={() => handlePageChange(currentPage + 1)} >
+                                        <MdOutlineKeyboardArrowRight />
+                                    </p>
+                                </div>
+                            )}
                                 </>
                             ) : (
                                 <NoResultsFound />

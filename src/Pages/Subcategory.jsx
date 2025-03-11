@@ -450,17 +450,20 @@ const SubCategory = () => {
 
                 {/* Add and Update Subcategory Modal */}
                 <Modal show={showAddEditModal} onHide={() => { setShowAddEditModal(false); setId(null); }} centered>
-                    <Modal.Header closeButton className="r_modalheader">
-                    </Modal.Header>
+                <Modal.Header className='mv_edit_profile_header' closeButton>
+
+                </Modal.Header>
+                <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
+                    {id ? 'Edit Sub Category' : 'Add Sub Category'}
+                </Modal.Title>
                     <Modal.Body className="r_modalbody">
-                        <h6 className='text-center fw-bold'>{id ? 'Edit Sub Category' : 'Add Sub Category'}</h6>
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
                             onSubmit={handleSubmit}
                             enableReinitialize={true}
                         >
-                            {({ handleSubmit, setFieldValue, values }) => (
+                            {({ handleBlur,handleChange, handleSubmit, setFieldValue, values }) => (
                                 <FormikForm onSubmit={handleSubmit} className="r_form">
                                     <Form.Group className="mb-3">
                                         <Form.Label>Main Category</Form.Label>
@@ -484,35 +487,41 @@ const SubCategory = () => {
                                         </Field>
                                         <ErrorMessage name="mainCategoryId" component="small" className="text-danger" />
                                     </Form.Group>
-
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Category</Form.Label>
-                                        <Field
-                                            as="select"
+                                    
+                                    <div className="mv_input_content mb-3">
+                                        <label className='mv_label_input'>Category</label>
+                                        <Form.Select
                                             name="categoryId"
-                                            className="form-select"
+                                            value={values.categoryId}
                                             disabled={!values.mainCategoryId}
-                                        >
-                                            <option value="">Select</option>
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                            }}
+                                            onBlur={handleBlur}
+                                            className='mv_form_select'>
+                                            <option>Select</option>
                                             {filteredCategories.map((cat) => (
                                                 <option key={cat._id} value={cat._id}>
                                                     {cat.categoryName}
                                                 </option>
                                             ))}
-                                        </Field>
+                                        </Form.Select>
                                         <ErrorMessage name="categoryId" component="small" className="text-danger" />
-                                    </Form.Group>
+                                    </div>
 
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Sub Category</Form.Label>
-                                        <Field
-                                            type="text"
-                                            name="subCategoryName"
-                                            placeholder="Enter Sub Category"
-                                            className="form-control"
-                                        />
+                                    <div className="mv_input_content mb-5">
+                                        <label className='mv_label_input'>Sub Category</label>
+                                        <InputGroup className="">
+                                            <Form.Control
+                                            placeholder="Enter sub category"
+                                            name='subCategoryName'
+                                            value={values.subCategoryName}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            />
+                                        </InputGroup>
                                         <ErrorMessage name="subCategoryName" component="small" className="text-danger" />
-                                    </Form.Group>
+                                    </div>
 
                                     <div className="d-flex justify-content-center gap-2 mt-4">
                                         <Button onClick={() => {

@@ -26,7 +26,7 @@ const Viewoffer = () => {
             alert("Error submitting form. Please try again.");
         }
         
-        
+         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
 
     // Format date function
