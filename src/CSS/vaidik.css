@@ -901,6 +901,17 @@
     box-shadow: none;
     border: 1px solid #95908F;
 }
+.mv_img_border{
+    font-size: 16px;
+    font-weight: 400;
+    color: #6A6A6A;
+    border: 1px solid #95908F;
+    border-radius: 4px;
+}
+.mv_img_border:focus{
+    box-shadow: none;
+    border: 1px solid #95908F;
+}
 .mv_form_select option{
     font-size: 14px;
     font-weight: 400;
