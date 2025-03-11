@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
@@ -14,16 +14,6 @@ const Stock = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
-
-    // Edit Stock
-    const [editstok, setEditstock] = useState(false);
-
-    const navigate = useNavigate();
-
-    const handleditstock = () => {
-        setEditstock(true);
-        // navigate('addsize')
-    }
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -164,6 +154,7 @@ const Stock = () => {
         fetchSubCategory();
         fetchProduct();
         fetchStockData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Update filteredData when data or searchTerm changes
@@ -300,12 +291,28 @@ const Stock = () => {
         handleClose();
     };
 
-    // Apply filters
     const handleApplyFilters = () => {
-        let filtered = [...data];
+        let result = [...data];
 
+        // Apply search filter
+        if (searchTerm.trim() !== '') {
+            result = result.filter(item =>
+                (item.mainCategoriesData && item.mainCategoriesData.length > 0 &&
+                    item.mainCategoriesData[0].mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.categoriesData && item.categoriesData.length > 0 &&
+                    item.categoriesData[0].categoryName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.subCategoriesData && item.subCategoriesData.length > 0 &&
+                    item.subCategoriesData[0].subCategoryName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.productData && item.productData.length > 0 &&
+                    item.productData[0].productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.stockStatus && item.stockStatus.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.quantity && item.quantity.toString().includes(searchTerm))
+            );
+        }
+
+        // Apply dropdown filters
         if (selectedMainCategory) {
-            filtered = filtered.filter(item =>
+            result = result.filter(item =>
                 item.mainCategoriesData &&
                 item.mainCategoriesData.length > 0 &&
                 item.mainCategoriesData[0]._id === selectedMainCategory
@@ -313,7 +320,7 @@ const Stock = () => {
         }
 
         if (selectedCategory) {
-            filtered = filtered.filter(item =>
+            result = result.filter(item =>
                 item.categoriesData &&
                 item.categoriesData.length > 0 &&
                 item.categoriesData[0]._id === selectedCategory
@@ -321,7 +328,7 @@ const Stock = () => {
         }
 
         if (selectedSubcategory) {
-            filtered = filtered.filter(item =>
+            result = result.filter(item =>
                 item.subCategoriesData &&
                 item.subCategoriesData.length > 0 &&
                 item.subCategoriesData[0]._id === selectedSubcategory
@@ -329,7 +336,7 @@ const Stock = () => {
         }
 
         if (selectedProduct) {
-            filtered = filtered.filter(item =>
+            result = result.filter(item =>
                 item.productData &&
                 item.productData.length > 0 &&
                 item.productData[0]._id === selectedProduct
@@ -338,15 +345,21 @@ const Stock = () => {
 
         // Apply stock status filter
         if (selectedStockStatus) {
-            filtered = filtered.filter(item =>
+            result = result.filter(item =>
                 item.stockStatus === selectedStockStatus
             );
         }
 
-        setFilteredData(filtered);
-        setCurrentPage(1); // Reset to first page when filters are applied
-        handleClose();
+        setFilteredData(result);
     };
+
+    // Update filteredData when any filter changes
+    useEffect(() => {
+        handleApplyFilters();
+        setCurrentPage(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, searchTerm, selectedMainCategory, selectedCategory, selectedSubcategory, selectedProduct, selectedStockStatus]);
+
 
     return (
         <>
@@ -517,7 +530,7 @@ const Stock = () => {
                                                     </td>
                                                     <td>{item.quantity}</td>
                                                     <td className='d-flex align-items-center justify-content-end'>
-                                                        <div className="mv_pencil_icon" onClick={handleditstock}>
+                                                        <div className="mv_pencil_icon">
                                                             <Link to='/addstock' state={{ id: item._id }}>
                                                                 <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                             </Link>
@@ -556,7 +569,7 @@ const Stock = () => {
             </div>
 
             {/* Delete Product Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" aria- labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
                     <p>Are you sure you want to <br /> delete? </p>

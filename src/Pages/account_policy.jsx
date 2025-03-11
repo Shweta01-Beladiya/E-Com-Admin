@@ -9,7 +9,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 
-const Accountpolicy = (props) => {
+const Accountpolicy = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
@@ -25,7 +25,7 @@ const Accountpolicy = (props) => {
     const [filteredData, setFilteredData] = useState();
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -121,7 +121,7 @@ const Accountpolicy = (props) => {
                     resetForm();
                 } catch (error) {
                     console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
+                    
                 }
             }
             else {
@@ -138,13 +138,15 @@ const Accountpolicy = (props) => {
                     resetForm();
                 } catch (error) {
                     console.error("Error:", error);
-                    alert("Error submitting form. Please try again.");
+                    if (error.response && error.response.status === 409) {
+                        setFieldError('policyName', 'Policy name already exists');
+                      }
                 }
             }
         }
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues,setFieldError } = formik;
     // *******************************************************************************
 
     // ************************************** Show Data **************************************
@@ -156,9 +158,8 @@ const Accountpolicy = (props) => {
                      Authorization: `Bearer ${token}`,
                  }
                })
-               console.log("data" , response?.data);
-               setFilteredData(response?.data?.
-                accountpolicy)
+            //    console.log("data" , response?.data);
+               setFilteredData(response?.data?.accountpolicy)
                setData(response?.data?.accountpolicy)
             }catch(error){
                console.error("Error fetching data:", error);
@@ -219,7 +220,6 @@ const Accountpolicy = (props) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
     
         if (searchTerm) {
           result = result.filter(user =>

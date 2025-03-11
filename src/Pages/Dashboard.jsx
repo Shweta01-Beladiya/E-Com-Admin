@@ -526,7 +526,7 @@ const Dashboard = () => {
               <div className='mv_sub_order_summary'>
                 <div className="row">
                   {orderSummary.map((item, index) => (
-                    <div className="col-xxl-3 col-xl-3 col-lg-6 col-md-3 col-6  mb-3" key={index}>
+                    <div className="col-xxl-3 col-md-6 col-sm-3 col-6  mb-3" key={index}>
                       <div className="mv_on_deli_con">
                         <p className="mv_on_deli_per mb-2">{item.percentage}%</p>
                         <p className="mv_on_deli_text mb-0">{item.label}</p>

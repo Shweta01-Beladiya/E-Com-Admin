@@ -63,6 +63,8 @@
 
   .modal-backdrop {
      --bs-backdrop-zindex: 1220 !important;
+     width: 100%;
+     height: 100%;
   }
 
   .modal {
@@ -114,6 +116,8 @@
 
   .offcanvas-backdrop {
      z-index: 1210 !important;
+     width: 100%;
+     height: 100%;
   }
 
   .offcanvas,
@@ -292,6 +296,9 @@
    .sb_table1 tr td:nth-child(1){
       width: 45%;
    }
+   .offcanvas{
+      --bs-offcanvas-width:320px;
+     }
   }
   @media (max-width:375px) {
      .illustration-container svg {

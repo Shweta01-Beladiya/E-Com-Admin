@@ -80,7 +80,7 @@ const MainCategory = () => {
     } catch (error) {
       console.error('Data create and update Error:', error);
       if (error.response && error.response.status === 409) {
-        setFieldError('mainCategoryName', 'This category name already exists');
+        setFieldError('mainCategoryName', 'Main category name already exists');
       }
     }
   };

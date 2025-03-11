@@ -20,7 +20,7 @@ const Coupon = () => {
     const [filters, setFilters] = useState({
         startDate: '',
         endDate: '',
-        status: '',
+        couponType: '',
     });
     const [id, setId] = useState(null);
 
@@ -93,7 +93,7 @@ const Coupon = () => {
             }
         }
         fetchAllData();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSearchChange = (e) => {
@@ -127,17 +127,19 @@ const Coupon = () => {
                 return itemDate >= new Date(filters.startDate);
             });
         }
-        
+
         if (filters.endDate) {
             filtered = filtered.filter((item) => {
                 const itemDate = new Date(item.endDate);
                 return itemDate <= new Date(filters.endDate);
             });
-        }        
+        }
 
-        if (filters.status) {
-            const statusBool = filters.status === "true";
-            filtered = filtered.filter((item) => item.status === statusBool);
+
+        if (filters.couponType) {
+            filtered = filtered.filter((item) =>
+                item.coupenType.toLowerCase() === filters.couponType.toLowerCase()
+            );
         }
 
         setFilteredData(filtered);
@@ -146,7 +148,7 @@ const Coupon = () => {
 
     const handleReset = () => {
         setSearchTerm("");
-        setFilters({ startDate: '', endDate: '', status: '' });
+        setFilters({ startDate: '', endDate: '', couponType: '' });
         setFilteredData(data);
         setShow(false);
     };
@@ -173,14 +175,14 @@ const Coupon = () => {
 
     const handleStatusChange = async (id, currentStatus) => {
         try {
-            const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`,{
+            const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, {
                 status: !currentStatus
-            } , {
-                headers: {Authorization : `Bearer ${token}`}
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data.status === 200) {
-                setData(prevData => 
-                    prevData.map(item => 
+                setData(prevData =>
+                    prevData.map(item =>
                         item._id === id ? { ...item, status: !item.status } : item
                     )
                 );
@@ -242,11 +244,11 @@ const Coupon = () => {
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
-                                                        <label className='mv_offcanvas_filter_category'>Status</label>
-                                                        <Form.Select className="mb-3" name="status" onChange={handleFilterChange}>
-                                                            <option>Select Status</option>
-                                                            <option value="true">Active</option>
-                                                            <option value="false">InActive</option>
+                                                        <label className='mv_offcanvas_filter_category'>Coupon Type</label>
+                                                        <Form.Select className="mb-3" name="couponType" onChange={handleFilterChange}>
+                                                            <option>Select Coupon Type</option>
+                                                            <option value="Fixed">Fixed</option>
+                                                            <option value="Percentage">Percentage</option>
                                                         </Form.Select>
                                                     </div>
                                                 </div>
@@ -272,76 +274,76 @@ const Coupon = () => {
                             </div>
                             {paginatedData.length > 0 ? (
                                 <>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Code</th>
-                                            <th className=''>Coupon Name</th>
-                                            <th className=''>Description</th>
-                                            <th className=''>Coupon Type</th>
-                                            <th className=''>Price</th>
-                                            <th className=''>Start Date</th>
-                                            <th className=''>End Date</th>
-                                            <th className=''>Status</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                                <td>{item.code}</td>
-                                                <td>{item.title}</td>
-                                                <td>{item.description}</td>
-                                                <td>{item.coupenType}</td>
-                                                <td>&#x20b9;{item.offerDiscount}</td>
-                                                <td>{new Date(item.startDate).toLocaleDateString('en-GB')}</td>
-                                                <td>{new Date(item.endDate).toLocaleDateString('en-GB')}</td>
-                                                <td>
-                                                    <Form.Check
-                                                        type="switch"
-                                                        label=""
-                                                        checked={item.status}
-                                                        className=''
-                                                        onChange={()=>handleStatusChange(item._id, item.status)}
-                                                    />
-                                                </td>
-                                                <td className='d-flex align-items-center justify-content-end'>
-                                                    <div className="mv_pencil_icon" >
-                                                        <Link to='/addcoupon' state={{ id: item._id }}>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </Link>
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                            onClick={() => handlePageChange(page)}>
-                                            {page}
-                                        </p>
-                                    ))}
-                                    <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
-                            )}
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Code</th>
+                                                    <th className=''>Coupon Name</th>
+                                                    <th className=''>Description</th>
+                                                    <th className=''>Coupon Type</th>
+                                                    <th className=''>Price</th>
+                                                    <th className=''>Start Date</th>
+                                                    <th className=''>End Date</th>
+                                                    <th className=''>Status</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{item.code}</td>
+                                                        <td>{item.title}</td>
+                                                        <td>{item.description}</td>
+                                                        <td>{item.coupenType}</td>
+                                                        <td>&#x20b9;{item.offerDiscount}</td>
+                                                        <td>{new Date(item.startDate).toLocaleDateString('en-GB')}</td>
+                                                        <td>{new Date(item.endDate).toLocaleDateString('en-GB')}</td>
+                                                        <td>
+                                                            <Form.Check
+                                                                type="switch"
+                                                                label=""
+                                                                checked={item.status}
+                                                                className=''
+                                                                onChange={() => handleStatusChange(item._id, item.status)}
+                                                            />
+                                                        </td>
+                                                        <td className='d-flex align-items-center justify-content-end'>
+                                                            <div className="mv_pencil_icon" >
+                                                                <Link to='/addcoupon' state={{ id: item._id }}>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>
+                                                            </div>
+                                                            <div className="mv_pencil_icon" onClick={() => handleDelete(item._id)}>
+                                                                <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
+                                                    onClick={() => handlePageChange(page)}>
+                                                    {page}
+                                                </p>
+                                            ))}
+                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
                                 </>
                             ) : (
-                                <NoResultsFound/>
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>

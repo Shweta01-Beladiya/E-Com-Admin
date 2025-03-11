@@ -17,7 +17,7 @@ const ViewProduct = () => {
     const [mainCategoryName, setMainCategoryName] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [subCategoryName, setSubCategoryName] = useState('');
-    const [unitName,setUnitName] = useState('');
+    const [unitName, setUnitName] = useState('');
 
     const fetchProduct = async () => {
         try {
@@ -47,12 +47,12 @@ const ViewProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getMainCategory/${product.mainCategoryId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setMainCategoryName(response.data.mainCategory.mainCategoryName); 
+            setMainCategoryName(response.data.mainCategory.mainCategoryName);
         } catch (error) {
             console.error('Error fetching main category:', error);
         }
     };
-    
+
     const fetchCategory = async () => {
         try {
             const response = await axios.get(`${BaseUrl}/api/getCategory/${product.categoryId}`, {
@@ -63,14 +63,14 @@ const ViewProduct = () => {
             console.error('Error fetching category:', error);
         }
     };
-    
+
     const fetchSubCategory = async () => {
         try {
             const response = await axios.get(`${BaseUrl}/api/getSubCategory/${product.subCategoryId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // console.log("response>>>>>>>>>",response.data);
-            
+
             setSubCategoryName(response.data.subCategory.subCategoryName);
         } catch (error) {
             console.error('Error fetching subcategory:', error);
@@ -83,7 +83,7 @@ const ViewProduct = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // console.log("esponse.data.unit",response.data.unit.name);
-            
+
             setUnitName(response.data.unit.name);
         } catch (error) {
             console.error('Error Fetching Error:', error);
@@ -95,9 +95,9 @@ const ViewProduct = () => {
         if (product.categoryId) fetchCategory();
         if (product.subCategoryId) fetchSubCategory();
         if (productVariant.unitId) fetchUnit();
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [product,productVariant]);
-    
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product, productVariant]);
+
     useEffect(() => {
         fetchProduct();
         fetchProductVariant();
@@ -141,55 +141,191 @@ const ViewProduct = () => {
                     </div>
                 </div>
             </div>
-
-            <div className="row rounded-lg shadow mt-4" style={{ backgroundColor: '#ffffff' }}>
-                <div className="col-12 p-0">
-                    <h6 className="p-3 mb-0" style={{ fontWeight: 'bold' }}>Product Information</h6>
-                    <hr className='m-0' />
-                </div>
-                {/* Left Column */}
-                <div className="col-md-6 col-12 p-4">
-                    <InfoField label="Main Category" value={mainCategoryName} />
-                    <InfoField label="Category" value={categoryName} />
-                    <InfoField label="Sub Category" value={subCategoryName} />
-                    <InfoField label="Product Name" value={product.productName} />
-                    <InfoField label="Short Description" value={productVariant.shortDescription} />
-                    <InfoField label="Gender" value={product.gender || '-'} />
-                    <InfoField label="Size" value={productVariant.size} />
-                    <InfoField label="Stock status" value={product.stockStatus} />
-                    <InfoField label="QTY" value={productVariant.specifications?.QTY || '-'} />
-                    <InfoField label="Description" value={productVariant.description} />
-                    <InfoField label="Price" value={productVariant.originalPrice || '-'} />
-                    <InfoField label="Discount Price" value={productVariant.discountPrice || '-'} />
-                    <InfoField label="Offer code" value={productVariant.offerCode || '-'} />
-                    <div className="d-flex items-center gap-2">
-                        <span style={{ color: '#808080', fontWeight: 'bold' }}>Color :</span>
-                        {productVariant.colorName &&
-                            productVariant.colorName.split(',').map((color, index) => (
-                                <div
-                                    key={index}
-                                    style={{ backgroundColor: color, width: '20px', height: '20px', borderRadius: '50%' }}
-                                ></div>
-                            ))}
+            <div className="row">
+                <div className='mv_main_offerdetails_con mt-4'>
+                    <div className="">
+                        <p className='mv_offer_details_heading mb-0'>Product Information</p>
                     </div>
-
-                </div>
-
-                <div className="col-md-6 col-12 p-4">
-                    <InfoField label="Rating" value={`⭐ ${product.rating}` || '-'} />
-                    <InfoField label="Unit" value={unitName} />
-                    <InfoField label="Brand" value={productVariant.specifications?.Brand || '-'} />
-                    <InfoField label="Fabric" value={productVariant.specifications?.Fabric || '-'} />
-                    <InfoField label="Pattern" value={productVariant.specifications?.Pattern || '-'} />
-                    <InfoField label="Sleeve Type" value={productVariant.specifications?.SleeveType || '-'} />
-                    <InfoField label="Wash case" value={productVariant.specifications?.washCase || '-'} />
-                    <InfoField label="Work" value={productVariant.specifications?.Work || '-'} />
-                    <InfoField label="Occasion" value={productVariant.specifications?.Occasion || '-'} />
-                    <InfoField label="Country Origin" value={productVariant.specifications?.CountryOrigin || '-'} />
-                    <InfoField label="Warning" value={productVariant.specifications?.Warning || '-'} />
-                    <InfoField label="Manufacturing Details" value={productVariant.manufacturingDetails || '-'} />
-                    <InfoField label="Shipping" value={productVariant.shiping || '-'} />
-                    <InfoField label="Return / exchange Policy" value={productVariant.returnPolicy || '-'} />
+                    <div className="row mv_main_view_product_con mv_main_offerdetails">
+                        <div className="col-xxl-5 mb-2">
+                            <div className="row">
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Main Category :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{mainCategoryName}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Category :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{categoryName}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Product :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{product.productName}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Short Description :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.shortDescription}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Gender :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{product.gender || '-'}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Size :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.size}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Stock status :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{product.stockStatus}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>QTY :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.QTY || '-'}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Description :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.description}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Price :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.originalPrice || '-'}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Discount Price :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.discountPrice || '-'}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Offer code :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.offerCode || '-'}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Color :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <div className='d-flex align-items-center gap-2'>
+                                        {productVariant.colorName &&
+                                            productVariant.colorName.split(',').map((color, index) => (
+                                                <div
+                                                    key={index}
+                                                    style={{ backgroundColor: color, width: '20px', height: '20px', borderRadius: '50%' }}
+                                                ></div>
+                                            ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-xxl-7">
+                            <div className="row">
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Rating :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{`⭐ ${product.rating}` || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Unit :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{unitName}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Brand :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.Brand || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Fabric :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.Fabric || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Pattern :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.Pattern || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Sleeve Type :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.SleeveType || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Wash case :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.washCase || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Work :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.Work || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Occasion :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.Occasion || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Country Origin :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.CountryOrigin || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Warning :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.Warning || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Manufacturing Details :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.manufacturingDetails || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Shipping :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.shiping || '-'}</p>
+                                </div>
+                                <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Return/exchange Policy :</p>
+                                </div>
+                                <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{productVariant.returnPolicy || '-'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

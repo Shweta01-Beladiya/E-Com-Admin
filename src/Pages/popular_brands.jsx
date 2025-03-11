@@ -39,7 +39,7 @@ const Popularbrands = (props) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("hihi" , result);
+        // console.log("hihi" , result);
         if (filters.brandName) {
           result = result.filter(user => user.brandName === filters.brandName);
         }
@@ -119,7 +119,7 @@ const Popularbrands = (props) => {
     const [currentPage, setCurrentPage] = useState(1);
  
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
  
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {

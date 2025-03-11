@@ -103,7 +103,7 @@ const Addproductoffer = () => {
                         navigate('/Productoffer');
                     }
                 } catch (error) {
-
+                    console.error('Data Create and update error:', error);
                 }
             }
         }
@@ -218,6 +218,7 @@ const Addproductoffer = () => {
             }
         }
         fetchSingleData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -229,29 +230,26 @@ const Addproductoffer = () => {
                 setFieldValue("categoryId", "");
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [values.mainCategoryId, category]);
 
     useEffect(() => {
-        if (values.categoryId) {
+        if (values.categoryId && subCategory.length > 0) {
             const filtered = subCategory.filter(subCat => subCat.categoryId === values.categoryId);
             setFilteredSubCategories(filtered);
-
-            if (!filtered.some(subCat => subCat._id === values.subCategoryId)) {
-                setFieldValue("subCategoryId", "");
-            }
         }
     }, [values.categoryId, subCategory]);
-
+    
     useEffect(() => {
-        if (values.subCategoryId) {
+        if (values.subCategoryId && product.length > 0) {
             const filtered = product.filter(pro => pro.subCategoryId === values.subCategoryId);
             setFilteredProducts(filtered);
-
-            if (!filtered.some(pro => pro._id === values.productId)) {
-                setFieldValue("productId", "");
-            }
         }
     }, [values.subCategoryId, product]);
+
+    const handlenavigate = () => {
+        navigate('/Productoffer');
+    }
 
     return (
         <>
@@ -478,7 +476,7 @@ const Addproductoffer = () => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button className='border-0 bg-transparent'>
+                                                <button className='border-0 bg-transparent' onClick={handlenavigate}>
                                                     Cancel
                                                 </button>
                                                 {id ?

@@ -80,7 +80,7 @@ const Product = () => {
         });
 
         setFilteredData(result);
-        setCurrentPage(1); // Reset to first page after filtering
+        setCurrentPage(1);
     };
 
     const handleSearchChange = (e) => {
@@ -89,24 +89,26 @@ const Product = () => {
 
     const handleMainCategoryChange = (e) => {
         setSelectedMainCategory(e.target.value);
-        // Reset subcategory when main category changes
         setSelectedCategory('');
+        setTimeout(() => applyFilters(), 0);
     };
 
     const handleCategoryChange = (e) => {
         setSelectedCategory(e.target.value);
+        setTimeout(() => applyFilters(), 0);
     };
 
     const handleStockStatusChange = (e) => {
         setSelectedStockStatus(e.target.value);
+        setTimeout(() => applyFilters(), 0);
     };
 
     const handleSliderChange = (newRange) => {
         setPriceRange(newRange);
+        setTimeout(() => applyFilters(), 300);
     };
 
     useEffect(() => {
-        // Apply search filter on searchQuery change
         if (data.length > 0) {
             applyFilters();
         }
@@ -147,33 +149,20 @@ const Product = () => {
     };
 
     const getPaginationButtons = () => {
+        if (totalPages <= 4) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+
         const buttons = [];
-        const maxButtonsToShow = 5;
 
-        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-        // Adjust startPage if we're near the end
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+        if (currentPage <= 2) {
+            buttons.push(1, 2, 3, "...");
+        } else if (currentPage >= totalPages - 1) {
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
 
-        // Add first page if not included
-        if (startPage > 1) {
-            buttons.push(1);
-            if (startPage > 2) buttons.push('...');
-        }
-
-        // Add main page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
-        // Add last page if not included
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) buttons.push('...');
-            buttons.push(totalPages);
-        }
         return buttons;
     };
 
@@ -386,7 +375,7 @@ const Product = () => {
                                                     <th className=''>Product Name</th>
                                                     <th className=''>Price</th>
                                                     <th className=''>Rating</th>
-                                                    <th className=''>Stock Status</th>
+                                                    {/* <th className=''>Stock Status</th> */}
                                                     <th className='d-flex align-items-center justify-content-end'>Action</th>
                                                 </tr>
                                             </thead>
@@ -413,7 +402,7 @@ const Product = () => {
                                                                 {item.rating || '0'}
                                                             </div>
                                                         </td>
-                                                        <td>
+                                                        {/* <td>
                                                             {
                                                                 item.stockStatus === 'In Stock' ? (
                                                                     <p className='m-0 mv_delivered_padd'>{item.stockStatus}</p>
@@ -425,7 +414,7 @@ const Product = () => {
                                                                     <p className='m-0'>Unknown</p>
                                                                 )
                                                             }
-                                                        </td>
+                                                        </td> */}
                                                         <td className='d-flex align-items-center justify-content-end'>
                                                             <div className="mv_pencil_icon">
                                                                 <Link to={`/viewProduct?id=${item._id}&productVariantId=${item.productVariantData?.[0]?._id || ''}`}>
@@ -447,17 +436,23 @@ const Product = () => {
                                         </table>
                                     </div>
                                     {totalPages > 1 && (
-                                        <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                            <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                                        <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage - 1)}>
                                                 <MdOutlineKeyboardArrowLeft />
                                             </p>
                                             {getPaginationButtons().map((page, index) => (
-                                                <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                                    onClick={() => typeof page === 'number' ? handlePageChange(page) : null}>
+                                                <p key={index}
+                                                    className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                    onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                    style={{ cursor: page === "..." ? "default" : "pointer" }}>
                                                     {page}
                                                 </p>
                                             ))}
-                                            <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
+                                                onClick={() => handlePageChange(currentPage + 1)} >
                                                 <MdOutlineKeyboardArrowRight />
                                             </p>
                                         </div>
