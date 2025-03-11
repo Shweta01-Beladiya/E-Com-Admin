@@ -26,6 +26,7 @@ const ContactUs = () => {
     // const [filteredData, setFilteredData] = useState(data);
     // const [viewModal, setViewModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [allData, setAllData] = useState([]);
 
     // const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     // console.log("totalpage",totalPages)
@@ -38,23 +39,42 @@ const ContactUs = () => {
             // console.log("reponse",response.data.contactUs);
             const dataFromStorage = response.data.contactUs
             if (dataFromStorage) {
-                const total = Math.ceil(dataFromStorage.length / itemsPerPage);
+                setAllData(dataFromStorage);
+
+                const filtered = dataFromStorage.filter(filterFunction);
+                const total = Math.ceil(filtered.length / itemsPerPage);
                 setTotalPages(total);
 
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-
-                setData(dataFromStorage.slice(startIndex, endIndex));
+                updateDisplayedData(dataFromStorage);
             }
         } catch (error) {
             console.error('Data Fetching Error:', error);
         }
     };
 
+    // Function to update displayed data based on current page and filters
+    const updateDisplayedData = (sourceData) => {
+        const filtered = sourceData.filter(filterFunction);
+        const total = Math.ceil(filtered.length / itemsPerPage);
+        setTotalPages(total);
+        
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        
+        setData(filtered.slice(startIndex, endIndex));
+    };
+
     useEffect(() => {
         local_data();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage]);
+
+    // Update displayed data when page, search, or subject filter changes
+    useEffect(() => {
+        if (allData.length > 0) {
+            updateDisplayedData(allData);
+        }
+    }, [currentPage, searchQuery, selectedSubject]);
 
     useEffect(() => {
         if(id) {
@@ -83,8 +103,9 @@ const ContactUs = () => {
         setSelectedSubject(event.target.value);
         setCurrentPage(1);
     };
+
     // Filter data based on search query
-    const filteredData = data.filter((item) => {
+    const filterFunction = (item) => {
         const matchesSearch =
             item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -94,8 +115,7 @@ const ContactUs = () => {
         const matchesSubject = selectedSubject === "" || item.subject === selectedSubject;
 
         return matchesSearch && matchesSubject;
-    });
-    
+    };
     
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -119,12 +139,7 @@ const ContactUs = () => {
         }
       
         return buttons;
-      };
-
-    const paginatedData = filteredData.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    };
 
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
@@ -166,8 +181,11 @@ const ContactUs = () => {
             });
             console.log("response",response.data);
             if(response.data.status === 200) {
-                setData(prevData => prevData.filter(item => item._id !== id)); 
-                setTotalPages(Math.ceil((data.length - 1) / itemsPerPage));
+                setAllData(prevData => prevData.filter(item => item._id !== id)); 
+                
+                const updatedAllData = allData.filter(item => item._id !== id);
+                updateDisplayedData(updatedAllData);
+                
                 setModalShow(false);
                 setId(null);
             }

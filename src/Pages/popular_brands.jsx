@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 import Addpopularbrands from './add_popularbrands';
+import NoResultsFound from "../Component/Noresult";
 
 const Popularbrands = () => {
 
@@ -21,6 +22,7 @@ const Popularbrands = () => {
         brandName: '',
     });
     const [tempFilters, setTempFilters] = useState(filters);
+    const [shouldResetPage, setShouldResetPage] = useState(false);
 
     // Edit Offer
     const [showAddForm, setShowAddForm] = useState(false);
@@ -43,9 +45,16 @@ const Popularbrands = () => {
           );
         }
     
-        setFilteredData(result);
-        setCurrentPage(1); // Reset to first page when filters change
-    }, [data, filters, searchTerm]);
+        if (shouldResetPage) {
+            setCurrentPage(1);
+            setShouldResetPage(false);
+        }
+        
+        const newTotalPages = Math.ceil(result.length / itemsPerPage);
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+            setCurrentPage(newTotalPages);
+        }
+    }, [data, filters, searchTerm, shouldResetPage]);
 
     // Offcanvas Filter
     const handleFilterChange = (field, value) => {
@@ -57,6 +66,7 @@ const Popularbrands = () => {
 
     const handleApplyFilters = () => {
         setFilters(tempFilters);
+        setShouldResetPage(true);
         handleClose();
     };
 
@@ -97,7 +107,14 @@ const Popularbrands = () => {
                    Authorization: `Bearer ${token}`,
                }
            })
-           console.log("delete response " , response);
+            const updatedData = filteredData.filter(item => item._id !== deleteToggle);
+            setFilteredData(updatedData);
+            setData(updatedData);
+            
+            if (updatedData.length === 0) {
+                setCurrentPage(1);
+            }
+
            setModalShow(false)
            seToggle(prev => !prev);
         }catch(error){
@@ -250,69 +267,73 @@ const Popularbrands = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Brand</th>
-                                            <th className=''>Image</th>
-                                            <th className=''>Offer</th>
-                                            <th className=''>Title</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                       {paginatedData.map((item, index) => {
-                                        // console.log(`${BaseUrl}/${item?.brandImage}`);
-                                        return(
-                                        <tr key={index}>
-                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                            <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandLogo }`}  alt="" />
-                                                {item?.brandName}
-                                            </td>
-                                            <td>
-                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandImage}`}  alt="" />
-                                            </td>
-                                            <td>{item?.offer}</td>
-                                            <td>{item?.title}</td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
-                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        )})}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
-                                    {/* Previous Button */}
-                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {/* Pagination Buttons */}
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index}
-                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                        onClick={() => typeof page === "number" && handlePageChange(page)}
-                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                        {page}
-                                        </p>
-                                    ))}
-                                    {/* Next Button */}
-                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage + 1)} >
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
-                            )}
+                            {paginatedData.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>Brand</th>
+                                                    <th className=''>Image</th>
+                                                    <th className=''>Offer</th>
+                                                    <th className=''>Title</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {paginatedData.map((item, index) => {
+                                                // console.log(`${BaseUrl}/${item?.brandImage}`);
+                                                return(
+                                                <tr key={index}>
+                                                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                    <td>
+                                                        <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandLogo }`}  alt="" />
+                                                        {item?.brandName}
+                                                    </td>
+                                                    <td>
+                                                        <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandImage}`}  alt="" />
+                                                    </td>
+                                                    <td>{item?.offer}</td>
+                                                    <td>{item?.title}</td>
+                                                    <td className='d-flex align-items-center justify-content-end'>
+                                                        <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
+                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                        </div>
+                                                        <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                            <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                )})}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                            {/* Previous Button */}
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                                onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {/* Pagination Buttons */}
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index}
+                                                className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                {page}
+                                                </p>
+                                            ))}
+                                            {/* Next Button */}
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                                onClick={() => handlePageChange(currentPage + 1)} >
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (<NoResultsFound />)}
                         </div>
                     </div>
                 </div>
