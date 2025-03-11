@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import '../CSS/riya.css';
 import axios from "axios";
-import { Formik, ErrorMessage, Field } from "formik";
+import { Formik, ErrorMessage } from "formik";
 import * as Yup from 'yup';
 import NoResultsFound from "../Component/Noresult";
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
@@ -46,7 +46,7 @@ const MainCategory = () => {
     fetchData();
   }, [BaseUrl, token]);
 
-  const handleSubmit = async (value, { resetForm,setFieldError  }) => {
+  const handleSubmit = async (value, { resetForm, setFieldError }) => {
     try {
       if (id) {
         // console.log("id",id);
@@ -92,6 +92,14 @@ const MainCategory = () => {
       setCategories((prevCategories) =>
         prevCategories.filter((cat) => cat._id !== id)
       );
+
+      const newTotalItems = filteredData.length - 1;
+      const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
+
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
+
       setShowDeleteModal(false);
       setId(null);
       setCategoryToDelete(null);
@@ -143,9 +151,9 @@ const MainCategory = () => {
     if (totalPages <= 4) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-  
+
     const buttons = [];
-  
+
     if (currentPage <= 2) {
       buttons.push(1, 2, 3, "...");
     } else if (currentPage >= totalPages - 1) {
@@ -153,13 +161,13 @@ const MainCategory = () => {
     } else {
       buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
     }
-  
+
     return buttons;
   };
 
   useEffect(() => {
     setFilteredData(filteredCategories);
-     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, searchTerm]);
 
   // *******************************************************************************
@@ -241,7 +249,7 @@ const MainCategory = () => {
                   {totalPages > 1 && (
                     <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
                       {/* Previous Button */}
-                      <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                      <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
                         onClick={() => handlePageChange(currentPage - 1)}>
                         <MdOutlineKeyboardArrowLeft />
                       </p>
@@ -255,7 +263,7 @@ const MainCategory = () => {
                         </p>
                       ))}
                       {/* Next Button */}
-                      <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                      <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
                         onClick={() => handlePageChange(currentPage + 1)} >
                         <MdOutlineKeyboardArrowRight />
                       </p>
@@ -288,7 +296,7 @@ const MainCategory = () => {
             onSubmit={handleSubmit}
             initialValues={initialValues}
           >
-            {({ handleBlur, handleChange, handleSubmit, values, setFieldError , touched }) => (
+            {({ handleBlur, handleChange, handleSubmit, values, setFieldError, touched }) => (
               <Form className="r_form" onSubmit={handleSubmit}>
                 <div className="mv_input_content mb-5">
                   <label className='mv_label_input'>Main Category</label>
@@ -300,7 +308,7 @@ const MainCategory = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />
-                    </InputGroup>
+                  </InputGroup>
                   <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
                 </div>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
@@ -356,7 +364,7 @@ const MainCategory = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                     />
-                    </InputGroup>
+                  </InputGroup>
                   <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
                 </div>
                 <div className='d-flex justify-content-center gap-3 mt-4'>

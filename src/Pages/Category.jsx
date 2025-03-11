@@ -161,7 +161,19 @@ const Category = () => {
             headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data.status === 200) {
-            setCategories((prevCatgory) => prevCatgory.filter((cat) => cat._id !== id))
+            setCategories((prevCategories) => {
+                
+                const newCategories = prevCategories.filter((cat) => cat._id !== id);
+                const newTotalItems = newCategories.length;
+                const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
+
+                if (currentPage > newTotalPages && newTotalPages > 0) {
+                    setCurrentPage(newTotalPages);
+                }
+
+                return newCategories;
+            });
+
             setShowDeleteModal(false);
             setCategoryToDelete(null)
         }

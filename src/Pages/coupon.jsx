@@ -287,7 +287,7 @@ const Coupon = () => {
                                                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                 <td>{item.code}</td>
                                                 <td>{item.title}</td>
-                                                <td>{item.description}</td>
+                                                <td className='text-truncate'>{item.description}</td>
                                                 <td>{item.coupenType}</td>
                                                 <td>&#x20b9;{item.offerDiscount}</td>
                                                 <td>{new Date(item.startDate).toLocaleDateString('en-GB')}</td>

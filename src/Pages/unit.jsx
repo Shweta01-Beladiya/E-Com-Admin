@@ -158,7 +158,15 @@ const Unit = () => {
             if (response.data.status === 200) {
                 setId(null);
                 setModalShow(false);
-                setData(prevData => prevData.filter(unit => unit._id !== id));
+                
+                const newData = data.filter(unit => unit._id !== id);
+                const newTotalPages = Math.ceil(newData.length / itemsPerPage);
+                
+                if (currentPage > newTotalPages && newTotalPages > 0) {
+                    setCurrentPage(newTotalPages);
+                }
+                
+                setData(newData);
             }
         } catch (error) {
             console.error('Data Delete Error:', error);

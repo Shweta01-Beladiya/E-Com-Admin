@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
-import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
@@ -10,8 +9,6 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
-    const navigate = useNavigate()
-    const [toggle, setToggle] = useState(false)
 
     // State variables
     let [isedit, setisedit] = useState(false);
@@ -25,7 +22,7 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
 
     const [brandImagePreview, setBrandImagePreview] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     useEffect(() => {
         if (editData && editData.offerImage) {
             try {
@@ -48,7 +45,7 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
         const selectedDate = e.target.value;
         const [year, month, day] = selectedDate.split("-");
         const formattedDate = `${day}-${month}-${year}`;
-        
+
         if (dateType === 'start') {
             setDate(formattedDate); // For UI display
             setFieldValue("startDate", selectedDate)
@@ -60,8 +57,8 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
 
     // ******************************* Validation *******************************
     const addofferInit = {
-        mainCategoryId:  editData?.mainCategoryId || "",
-        categoryId:  editData?.categoryId || "",
+        mainCategoryId: editData?.mainCategoryId || "",
+        categoryId: editData?.categoryId || "",
         subCategoryId: editData?.subCategoryId || "",
         offerType: editData?.offerType || "",
         offerName: editData?.offerName || "",
@@ -115,7 +112,7 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                             "Content-Type": "multipart/form-data"
                         }
                     });
-                }else {
+                } else {
                     response = await axios.post(`${BaseUrl}/api/createOffer`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -123,7 +120,7 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                         }
                     });
                 }
-                
+
                 if (response.data.status === 200 || response.data.status === 201) {
                     // Call the success callback provided by parent component
                     if (onSubmitSuccess) {
@@ -163,7 +160,7 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // console.log("response", response.data.category);
-                setCategories(response.data.category);
+            setCategories(response.data.category);
         } catch (error) {
             console.error('Data fetching Error:', error);
         }
@@ -174,28 +171,28 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // console.log("response", response.data);
-                setsubCategories(response.data.subCategory);
+            setsubCategories(response.data.subCategory);
         } catch (error) {
             console.error('Data fetching Error:', error);
         }
     }
-    function mCategory(value){
-        var fliter = categories.filter(item=> item.mainCategoryId === value)
-        console.log('f',fliter);
+    function mCategory(value) {
+        var fliter = categories.filter(item => item.mainCategoryId === value)
+        console.log('f', fliter);
         setselectedCategories(fliter)
     }
-    function sCategory(value){
-        console.log('sub',subcategories);
-        var fliter = subcategories.filter(item=> item.categoryId === value)
-        console.log('f123',fliter);
+    function sCategory(value) {
+        console.log('sub', subcategories);
+        var fliter = subcategories.filter(item => item.categoryId === value)
+        console.log('f123', fliter);
         setselectedSubCategories(fliter)
     }
-    useEffect(()=>{
+    useEffect(() => {
         fetchMainCategory();
         fetchCategory();
         fetchsubCategory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
+    }, [])
 
     // Set initial selected categories and subcategories when editData is loaded
     useEffect(() => {
@@ -237,8 +234,8 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                                                     name="mainCategoryId"
                                                     value={values.mainCategoryId}
                                                     onChange={(e) => {
-                                                        handleChange(e);  // ✅ Correctly pass the event
-                                                        mCategory(e.target.value);  // ✅ Get updated value from the event
+                                                        handleChange(e);
+                                                        mCategory(e.target.value);
                                                     }}
                                                     onBlur={handleBlur}
                                                     className='mv_form_select'>
@@ -330,51 +327,66 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Image</label>
-                                                <InputGroup className="">
-                                                    <Form.Control
-                                                        placeholder="Choose Image"
-                                                        aria-label=""
-                                                        readOnly
-                                                        value={addimg}
-                                                        name="addpopularbrandimage"
-                                                        onBlur={handleBlur}
-                                                    />
-                                                    <label className="mv_browse_button">
-                                                        Browse
-                                                        <input 
-                                                            type="file"
-                                                            hidden
-                                                            accept="image/jpeg, image/png, image/jpg"
-                                                            onChange={(e) => {
-                                                                const file = e.currentTarget.files[0];
-                                                                if (file) {
-                                                                    setaddimg(file.name);
-                                                                    setFieldValue("addpopularbrandimage", file);
-                                                                    setBrandImagePreview(URL.createObjectURL(file));
-                                                                }
-                                                                setToggle(true)
-                                                            }}
-                                                        />
-                                                    </label>
-                                                </InputGroup>
-                                                {errors.addpopularbrandimage && touched.addpopularbrandimage && <div className="text-danger small">{errors.addpopularbrandimage}</div>}
-                                                {brandImagePreview && (
-                                                    <div className="mt-2">
-                                                        <img
-                                                            className='mv_update_img'
-                                                            src={brandImagePreview}
-                                                            alt="Brand Image Preview"
-                                                            style={{
-                                                                maxWidth: '20px',
-                                                                maxHeight: '20px',
-                                                                objectFit: 'contain',
-                                                                border: '1px solid #ddd',
-                                                                borderRadius: '4px',
-                                                                padding: '2px'
-                                                            }}
-                                                        />
+                                                <div className="position-relative">
+                                                    <div className="border border-black rounded w-100 p-1 d-flex align-items-center justify-content-between">
+                                                        <div className="d-flex align-items-center p-1" style={{backgroundColor: addimg ? '#EAEAEA' :'transparent', width:'50%'}}>
+                                                            {addimg && (
+                                                                <>
+                                                                    <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                                        <img
+                                                                            src={brandImagePreview || `${BaseUrl}/${editData?.offerImage}`}
+                                                                            alt="Preview"
+                                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className='text-truncate' style={{width:'100%'}}>{addimg}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn text-danger p-0 ms-2"
+                                                                        style={{ fontSize: '1.25rem', lineHeight: 1 }}
+                                                                        onClick={() => {
+                                                                            setaddimg("");
+                                                                            setBrandImagePreview(null);
+                                                                            setFieldValue("addpopularbrandimage", "");
+                                                                        }}
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {!addimg && (
+                                                                <span className="text-muted ">Choose Image</span>
+                                                            )}
+                                                        </div>
+                                                        <label className="btn" style={{
+                                                            backgroundColor: '#3A2C2C',
+                                                            color: 'white',
+                                                            borderRadius: '4px',
+                                                            padding: '3px 16px',
+                                                            marginLeft: '8px',
+                                                            cursor: 'pointer',
+                                                            fontSize:'12px'
+                                                        }}>
+                                                            Browse
+                                                            <input
+                                                                type="file"
+                                                                hidden
+                                                                accept="image/jpeg, image/png, image/jpg"
+                                                                onChange={(e) => {
+                                                                    const file = e.currentTarget.files[0];
+                                                                    if (file) {
+                                                                        setaddimg(file.name);
+                                                                        setFieldValue("addpopularbrandimage", file);
+                                                                        setBrandImagePreview(URL.createObjectURL(file));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
                                                     </div>
-                                                )}
+                                                </div>
+                                                {errors.addpopularbrandimage && touched.addpopularbrandimage &&
+                                                    <div className="text-danger small">{errors.addpopularbrandimage}</div>
+                                                }
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -397,9 +409,9 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>Start Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
-                                                { 
-                                                    values.startDate ? null : 
-                                                    <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
+                                                {
+                                                    values.startDate ? null :
+                                                        <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date}</label>
                                                 }
                                                 <Form.Control
                                                     className=""
@@ -416,9 +428,9 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <label className='mv_offcanvas_filter_category'>End Date</label>
                                             <div className="mv_input_content mv_add_product_date_scheduled mb-3">
-                                                { 
-                                                    values.endDate ? null : 
-                                                    <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
+                                                {
+                                                    values.endDate ? null :
+                                                        <label className='mv_label_input mv_add_product_date mv_filter_start_date'>{date1}</label>
                                                 }
                                                 <Form.Control
                                                     className=""
@@ -441,7 +453,7 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         placeholder="Enter Description"
-                                                        as="textarea" 
+                                                        as="textarea"
                                                         aria-label="With textarea"
                                                         aria-describedby="basic-addon1"
                                                     />
@@ -454,10 +466,10 @@ const Addoffer = ({ editData, onCancel, onSubmitSuccess }) => {
                                                 <button onClick={onCancel} className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
-                                                {editData?
+                                                {editData ?
                                                     <button type="submit" className='border-0 bg-transparent' onClick={() => setisedit()}>
                                                         Update
-                                                    </button> : 
+                                                    </button> :
                                                     <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
                                                         Add
                                                     </button>

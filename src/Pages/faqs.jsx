@@ -25,7 +25,7 @@ const Faqs = (props) => {
     const [filteredData, setFilteredData] = useState();
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -122,7 +122,7 @@ const Faqs = (props) => {
                             "Content-Type": "application/json"
                         }
                     });
-                    console.log("Response:", response?.data);
+                    // console.log("Response:", response?.data);
                     setModalShow1(false);
                     setToggle(!toggle);
                     resetForm();
@@ -146,7 +146,7 @@ const Faqs = (props) => {
                      Authorization: `Bearer ${token}`,
                  }
                })
-               console.log("data" , response?.data);
+            //    console.log("data" , response?.data);
                setFilteredData(response?.data?.faqs)
                setData(response?.data?.faqs)
             }catch(error){
@@ -210,7 +210,7 @@ const Faqs = (props) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
+        // console.log("" , result);
     
         if (searchTerm) {
           result = result.filter(user =>

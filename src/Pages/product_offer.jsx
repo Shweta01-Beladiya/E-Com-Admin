@@ -434,7 +434,7 @@ const Productoffer = () => {
                                                     <tr key={index}>
                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.subCategoriesData[0].subCategoryName}</td>
-                                                        <td>{item.productData[0].productName}</td>
+                                                        <td>{item.productData[0]?.productName}</td>
                                                         <td>{item.code}</td>
                                                         <td>{item.discountPrice}%</td>
                                                         <td>${item.price}</td>
