@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InputGroup, Form } from 'react-bootstrap';
 import '../CSS/vaidik.css';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -57,30 +57,37 @@ const Addcoupon = () => {
         endDate: Yup.date().required("End Date is required"),
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched , setFieldValue } = useFormik({
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched , setFieldValue,setFieldError } = useFormik({
         initialValues: couponInit,
         validationSchema: couponValidate,
         onSubmit:  async(values) => {
             // console.log(values);
 
-            if(id) {
-                const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, values, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                // console.log("resposne",response.data);
-                if(response.data.status === 200) {
-                    navigate('/coupon');
-                }
-            } else {
-                const response = await axios.post(`${BaseUrl}/api/createSpecialOffer`, values, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
+            try {
+                if(id) {
+                    const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, values, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    // console.log("resposne",response.data);
+                    if(response.data.status === 200) {
+                        navigate('/coupon');
                     }
-                });
-                // console.log("response",response.data);
-                if(response.data.status === 201){
-                    navigate('/coupon');
+                } else {
+                    const response = await axios.post(`${BaseUrl}/api/createSpecialOffer`, values, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    // console.log("response",response.data);
+                    if(response.data.status === 201){
+                        navigate('/coupon');
+                    }
                 }
+            } catch (error) {
+                console.error('Data Create and update Error:',error);
+                if (error.response && error.response.status === 400) {
+                    setFieldError('title', 'Coupon Name already exists');
+                  }
             }
         }
     })

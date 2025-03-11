@@ -9,8 +9,8 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 
-const Reasonforcancellation = (props) => {
-   
+const Reasonforcancellation = () => {
+
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
@@ -26,7 +26,7 @@ const Reasonforcancellation = (props) => {
     const [filteredData, setFilteredData] = useState();
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -34,21 +34,21 @@ const Reasonforcancellation = (props) => {
         }
     };
 
-    const getPaginationButtons = () => {
+   const getPaginationButtons = () => {
         if (totalPages <= 4) {
-          return Array.from({ length: totalPages }, (_, i) => i + 1);
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
-      
+
         const buttons = [];
-      
+
         if (currentPage <= 2) {
-          buttons.push(1, 2, 3, "...");
+            buttons.push(1, 2, 3, "...");
         } else if (currentPage >= totalPages - 1) {
-          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
         } else {
-          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-      
+
         return buttons;
     };
 
@@ -57,20 +57,10 @@ const Reasonforcancellation = (props) => {
         currentPage * itemsPerPage
     );
     // *******************************************************************************
-    
+
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
-
-    // const [values, setValues] = useState({
-    //     name: "",
-    //     name1: ""
-    // });
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setValues({ ...values, [name]: value });
-    // };
 
     // ******************************* Validation *******************************
     const [id, setId] = useState(null);
@@ -78,11 +68,11 @@ const Reasonforcancellation = (props) => {
     const init = {
         reasonName: "",
     };
-    
+
     const validate = Yup.object().shape({
         reasonName: Yup.string().required("Reason for cancellation is required")
     });
-    
+
     const formik = useFormik({
         initialValues: init,
         validationSchema: validate,
@@ -91,7 +81,7 @@ const Reasonforcancellation = (props) => {
             // reasonforcancellation(values)
 
             const reasonforcancel = {
-                reasonName:values?.reasonName,
+                reasonName: values?.reasonName,
             }
 
             //************************************** Edit and Add **************************************
@@ -132,11 +122,11 @@ const Reasonforcancellation = (props) => {
         }
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm,setValues } = formik;
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, resetForm, setValues } = formik;
     // **************************************************************************
 
     // ************************************** Show Data **************************************
-    useEffect(()=>{
+    useEffect(() => {
         const fetchBrandData = async () => {
             try{
                const response = await axios.get(`${BaseUrl}/api/allReasons`,{
@@ -152,41 +142,40 @@ const Reasonforcancellation = (props) => {
             }
         }
         fetchBrandData()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[toggle])
+    }, [toggle])
     // ***************************************************************************************
- 
+
     // ************************************** Delete Item **************************************
-    const handleManage = (id) =>{
+    const handleManage = (id) => {
         setModalShow(true)
         setDeleteToggle(id)
     }
- 
+
     const handleDelete = async () => {
-        try{
-            const response = await axios.delete(`${BaseUrl}/api/deleteReason/${deleteToggle}`,{
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteReason/${deleteToggle}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            console.log("delete response " , response);
+            console.log("delete response ", response);
             setModalShow(false)
             setToggle(!toggle)
-        }catch(error){
+        } catch (error) {
             alert(error)
         }
-     }
+    }
     // ***************************************************************************************
 
     // Edit
     const handleEdit = (item) => {
         setId(item._id);
-        
+
         // Set form values with the selected item data
         setValues({
             reasonName: item.reasonName || "",
         });
-        
+
         setModalShow1(true);
     };
 
@@ -207,17 +196,38 @@ const Reasonforcancellation = (props) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
-    
+        // console.log("", result);
+
         if (searchTerm) {
-          result = result.filter(user =>
-            user.reasonName?.toLowerCase().includes(searchTerm.toLowerCase())
-          );
+            result = result.filter(user =>
+                user.reasonName?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
-    
+
         setFilteredData(result);
         setCurrentPage(1);
     }, [data, searchTerm]);
+
+    const handleStatusChange = async (id, currentStatus) => {
+        try {
+            const response = await axios.put(`${BaseUrl}/api/updateReason/${id}`, {
+                status: !currentStatus
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("Respos", response.data);
+            if (response.data.status === 200) {
+                setData(prevData => prevData.map(item =>
+                    item._id === id ? { ...item, status: !currentStatus } : item
+                ));
+                setFilteredData(prevData => prevData.map(item =>
+                    item._id === id ? { ...item, status: !currentStatus } : item
+                ));
+            }
+        } catch (error) {
+            console.error('Data Fetching Error:', error);
+        }
+    }
 
     return (
         <>
@@ -238,9 +248,9 @@ const Reasonforcancellation = (props) => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
                                         />
                                     </InputGroup>
                                 </div>
@@ -264,29 +274,28 @@ const Reasonforcancellation = (props) => {
                                     </thead>
                                     <tbody>
                                         {paginatedData?.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                            <td>{item.reasonName}</td>
-                                            <td>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id={`custom-switch-${item.id}`}
-                                                    label=""
-                                                    checked={item.status}
-                                                    className=''
+                                            <tr key={index}>
+                                                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td>{item.reasonName}</td>
+                                                <td>
+                                                    <Form.Check
+                                                        type="switch"
+                                                        checked={item.status}
+                                                        className=''
+                                                        onChange={() => handleStatusChange(item._id, item.status)}
                                                     />
-                                            </td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td className='d-flex align-items-center justify-content-end'>
+                                                    <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                        <Link>
+                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -339,7 +348,7 @@ const Reasonforcancellation = (props) => {
             {/* Add Edit Reason Model */}
             <Modal show={modalShow1} onHide={handleCloseModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header className='mv_edit_profile_header' closeButton>
-                    
+
                 </Modal.Header>
                 <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
                     {id ? 'Edit Reason' : 'Add Reason'}
@@ -355,7 +364,7 @@ const Reasonforcancellation = (props) => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter reason for cancellatoin"
-                                    as="textarea" 
+                                    as="textarea"
                                     aria-label="With textarea"
                                     aria-describedby="basic-addon1"
                                 />

@@ -147,7 +147,7 @@ const Help = () => {
                      Authorization: `Bearer ${token}`,
                  }
                })
-               console.log("data" , response?.data);
+
                setFilteredData(response?.data?.helpQuestion)
                setData(response?.data?.helpQuestion)
             }catch(error){

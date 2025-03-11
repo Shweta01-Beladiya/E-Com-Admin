@@ -202,7 +202,7 @@ const AddProduct = () => {
         }
     };
     // Form submission handler
-    const handleSubmit = async (values, { setSubmitting }) => {
+    const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
         try {
             if (id) {
                 console.log("Images Before Sending:", values.images);
@@ -285,7 +285,7 @@ const AddProduct = () => {
                 values.images.forEach((image) => {
                     formData.append("images", image.file);
                 });
-               
+
                 const specObject = {};
                 values.specifications.forEach(spec => {
                     if (spec.key && spec.value) {
@@ -321,6 +321,9 @@ const AddProduct = () => {
             }
         } catch (error) {
             console.error('Data Fetching Error:', error);
+            if (error.response && error.response.status === 409) {
+                setFieldError('productName', 'Product name already exists');
+              }
         }
         setSubmitting(false);
     };

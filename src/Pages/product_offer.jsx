@@ -260,7 +260,17 @@ const Productoffer = () => {
             });
             // console.log("response", response.data);
             if (response.data.status === 200) {
-
+                setFilteredData(prevData =>
+                    prevData.map(item =>
+                        item._id === id ? { ...item, status: !item.status } : item
+                    )
+                );
+                
+                setData(prevData =>
+                    prevData.map(item =>
+                        item._id === id ? { ...item, status: !item.status } : item
+                    )
+                );
             }
         } catch (error) {
             console.error('Data Fetching Error:', error);

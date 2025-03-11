@@ -135,8 +135,6 @@ const Size = () => {
             setFilteredData(data);
         } else {
             const filtered = data.filter((item) =>
-                item.sizeName.toLowerCase().includes(term.toLowerCase()) ||
-                item.size.toString().includes(term) ||
                 item.mainCategoryData[0].mainCategoryName.toLowerCase().includes(term.toLowerCase()) ||
                 item.categoryData[0].categoryName.toLowerCase().includes(term.toLowerCase()) ||
                 item.subCategoryData[0].subCategoryName.toLowerCase().includes(term.toLowerCase())
@@ -193,7 +191,7 @@ const Size = () => {
         applyFilters();
         handleClose();
     };
-    
+
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -233,29 +231,30 @@ const Size = () => {
 
     // Modal
     const [modalShow, setModalShow] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState(null);
+    const [id, setId] = useState(null);
 
-    const handleDeleteClick = (item) => {
-        setItemToDelete(item);
+    const handleDeleteClick = (id) => {
+        setId(id);
         setModalShow(true);
     };
 
     const handleDelete = async () => {
-        if (!itemToDelete) return;
 
         try {
-            // Implement your delete API call here
-            // await axios.delete(`${BaseUrl}/api/deleteSize/${itemToDelete._id}`, {
-            //     headers: { Authorization: `Bearer ${token}` }
-            // });
 
-            // Update the local state after successful delete
-            const updatedData = data.filter(item => item._id !== itemToDelete._id);
-            setData(updatedData);
-            setFilteredData(updatedData);
+            const response = await axios.delete(`${BaseUrl}/api/deleteSize/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log("response",response.data);
+            if (response.data.status === 200) {
+                const updatedData = data.filter(item => item._id !== id);
+                const updatedFilteredData = filteredData.filter(item => item._id !== id);
 
-            setModalShow(false);
-            setItemToDelete(null);
+                setData(updatedData);
+                setFilteredData(updatedFilteredData);
+                setModalShow(false);
+                setId(null);
+            }
         } catch (error) {
             console.error('Delete operation failed', error);
         }
@@ -397,7 +396,7 @@ const Size = () => {
                                             <tbody>
                                                 {paginatedData?.map((item, index) => (
                                                     <tr key={index}>
-                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                         <td>{item.mainCategoryData[0]?.mainCategoryName}</td>
                                                         <td>{item.categoryData[0]?.categoryName}</td>
                                                         <td>{item.subCategoryData[0]?.subCategoryName}</td>
@@ -410,7 +409,7 @@ const Size = () => {
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>
-                                                            <div className="mv_pencil_icon" onClick={() => handleDeleteClick(item)}>
+                                                            <div className="mv_pencil_icon" onClick={() => handleDeleteClick(item._id)}>
                                                                 <img src={require('../mv_img/trust_icon.png')} alt="" />
                                                             </div>
                                                         </td>
@@ -444,7 +443,7 @@ const Size = () => {
                                     )}
                                 </>
                             ) : (
-                                <NoResultsFound/>
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>

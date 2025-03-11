@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Offcanvas, InputGroup, Col, Row } from 'react-bootstrap';
-import { FaFilter } from "react-icons/fa6";
 import "../CSS/riya.css";
 import { FaSearch } from 'react-icons/fa';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-icons/md';
@@ -111,7 +110,7 @@ const SubCategory = () => {
             }
         }
         fetchSingleSubCategory();
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, BaseUrl, token]);
 
     // Function to filter categories based on selected main category
@@ -130,9 +129,10 @@ const SubCategory = () => {
         if (filters.mainCategory) {
             filterCategoriesByMainCategory(filters.mainCategory);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters.mainCategory, category]);
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, { setFieldError }) => {
         setId(id);
         try {
             if (id) {
@@ -157,6 +157,9 @@ const SubCategory = () => {
             }
         } catch (error) {
             console.error('Data Create and update error:', error);
+            if (error.response && error.response.status === 409) {
+                setFieldError('subCategoryName', 'Sub category name already exists');
+            }
         }
     }
 
@@ -182,8 +185,8 @@ const SubCategory = () => {
         return subCategories.filter((sub) => {
 
             const matchesSearch = sub.subCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                sub.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                sub.categoriesData[0].categoryName.toLowerCase().includes(searchQuery.toLowerCase());
+                sub.mainCategoryData[0]?.mainCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                sub.categoriesData[0]?.categoryName.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesMainCategory = !filters.mainCategory || sub.mainCategoryId === filters.mainCategory;
             const matchesCategory = !filters.category || sub.categoryId === filters.category;
@@ -216,31 +219,22 @@ const SubCategory = () => {
     };
 
     const getPaginationButtons = () => {
+        if (totalPages <= 4) {
+          return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+      
         const buttons = [];
-        const maxButtonsToShow = 5;
-
-        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+      
+        if (currentPage <= 2) {
+          buttons.push(1, 2, 3, "...");
+        } else if (currentPage >= totalPages - 1) {
+          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-
-        if (startPage > 1) {
-            buttons.push(1);
-            if (startPage > 2) buttons.push('...');
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) buttons.push('...');
-            buttons.push(totalPages);
-        }
+      
         return buttons;
-    };
+      };
 
     const paginatedData = filteredData?.slice(
         (currentPage - 1) * itemsPerPage,
@@ -363,17 +357,23 @@ const SubCategory = () => {
 
                         {/* Enhanced Pagination */}
                         {totalPages > 1 && (
-                            <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                            <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+
+                                <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
+                                    onClick={() => handlePageChange(currentPage - 1)}>
                                     <MdOutlineKeyboardArrowLeft />
                                 </p>
                                 {getPaginationButtons().map((page, index) => (
-                                    <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                        onClick={() => handlePageChange(page)}>
+                                    <p key={index}
+                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                        onClick={() => typeof page === "number" && handlePageChange(page)}
+                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
                                         {page}
                                     </p>
                                 ))}
-                                <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+
+                                <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
+                                    onClick={() => handlePageChange(currentPage + 1)} >
                                     <MdOutlineKeyboardArrowRight />
                                 </p>
                             </div>

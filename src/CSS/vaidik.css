@@ -437,7 +437,9 @@
     text-align: center;
 }
 
-
+.mv_offer_details_sub_heading{
+    font-weight: bold;
+}
 
 
 @media (max-width: 1800px){
@@ -493,6 +495,9 @@
     .mv_revenue{
         padding: 10px !important;
     }
+    .mv_sales_by_location_table thead tr th{
+        padding: 15px;
+    }
 }
 @media (max-width: 1200px){
     .mv_product_table thead tr th {
@@ -529,6 +534,9 @@
     }
     .mv_product_table{
         width: 100% !important;
+    }
+    .mv_sales_by_location_table thead tr th{
+        padding: 15px 20px;
     }
 }
 @media (max-width: 991px){

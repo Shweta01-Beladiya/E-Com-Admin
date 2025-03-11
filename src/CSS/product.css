@@ -431,6 +431,7 @@
 }
 .mv_main_offerdetails_con{
     box-shadow: 1px 1px 20px 0.5px #0000000F;
+    background-color: white;
 }
 .mv_offer_details_heading{
     font-weight: 500;

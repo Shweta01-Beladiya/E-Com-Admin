@@ -30,7 +30,7 @@ const Addstock = () => {
 
 
     // ******************************* Validation *******************************
-      const [initialValues, setInitialValues] = useState({
+    const [initialValues, setInitialValues] = useState({
         mainCategoryId: "",
         categoryId: "",
         subCategoryId: "",
@@ -48,19 +48,19 @@ const Addstock = () => {
         quantity: Yup.number().required("Quantity is required"),
     });
 
-    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldValue } = useFormik({
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, setFieldError } = useFormik({
         initialValues: initialValues,
         validationSchema: stockValidate,
-        enableReinitialize: true, 
+        enableReinitialize: true,
         onSubmit: async (values) => {
             // console.log(values);
             // addstock(values)
             if (id) {
                 const response = await axios.put(`${BaseUrl}/api/updateStock/${id}`, values, {
-                    headers: {Authorization: `Bearer ${token}`}
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 // console.log("response",response.data);
-                if(response.data.status === 200) {
+                if (response.data.status === 200) {
                     navigate('/stock');
                 }
             } else {
@@ -73,7 +73,10 @@ const Addstock = () => {
                         navigate('/stock');
                     }
                 } catch (error) {
-                    console.error('Data Fetching Error:', error)
+                    console.error('Data Fetching Error:', error);
+                    if (error.response && error.response.status === 409) {
+                        setFieldError('stockStatus', 'Stock Alredy Exist');
+                      }
                 }
             }
 
@@ -130,27 +133,27 @@ const Addstock = () => {
     }
 
     useEffect(() => {
-        const fetchSingleData = async() => {
-           if(id) {
-            try {
-                const response = await axios.get(`${BaseUrl}/api/getStock/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                // console.log("response",response.data.stock);
-               const stockData = response.data.stock;
-               
-               setInitialValues({
-                mainCategoryId: stockData.mainCategoryId,
-                categoryId:stockData.categoryId,
-                subCategoryId:stockData.subCategoryId,
-                productId: stockData.productId,
-                stockStatus: stockData.stockStatus,
-                quantity: stockData.quantity
-               });
-            } catch (error) {
-                console.error('Data fetching error:', error);
-            }
-           } else {
+        const fetchSingleData = async () => {
+            if (id) {
+                try {
+                    const response = await axios.get(`${BaseUrl}/api/getStock/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    // console.log("response",response.data.stock);
+                    const stockData = response.data.stock;
+
+                    setInitialValues({
+                        mainCategoryId: stockData.mainCategoryId,
+                        categoryId: stockData.categoryId,
+                        subCategoryId: stockData.subCategoryId,
+                        productId: stockData.productId,
+                        stockStatus: stockData.stockStatus,
+                        quantity: stockData.quantity
+                    });
+                } catch (error) {
+                    console.error('Data fetching error:', error);
+                }
+            } else {
                 setInitialValues({
                     mainCategoryId: "",
                     categoryId: "",
@@ -159,10 +162,11 @@ const Addstock = () => {
                     stockStatus: "",
                     quantity: ""
                 })
-           }
+            }
         }
         fetchSingleData();
-    },[id]);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     useEffect(() => {
         fetchMainCategory();
@@ -172,39 +176,30 @@ const Addstock = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Update filtered categories when main category changes or data loads
     useEffect(() => {
-        if (values.mainCategoryId) {
+        if (values.mainCategoryId && category.length > 0) {
             const filtered = category.filter(cat => cat.mainCategoryId === values.mainCategoryId);
             setFilteredCategories(filtered);
-            
-            if (!filtered.some(cat => cat._id === values.categoryId)) {
-                setFieldValue("categoryId", ""); 
-            }
         }
     }, [values.mainCategoryId, category]);
-    
+
+    // Update filtered subcategories when category changes or data loads
     useEffect(() => {
-        if (values.categoryId) {
+        if (values.categoryId && subCategory.length > 0) {
             const filtered = subCategory.filter(subCat => subCat.categoryId === values.categoryId);
             setFilteredSubCategories(filtered);
-    
-            if (!filtered.some(subCat => subCat._id === values.subCategoryId)) {
-                setFieldValue("subCategoryId", ""); 
-            }
         }
     }, [values.categoryId, subCategory]);
-    
+
+    // Update filtered products when subcategory changes or data loads
     useEffect(() => {
-        if (values.subCategoryId) {
+        if (values.subCategoryId && product.length > 0) {
             const filtered = product.filter(pro => pro.subCategoryId === values.subCategoryId);
             setFilteredProducts(filtered);
-    
-            if (!filtered.some(pro => pro._id === values.productId)) {
-                setFieldValue("productId", ""); 
-            }
         }
-    }, [values.subCategoryId, product]);    
-   
+    }, [values.subCategoryId, product]);
+
     return (
         <>
             <div>
@@ -331,8 +326,8 @@ const Addstock = () => {
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
                                                 <Link to={'/stock'} >
-                                                <button className='border-0 bg-transparent' >Cancel
-                                                </button>
+                                                    <button className='border-0 bg-transparent' >Cancel
+                                                    </button>
                                                 </Link>
                                                 {id ?
                                                     <button type="submit" className='border-0 bg-transparent' >

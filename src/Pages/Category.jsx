@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Offcanvas, Modal, Form, Row, Col, InputGroup } from 'react-bootstrap';
-import { FiFilter } from 'react-icons/fi';
-import { FaFilter, FaSearch } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import '../CSS/riya.css';
 import axios from 'axios';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from 'react-icons/md';
@@ -120,7 +119,7 @@ const Category = () => {
         setShowFilter(false);
     };
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, { setFieldError }) => {
         try {
 
             if (id) {
@@ -151,6 +150,9 @@ const Category = () => {
             }
         } catch (error) {
             console.error('Data Create and update Error:', error);
+            if (error.response && error.response.status === 409) {
+                setFieldError('categoryName', 'Category name already exists');
+            }
         }
     }
 
@@ -209,28 +211,18 @@ const Category = () => {
     }, [searchTerm, filters]);
 
     const getPaginationButtons = () => {
+        if (totalPages <= 4) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+
         const buttons = [];
-        const maxButtonsToShow = 5;
 
-        let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
-
-        if (endPage - startPage + 1 < maxButtonsToShow) {
-            startPage = Math.max(1, endPage - maxButtonsToShow + 1);
-        }
-
-        if (startPage > 1) {
-            buttons.push(1);
-            if (startPage > 2) buttons.push('...');
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(i);
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) buttons.push('...');
-            buttons.push(totalPages);
+        if (currentPage <= 2) {
+            buttons.push(1, 2, 3, "...");
+        } else if (currentPage >= totalPages - 1) {
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
 
         return buttons;
@@ -347,17 +339,23 @@ const Category = () => {
                             </table>
                         </div>
                         {totalPages > 1 && (
-                            <div className='mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4'>
-                                <p className='mb-0' onClick={() => handlePageChange(currentPage - 1)}>
+                            <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+
+                                <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
+                                    onClick={() => handlePageChange(currentPage - 1)}>
                                     <MdOutlineKeyboardArrowLeft />
                                 </p>
                                 {getPaginationButtons().map((page, index) => (
-                                    <p key={index} className={`mb-0 ${currentPage === page ? 'mv_active' : ''}`}
-                                        onClick={() => handlePageChange(page)}>
+                                    <p key={index}
+                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                        onClick={() => typeof page === "number" && handlePageChange(page)}
+                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
                                         {page}
                                     </p>
                                 ))}
-                                <p className='mb-0' onClick={() => handlePageChange(currentPage + 1)}>
+
+                                <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
+                                    onClick={() => handlePageChange(currentPage + 1)} >
                                     <MdOutlineKeyboardArrowRight />
                                 </p>
                             </div>
@@ -419,20 +417,21 @@ const Category = () => {
 
             {/* Add and Edt Category Modal */}
             <Modal show={showAddModal} onHide={() => { setShowAddModal(false); setId(null); }} centered>
-                <Modal.Header closeButton className="r_modalheader"></Modal.Header>
-                <Modal.Body className="r_modalbody">
-                    <h6 className='text-center fw-bold'>{id ? 'Edit Category' : 'Add Category'}</h6>
-
+                <Modal.Header closeButton className="mv_edit_profile_header"></Modal.Header>
+                <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
+                    {id ? 'Edit Category' : 'Add Category'}
+                </Modal.Title>
+                <Modal.Body className="mv_edit_profile_model_padd">
                     <Formik
                         enableReinitialize={true}
                         initialValues={initialValues}
                         validationSchema={CategorySchema}
                         onSubmit={handleSubmit}
                     >
-                        {({ isSubmitting }) => (
-                            <FormikForm className="r_form">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Main Category</Form.Label>
+                        {({ isSubmitting, values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                            <FormikForm onSubmit={handleSubmit}>
+                                <div className="mv_input_content mb-3">
+                                    <label className='mv_label_input'>Main Category</label>
                                     <Field as="select" name="mainCategoryId" className="form-select">
                                         <option value="">Select Main Category</option>
                                         {mainCategory.map((category) => (
@@ -441,22 +440,32 @@ const Category = () => {
                                             </option>
                                         ))}
                                     </Field>
-                                    <ErrorMessage name="mainCategoryId" component="small" className="text-danger small" />
-                                </Form.Group>
-
-                                <Form.Group className="mb-4">
-                                    <Form.Label>Category Name</Form.Label>
-                                    <Field type="text" name="categoryName" className="form-control" placeholder="Enter category name" />
-                                    <ErrorMessage name="categoryName" component="small" className="text-danger small" />
-                                </Form.Group>
-
-                                <div className="d-flex justify-content-center gap-2 mt-4">
-                                    <Button onClick={() => { setShowAddModal(false); setId(null) }} className="r_cancel">
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="r_delete" disabled={isSubmitting}>
-                                        {id ? 'Update' : 'Add'}
-                                    </Button>
+                                    <ErrorMessage name="mainCategoryId" component="div" className="text-danger small" />
+                                </div>
+                                <div className="mv_input_content mb-5">
+                                    <label className='mv_label_input'>Category Name</label>
+                                    <InputGroup className="">
+                                        <Form.Control
+                                            placeholder="Enter Category name"
+                                            name='categoryName'
+                                            value={values.categoryName}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                        />
+                                    </InputGroup>
+                                    {errors.categoryName && touched.categoryName && <div className="text-danger small">{errors.categoryName}</div>}
+                                </div>
+                                <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
+                                    <div className="mv_logout_cancel">
+                                        <button type="button" onClick={() => { setShowAddModal(false); setId(null) }}>
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    <div className="mv_logout_button">
+                                        <button type="submit" disabled={isSubmitting}>
+                                            {id ? 'Update' : 'Add'}
+                                        </button>
+                                    </div>
                                 </div>
                             </FormikForm>
                         )}

@@ -20,7 +20,7 @@ const Coupon = () => {
     const [filters, setFilters] = useState({
         startDate: '',
         endDate: '',
-        status: '',
+        couponType: '',
     });
     const [id, setId] = useState(null);
 
@@ -84,7 +84,7 @@ const Coupon = () => {
             }
         }
         fetchAllData();
-          // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSearchChange = (e) => {
@@ -118,17 +118,19 @@ const Coupon = () => {
                 return itemDate >= new Date(filters.startDate);
             });
         }
-        
+
         if (filters.endDate) {
             filtered = filtered.filter((item) => {
                 const itemDate = new Date(item.endDate);
                 return itemDate <= new Date(filters.endDate);
             });
-        }        
+        }
 
-        if (filters.status) {
-            const statusBool = filters.status === "true";
-            filtered = filtered.filter((item) => item.status === statusBool);
+
+        if (filters.couponType) {
+            filtered = filtered.filter((item) =>
+                item.coupenType.toLowerCase() === filters.couponType.toLowerCase()
+            );
         }
 
         setFilteredData(filtered);
@@ -137,7 +139,7 @@ const Coupon = () => {
 
     const handleReset = () => {
         setSearchTerm("");
-        setFilters({ startDate: '', endDate: '', status: '' });
+        setFilters({ startDate: '', endDate: '', couponType: '' });
         setFilteredData(data);
         setShow(false);
     };
@@ -164,14 +166,14 @@ const Coupon = () => {
 
     const handleStatusChange = async (id, currentStatus) => {
         try {
-            const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`,{
+            const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, {
                 status: !currentStatus
-            } , {
-                headers: {Authorization : `Bearer ${token}`}
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data.status === 200) {
-                setData(prevData => 
-                    prevData.map(item => 
+                setData(prevData =>
+                    prevData.map(item =>
                         item._id === id ? { ...item, status: !item.status } : item
                     )
                 );
@@ -233,11 +235,11 @@ const Coupon = () => {
                                                         </div>
                                                     </div>
                                                     <div className="mv_input_content">
-                                                        <label className='mv_offcanvas_filter_category'>Status</label>
-                                                        <Form.Select className="mb-3" name="status" onChange={handleFilterChange}>
-                                                            <option>Select Status</option>
-                                                            <option value="true">Active</option>
-                                                            <option value="false">InActive</option>
+                                                        <label className='mv_offcanvas_filter_category'>Coupon Type</label>
+                                                        <Form.Select className="mb-3" name="couponType" onChange={handleFilterChange}>
+                                                            <option>Select Coupon Type</option>
+                                                            <option value="Fixed">Fixed</option>
+                                                            <option value="Percentage">Percentage</option>
                                                         </Form.Select>
                                                     </div>
                                                 </div>
@@ -339,7 +341,7 @@ const Coupon = () => {
                             )}
                                 </>
                             ) : (
-                                <NoResultsFound/>
+                                <NoResultsFound />
                             )}
                         </div>
                     </div>
