@@ -249,6 +249,7 @@ const SubCategory = () => {
         // console.log("DeleteRespo", response.data);
         if (response.data.status === 200) {
             setSubCategories((prevSubCat) => prevSubCat.filter((sub) => sub._id !== id));
+            
             setShowDeleteModal(false);
             setSubCatToDelete(null);
         }

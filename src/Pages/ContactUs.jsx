@@ -7,6 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
+import NoResultsFound from '../Component/Noresult';
 
 
 const ContactUs = () => {
@@ -238,63 +239,69 @@ const ContactUs = () => {
                                     </Offcanvas>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>Name</th>
-                                            <th className=''>Email</th>
-                                            <th className=''>Contact No.</th>
-                                            <th className=''>Subject</th>
-                                            <th className=''>Message</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.email}</td>
-                                            <td>{item.contactNo}</td>
-                                            <td>{item.subject}</td>
-                                            <td>{item.message}</td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                            <div className="mv_pencil_icon" onClick={() => handleViewShow(item._id)}>
-                                                        <img src={require('../mv_img/eyes_icon.png')} alt="" />
-                                                    </div>
-                                                    <div className="mv_pencil_icon" onClick={() => { setModalShow(true); setId(item._id) }}>
-                                                        <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                    </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
-                                    {/* Previous Button */}
-                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {/* Pagination Buttons */}
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index}
-                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                        onClick={() => typeof page === "number" && handlePageChange(page)}
-                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                        {page}
-                                        </p>
-                                    ))}
-                                    {/* Next Button */}
-                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage + 1)} >
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
+                            {paginatedData.length > 0 ? (
+                                <>
+                                <div className="mv_product_table_padd">
+                                    <table className='mv_product_table justify-content-between'>
+                                        <thead>
+                                            <tr>
+                                                <th className=''>ID</th>
+                                                <th className=''>Name</th>
+                                                <th className=''>Email</th>
+                                                <th className=''>Contact No.</th>
+                                                <th className=''>Subject</th>
+                                                <th className=''>Message</th>
+                                                <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {paginatedData.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.email}</td>
+                                                <td>{item.contactNo}</td>
+                                                <td>{item.subject}</td>
+                                                <td>{item.message}</td>
+                                                <td className='d-flex align-items-center justify-content-end'>
+                                                <div className="mv_pencil_icon" onClick={() => handleViewShow(item._id)}>
+                                                            <img src={require('../mv_img/eyes_icon.png')} alt="" />
+                                                        </div>
+                                                        <div className="mv_pencil_icon" onClick={() => { setModalShow(true); setId(item._id) }}>
+                                                            <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                        </div>
+                                                </td>
+                                            </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
+                                {totalPages > 1 && (
+                                    <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                        {/* Previous Button */}
+                                        <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                            onClick={() => handlePageChange(currentPage - 1)}>
+                                            <MdOutlineKeyboardArrowLeft />
+                                        </p>
+                                        {/* Pagination Buttons */}
+                                        {getPaginationButtons().map((page, index) => (
+                                            <p key={index}
+                                            className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                            onClick={() => typeof page === "number" && handlePageChange(page)}
+                                            style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                            {page}
+                                            </p>
+                                        ))}
+                                        {/* Next Button */}
+                                        <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                            onClick={() => handlePageChange(currentPage + 1)} >
+                                            <MdOutlineKeyboardArrowRight />
+                                        </p>
+                                    </div>
+                                )}
+                                </>
+                            ) : (
+                                <NoResultsFound/>
                             )}
                         </div>
                     </div>
@@ -302,7 +309,7 @@ const ContactUs = () => {
             </div>
 
             {/* Delete Contact Us Model */}
-            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => { setModalShow(false); setId(null) }} size="lg" aria-labelledby="contained-modal-title-vcenter" centered >
+            <Modal className='mv_logout_dialog' show={modalShow} onHide={() => { setModalShow(false); setId(null) }} size="lg" centered >
                 <Modal.Body className='text-center mv_logout'>
                     <h5 className='mb-2'>Delete</h5>
                     <p>Are you sure you want to delete Contact Us?</p>

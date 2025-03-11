@@ -237,7 +237,7 @@ const Product = () => {
             const response = await axios.delete(`${BaseUrl}/api/deleteProduct/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response", response);
+            // console.log("response", response);
             if (response.data.status === 200) {
                 setData(preData => preData.filter(product => product._id !== id));
                 setModalShow(false);

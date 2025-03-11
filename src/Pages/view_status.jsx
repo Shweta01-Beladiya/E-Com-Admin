@@ -246,7 +246,7 @@ const Viewstatus = () => {
                                             <tr key={index}>
                                                 <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                                 <td>{item.userData[0].name}</td>
-                                                <td>{item.productData[0].productName}</td>
+                                                <td>{item.productData[0]?.productName}</td>
                                                 <td>
                                                     {(() => {
                                                         const date = new Date(item.createdAt);

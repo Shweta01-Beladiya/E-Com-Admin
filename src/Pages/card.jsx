@@ -399,52 +399,66 @@ const Cards = ({ editData }) => {
                             </InputGroup>
                             {errors.subTitle && touched.subTitle && <div className="text-danger small">{errors.subTitle}</div>}
                         </div>
-                        <div className="mv_input_content mb-5">
+                         <div className="mv_input_content mb-3">
                             <label className='mv_label_input'>Image</label>
-                            <InputGroup className="">
-                                <Form.Control
-                                    placeholder="Choose Image"
-                                    aria-label=""
-                                    readOnly
-                                    value={addimg}
-                                    name="addcardimage"
-                                    onBlur={handleBlur}
-                                />
-                                <label className="mv_browse_button">
-                                    Browse
-                                    <input
-                                        type="file"
-                                        hidden
-                                        accept="image/jpeg, image/png, image/jpg"
-                                        onChange={(e) => {
-                                        const file = e.currentTarget.files[0];
-                                            if (file) {
-                                                setaddimg(file.name);
-                                                setFieldValue("addcardimage", file);
-                                                setBrandImagePreview(URL.createObjectURL(file));
-                                            }
-                                        }}
-                                    />
-                                </label>
-                            </InputGroup>
-                            {errors.addcardimage && touched.addcardimage && <div className="text-danger small">{errors.addcardimage}</div>}
-                            {brandImagePreview && (
-                                <div className="mt-2">
-                                    <img
-                                        className='mv_update_img'
-                                        src={brandImagePreview}
-                                        alt="Brand Image Preview"
-                                        style={{
-                                            maxWidth: '20px',
-                                            maxHeight: '20px',
-                                            objectFit: 'contain',
-                                            border: '1px solid #ddd',
-                                            borderRadius: '4px',
-                                            padding: '2px'
-                                        }}
-                                    />
+                            <div className="position-relative">
+                                <div className="border border-black rounded w-100 p-1 d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' :'transparent', width:'50%' }}>
+                                        {addimg && (
+                                            <>
+                                                <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                    <img
+                                                        src={brandImagePreview || `${BaseUrl}/${editData?.addcardimage}`}
+                                                        alt="Preview"
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                                <span className='text-truncate' style={{width:'100%'}}>{addimg}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn text-danger p-0 text-end "
+                                                    style={{ fontSize: '1.25rem', lineHeight: 1 }}
+                                                    onClick={() => {
+                                                        setaddimg("");
+                                                        setBrandImagePreview(null);
+                                                        setFieldValue("addpopularbrandimage", "");
+                                                    }}
+                                                >
+                                                    ×
+                                                </button>
+                                            </>
+                                        )}
+                                        {!addimg && (
+                                            <span className="text-muted">Choose Image</span>
+                                        )}
+                                    </div>
+                                    <label className="btn" style={{
+                                        backgroundColor: '#3A2C2C',
+                                        color: 'white',
+                                        borderRadius: '4px',
+                                        padding: '4px 16px',
+                                        marginLeft: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}>
+                                        Browse
+                                        <input
+                                            type="file"
+                                            hidden
+                                            accept="image/jpeg, image/png, image/jpg"
+                                            onChange={(e) => {
+                                                const file = e.currentTarget.files[0];
+                                                    if (file) {
+                                                        setaddimg(file.name);
+                                                        setFieldValue("addcardimage", file);
+                                                        setBrandImagePreview(URL.createObjectURL(file));
+                                                    }
+                                                }}
+                                        />
+                                    </label>
                                 </div>
-                            )}
+                            </div>
+                            {errors.addcardimage && touched.addcardimage && <div className="text-danger small">{errors.addcardimage}</div>}
                         </div>
                         <div className='mv_logout_Model_button d-flex align-items-center justify-content-center mb-4'>
                             <div className="mv_logout_cancel">

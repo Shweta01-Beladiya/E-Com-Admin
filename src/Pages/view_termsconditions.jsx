@@ -18,7 +18,7 @@ const Viewtermsconditions = () => {
                         Authorization: `Bearer ${token}`,
                     }
                 });
-                console.log("Terms data fetched:", response?.data);
+                // console.log("Terms data fetched:", response?.data);
                 setTermsData(response?.data?.terms || []);
                 setLoading(false);
             } catch (error) {
