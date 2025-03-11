@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import NoResultsFound from "../Component/Noresult";
 
 const Faqs = (props) => {
 
@@ -18,6 +19,7 @@ const Faqs = (props) => {
     const [deleteToggle, setDeleteToggle] = useState(null)
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [shouldResetPage, setShouldResetPage] = useState(false);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -171,7 +173,14 @@ const Faqs = (props) => {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            console.log("delete response " , response);
+            const updatedData = filteredData.filter(item => item._id !== deleteToggle);
+            setFilteredData(updatedData);
+            setData(updatedData);
+            
+            if (updatedData.length === 0) {
+                setCurrentPage(1);
+            }
+
             setModalShow(false)
             setToggle(!toggle)
         }catch(error){
@@ -219,9 +228,16 @@ const Faqs = (props) => {
           );
         }
     
-        setFilteredData(result);
-        setCurrentPage(1);
-    }, [data, searchTerm]);
+        if (shouldResetPage) {
+            setCurrentPage(1);
+            setShouldResetPage(false);
+        }
+        
+        const newTotalPages = Math.ceil(result.length / itemsPerPage);
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+            setCurrentPage(newTotalPages);
+        }
+    }, [data, searchTerm, shouldResetPage]);
 
     return (
         <>
@@ -256,60 +272,64 @@ const Faqs = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="mv_product_table_padd">
-                                <table className='mv_product_table justify-content-between'>
-                                    <thead>
-                                        <tr>
-                                            <th className=''>ID</th>
-                                            <th className=''>FAQ Question</th>
-                                            <th className=''>Answer</th>
-                                            <th className='d-flex align-items-center justify-content-end'>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {paginatedData?.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                            <td>{item.question}</td>
-                                            <td>{item.answer}</td>
-                                            <td className='d-flex align-items-center justify-content-end'>
-                                                <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
-                                                    <Link>
-                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                    </Link>
-                                                </div>
-                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
-                                    {/* Previous Button */}
-                                    <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage - 1)}>
-                                        <MdOutlineKeyboardArrowLeft />
-                                    </p>
-                                    {/* Pagination Buttons */}
-                                    {getPaginationButtons().map((page, index) => (
-                                        <p key={index}
-                                        className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                        onClick={() => typeof page === "number" && handlePageChange(page)}
-                                        style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                        {page}
-                                        </p>
-                                    ))}
-                                    {/* Next Button */}
-                                    <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
-                                        onClick={() => handlePageChange(currentPage + 1)} >
-                                        <MdOutlineKeyboardArrowRight />
-                                    </p>
-                                </div>
-                            )}
+                            {paginatedData?.length > 0 ? (
+                                <>
+                                    <div className="mv_product_table_padd">
+                                        <table className='mv_product_table justify-content-between'>
+                                            <thead>
+                                                <tr>
+                                                    <th className=''>ID</th>
+                                                    <th className=''>FAQ Question</th>
+                                                    <th className=''>Answer</th>
+                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {paginatedData?.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                    <td>{item.question}</td>
+                                                    <td>{item.answer}</td>
+                                                    <td className='d-flex align-items-center justify-content-end'>
+                                                        <div className="mv_pencil_icon" onClick={() => handleEdit(item)}>
+                                                            <Link>
+                                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                            </Link>
+                                                        </div>
+                                                        <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                            <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {totalPages > 1 && (
+                                        <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
+                                            {/* Previous Button */}
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                                onClick={() => handlePageChange(currentPage - 1)}>
+                                                <MdOutlineKeyboardArrowLeft />
+                                            </p>
+                                            {/* Pagination Buttons */}
+                                            {getPaginationButtons().map((page, index) => (
+                                                <p key={index}
+                                                className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                {page}
+                                                </p>
+                                            ))}
+                                            {/* Next Button */}
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                                onClick={() => handlePageChange(currentPage + 1)} >
+                                                <MdOutlineKeyboardArrowRight />
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (<NoResultsFound />)}
                         </div>
                     </div>
                 </div>

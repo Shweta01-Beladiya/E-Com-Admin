@@ -465,28 +465,28 @@ const SubCategory = () => {
                         >
                             {({ handleBlur,handleChange, handleSubmit, setFieldValue, values }) => (
                                 <FormikForm onSubmit={handleSubmit} className="r_form">
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Main Category</Form.Label>
-                                        <Field
-                                            as="select"
+                                    <div className="mv_input_content mb-3">
+                                        <label className='mv_label_input'>Main Category</label>
+                                        <Form.Select
                                             name="mainCategoryId"
-                                            className="form-select"
+                                            value={values.mainCategoryId}
                                             onChange={(e) => {
                                                 const mainCatId = e.target.value;
                                                 setFieldValue('mainCategoryId', mainCatId);
-                                                setFieldValue('categoryId', ''); // Reset category when main category changes
+                                                setFieldValue('categoryId', '');
                                                 filterCategoriesByMainCategory(mainCatId);
                                             }}
-                                        >
+                                            onBlur={handleBlur}
+                                            className='mv_form_select'>
                                             <option value="">Select</option>
                                             {mainCategory.map((main) => (
                                                 <option key={main._id} value={main._id}>
                                                     {main.mainCategoryName}
                                                 </option>
                                             ))}
-                                        </Field>
+                                        </Form.Select>
                                         <ErrorMessage name="mainCategoryId" component="small" className="text-danger" />
-                                    </Form.Group>
+                                    </div>
                                     
                                     <div className="mv_input_content mb-3">
                                         <label className='mv_label_input'>Category</label>
