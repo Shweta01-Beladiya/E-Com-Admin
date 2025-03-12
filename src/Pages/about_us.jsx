@@ -29,7 +29,7 @@ const Aboutus = ({ editData }) => {
     const [filteredData, setFilteredData] = useState([]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    console.log("totalpage", totalPages)
+    // console.log("totalpage", totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -95,7 +95,7 @@ const Aboutus = ({ editData }) => {
         initialValues: init,
         validationSchema: validate,
         onSubmit: async (values) => {
-            console.log(values);
+            // console.log(values);
 
             const formData = new FormData();
             formData.append("title", values.title);
@@ -155,7 +155,7 @@ const Aboutus = ({ editData }) => {
                         Authorization: `Bearer ${token}`,
                     }
                 })
-                console.log("data", response?.data);
+                // console.log("data", response?.data);
                 setFilteredData(response?.data?.aboutUs)
                 setData(response?.data?.aboutUs)
             } catch (error) {
@@ -236,7 +236,7 @@ const Aboutus = ({ editData }) => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("", result);
+        // console.log("", result);
 
         if (searchTerm) {
             result = result.filter(user =>

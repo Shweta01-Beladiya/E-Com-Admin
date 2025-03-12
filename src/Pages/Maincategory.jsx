@@ -69,7 +69,7 @@ const MainCategory = () => {
         const response = await axios.post(`${BaseUrl}/api/createMaincategory`, value, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        console.log("Response", response.data);
+        // console.log("Response", response.data);
         if (response.data.status === 201) {
           setCategories((prevCategories) => [...prevCategories, response.data.maincategory]);
           setShowAddModal(false);

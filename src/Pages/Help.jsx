@@ -27,7 +27,7 @@ const Help = () => {
     const [filteredData, setFilteredData] = useState();
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
-    console.log("totalpage",totalPages)
+    // console.log("totalpage",totalPages)
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -219,7 +219,7 @@ const Help = () => {
     // Search Data
     useEffect(() => {
         let result = data;
-        console.log("" , result);
+        // console.log("" , result);
     
         if (searchTerm) {
           result = result.filter(user =>

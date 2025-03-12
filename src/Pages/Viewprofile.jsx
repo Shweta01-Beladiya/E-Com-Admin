@@ -186,12 +186,12 @@ const Viewprofile = () => {
                                 <div className="row mb-3">
                                     <div className="col-xxl-4 col-xl-12 col-lg-12 col-md-4 col-sm-5 col-5">
                                         <div className='mv_full_name'>
-                                            <div className='mv_heading_full_name'>{data.gender}</div>
+                                            <div className='mv_heading_full_name'>Gender</div>
                                             <div>:</div>
                                         </div>
                                     </div>
                                     <div className="col-xxl-8 col-xl-12 col-lg-12 col-md-8 col-sm-7 col-7">
-                                        <p className='mv_user_name mb-0'>Male</p>
+                                        <p className='mv_user_name mb-0'>{data.gender}</p>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +224,12 @@ const Viewprofile = () => {
                                             <p className='mv_profile_image_heading'>Profile Image</p>
                                             <div className='mv_main_profile_img'>
                                                 <div className="mv_profile_img">
-                                                    <img src={data.image ? `${BaseUrl}/${data.image}` : defaultProfileImage} alt="Profile" />
+                                                    <img
+                                                        src={data.image
+                                                            ? (data.image.startsWith('blob:') ? data.image : `${BaseUrl}/${data.image}`)
+                                                            : defaultProfileImage}
+                                                        alt="Profile"
+                                                    />
                                                 </div>
                                                 <div className='mv_main_pro_img_camera' onClick={handleImageClick}>
                                                     <img className='mv_pro_img_camera' src={require('../mv_img/profile_img_camera.png')} alt="" />

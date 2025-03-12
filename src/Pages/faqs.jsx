@@ -90,7 +90,7 @@ const Faqs = (props) => {
         initialValues: init,
         validationSchema: validate,
         onSubmit: async (values) => {
-            console.log(values);
+            // console.log(values);
             // faqs(values)
 
             const faq = {
@@ -107,10 +107,12 @@ const Faqs = (props) => {
                             "Content-Type": "application/json"
                         }
                     });
-                    console.log("Response:", response?.data);
-                    setModalShow1(false);
-                    setToggle(!toggle);
-                    resetForm();
+                    // console.log("Response:", response?.data);
+                    if(response.data.status === 200) {
+                        setModalShow1(false);
+                        setToggle(!toggle);
+                        resetForm();
+                    }
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");
@@ -125,9 +127,11 @@ const Faqs = (props) => {
                         }
                     });
                     // console.log("Response:", response?.data);
-                    setModalShow1(false);
-                    setToggle(!toggle);
-                    resetForm();
+                    if(response.data.status === 201) {
+                        setModalShow1(false);
+                        setToggle(!toggle);
+                        resetForm();
+                    }
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error submitting form. Please try again.");

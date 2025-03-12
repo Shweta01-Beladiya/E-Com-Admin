@@ -120,7 +120,7 @@ const ViewProduct = () => {
                     <div className="bg-white ">
                         <h6 className="p-3 m-0" style={{ fontWeight: 'bold' }}>Product Image</h6>
                         <hr className='m-0' />
-                        <div className="row d-flex p-4">
+                        <div className="row d-flex g-4 p-4">
                             {/* {console.log("productVariant.images", productVariant.images)} */}
                             {productVariant.images && productVariant.images.length > 0 ? (
                                 productVariant.images.map((image, index) => (
