@@ -74,6 +74,7 @@ const ContactUs = () => {
         if (allData.length > 0) {
             updateDisplayedData(allData);
         }
+         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, searchQuery, selectedSubject]);
 
     useEffect(() => {

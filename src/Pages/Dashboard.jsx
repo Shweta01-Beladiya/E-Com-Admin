@@ -456,6 +456,7 @@ const Dashboard = () => {
     if (locationData) {
       processSalesLocationData(locationData, locationPeriod);
     }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationPeriod, locationData]);
 
   useEffect(() => {
@@ -580,7 +581,7 @@ const Dashboard = () => {
                     <p className='mb-0 mv_heading_order_sum'>Review</p>
                   </div>
                   <div>
-                    <p className='mb-0 mv_review_view_all'><Link to={'/review'}>View all</Link></p>
+                    <Link to={'/review'} className='text-decoration-none'><p className='mb-0 mv_review_view_all'>View all</p></Link>
                   </div>
                 </div>
               </div>

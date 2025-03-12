@@ -12,20 +12,17 @@ const ViewProduct = () => {
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
-    const [product, setProduct] = useState({});
-    const [productVariant, setProductVariant] = useState({});
-    const [mainCategoryName, setMainCategoryName] = useState('');
-    const [categoryName, setCategoryName] = useState('');
-    const [subCategoryName, setSubCategoryName] = useState('');
-    const [unitName, setUnitName] = useState('');
+    const [product, setProduct] = useState([]);
+    const [productVariant, setProductVariant] = useState([]);
 
     const fetchProduct = async () => {
         try {
             const response = await axios.get(`${BaseUrl}/api/getProduct/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("resposnse",response.data);
-            setProduct(response.data.product)
+            // console.log("resposne@@@@@@@@@", response);
+
+            setProduct(response.data.product[0])
         } catch (error) {
             console.error('Data Fetching Error:', error);
         }
@@ -35,68 +32,14 @@ const ViewProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getProductVariant/${productVariantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("response", response.data.productVariant); 
-            setProductVariant(response.data.productVariant);
+            // console.log("response@@@@@@@@@@@@@@", response.data.productVariant);
+            if (Array.isArray(response.data.productVariant) && response.data.productVariant.length > 0) {
+                setProductVariant(response.data.productVariant[0]);
+            }
         } catch (error) {
             console.error('Data Fetching Error:', error);
         }
     }
-
-    const fetchMainCategory = async () => {
-        try {
-            const response = await axios.get(`${BaseUrl}/api/getMainCategory/${product.mainCategoryId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setMainCategoryName(response.data.mainCategory.mainCategoryName);
-        } catch (error) {
-            console.error('Error fetching main category:', error);
-        }
-    };
-
-    const fetchCategory = async () => {
-        try {
-            const response = await axios.get(`${BaseUrl}/api/getCategory/${product.categoryId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setCategoryName(response.data.category.categoryName);
-        } catch (error) {
-            console.error('Error fetching category:', error);
-        }
-    };
-
-    const fetchSubCategory = async () => {
-        try {
-            const response = await axios.get(`${BaseUrl}/api/getSubCategory/${product.subCategoryId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // console.log("response>>>>>>>>>",response.data);
-
-            setSubCategoryName(response.data.subCategory.subCategoryName);
-        } catch (error) {
-            console.error('Error fetching subcategory:', error);
-        }
-    };
-
-    const fetchUnit = async () => {
-        try {
-            const response = await axios.get(`${BaseUrl}/api/getUnit/${productVariant.unitId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // console.log("esponse.data.unit",response.data.unit.name);
-
-            setUnitName(response.data.unit.name);
-        } catch (error) {
-            console.error('Error Fetching Error:', error);
-        }
-    }
-
-    useEffect(() => {
-        if (product.mainCategoryId) fetchMainCategory();
-        if (product.categoryId) fetchCategory();
-        if (product.subCategoryId) fetchSubCategory();
-        if (productVariant.unitId) fetchUnit();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [product, productVariant]);
 
     useEffect(() => {
         fetchProduct();
@@ -153,13 +96,19 @@ const ViewProduct = () => {
                                     <p className='mv_view_product_heading'>Main Category :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>{mainCategoryName}</p>
+                                    <p className='mv_offer_details_sub_heading'>{product.mainCategoriesData?.[0].mainCategoryName}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Category :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>{categoryName}</p>
+                                    <p className='mv_offer_details_sub_heading'>{product.categoriesData?.[0].categoryName}</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_view_product_heading'>Sub Category :</p>
+                                </div>
+                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
+                                    <p className='mv_offer_details_sub_heading'>{product.subCategoriesData?.[0].subCategoryName}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Product :</p>
@@ -167,17 +116,12 @@ const ViewProduct = () => {
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_offer_details_sub_heading'>{product.productName}</p>
                                 </div>
+
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Short Description :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_offer_details_sub_heading'>{productVariant.shortDescription}</p>
-                                </div>
-                                <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_view_product_heading'>Gender :</p>
-                                </div>
-                                <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>{product.gender || '-'}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Size :</p>
@@ -195,7 +139,7 @@ const ViewProduct = () => {
                                     <p className='mv_view_product_heading'>QTY :</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>{productVariant.specifications?.QTY || '-'}</p>
+                                    <p className='mv_offer_details_sub_heading'>{product.quantity}</p>
                                 </div>
                                 <div className="col-xxl-6 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Description :</p>
@@ -243,13 +187,17 @@ const ViewProduct = () => {
                                     <p className='mv_view_product_heading'>Rating :</p>
                                 </div>
                                 <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>{`⭐ ${product.rating}` || '-'}</p>
+                                    {product.ratingData?.[0]?.rating ? (
+                                        <p className="mv_offer_details_sub_heading">
+                                            {`⭐ ${product.ratingData[0].rating || 0}`}
+                                        </p>
+                                    ) : null}
                                 </div>
                                 <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Unit :</p>
                                 </div>
                                 <div className="col-xxl-9 col-xl-9 col-lg-5 col-md-6 col-sm-6 col-6">
-                                    <p className='mv_offer_details_sub_heading'>{unitName}</p>
+                                    <p className='mv_offer_details_sub_heading'>{product.unitData?.[0].name}</p>
                                 </div>
                                 <div className="col-xxl-3 col-xl-3 col-lg-5 col-md-6 col-sm-6 col-6">
                                     <p className='mv_view_product_heading'>Brand :</p>
@@ -331,12 +279,5 @@ const ViewProduct = () => {
         </div>
     );
 };
-const InfoField = ({ label, value }) => (
-    <table style={{ width: '100%' }}>
-        <tr style={{ width: '50%' }}>
-            <td style={{ width: '50%', padding: '5px 0', color: 'gray', fontWeight: 'bold' }}>{label} : </td>
-            <td className="text-gray-600" style={{ width: '50%', padding: '5px 0', fontWeight: "bold" }}>{value}</td>
-        </tr>
-    </table>
-);
+
 export default ViewProduct;

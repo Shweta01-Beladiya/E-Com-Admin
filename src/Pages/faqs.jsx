@@ -176,17 +176,19 @@ const Faqs = (props) => {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
-            })
-            const updatedData = filteredData.filter(item => item._id !== deleteToggle);
-            setFilteredData(updatedData);
-            setData(updatedData);
-            
-            if (updatedData.length === 0) {
-                setCurrentPage(1);
+            });
+            if(response.data.status === 200) {
+                const updatedData = filteredData.filter(item => item._id !== deleteToggle);
+                setFilteredData(updatedData);
+                setData(updatedData);
+                
+                if (updatedData.length === 0) {
+                    setCurrentPage(1);
+                }
+    
+                setModalShow(false)
+                setToggle(!toggle)
             }
-
-            setModalShow(false)
-            setToggle(!toggle)
         }catch(error){
             alert(error)
         }
@@ -241,6 +243,7 @@ const Faqs = (props) => {
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         }
+         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, searchTerm, shouldResetPage]);
 
     return (

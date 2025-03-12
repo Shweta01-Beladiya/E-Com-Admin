@@ -10,7 +10,8 @@ import axios from 'axios';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const AddProduct = () => {
-
+    const formikRef = useRef(null);
+    
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
@@ -32,15 +33,10 @@ const AddProduct = () => {
     const [filteredCategories, setFilteredCategories] = useState([]);
     const [filteredSubCategories, setFilteredSubCategories] = useState([]);
     const fileInputRef = useRef(null);
-    // const [selectedOffers, setSelectedOffers] = useState([]);
     const [size, setSize] = useState([]);
     const [filteredSizes, setFilteredSizes] = useState([]);
     const [unit, setUnit] = useState([]);
-    // const options = [
-    //     { value: 'New100', label: 'NEW100' },
-    //     { value: 'New200', label: 'NEW200' },
-    //     { value: 'New300', label: 'NEW300' }
-    // ]
+
 
     // Initial form values
     const [initialValues, setInitialValues] = useState({
@@ -123,17 +119,17 @@ const AddProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getProduct/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("response>>>>>>>>>", response.data.product);
+            console.log("response>>>>>>>>>", response.data.product);
 
             // Fetch variant data
             const preResponse = await axios.get(`${BaseUrl}/api/getProductVariant/${variantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("preResponse", preResponse.data.productVariant);
+            console.log("preResponse", preResponse.data.productVariant);
 
             if (response.data && response.data.product) {
-                const product = response.data.product;
-                const variant = preResponse.data.productVariant;
+                const product = response.data.product[0];
+                const variant = preResponse.data.productVariant[0];
 
                 if (product && variant) {
                     // Setup filtered categories based on main category
@@ -205,8 +201,7 @@ const AddProduct = () => {
     const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
         try {
             if (id) {
-                console.log("Images Before Sending:", values.images);
-
+                
                 // Update existing product
                 await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
                     mainCategoryId: values.mainCategoryId,
@@ -216,18 +211,26 @@ const AddProduct = () => {
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-
+                
                 // Use the variant ID from the URL params instead of from productData
                 if (!variantId) {
                     console.error('Variant ID not found for updating');
                     return;
                 }
-
+                
                 const formData = new FormData();
-
-                values.images.forEach((image) => {
-                    if (image.file) {
-                        formData.append("images", image.file);
+                // For updating existing products
+                const existingImages = values.images
+                .filter(img => !img.file && img.existingPath)
+                .map(img => img.existingPath);
+                
+                formData.append("existingImages", JSON.stringify(existingImages));
+                // console.log("existingImages", existingImages);
+                
+                // Only append new file uploads to "images"
+                values.images.forEach((img) => {
+                    if (img.file) {
+                        formData.append("images", img.file);
                     }
                 });
                 const specObject = {};
@@ -307,14 +310,14 @@ const AddProduct = () => {
                 formData.append("returnPolicy", values.returnPolicy);
                 formData.append("manufacturingDetails", values.manufacturingDetails);
                 formData.append("specifications", JSON.stringify(specObject));
-
+                
                 const proResponse = await axios.post(`${BaseUrl}/api/createProductVariant`, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "multipart/form-data"
                     }
                 });
-
+                
                 if (proResponse.data.status === 200) {
                     navigate('/product');
                 }
@@ -323,7 +326,7 @@ const AddProduct = () => {
             console.error('Data Fetching Error:', error);
             if (error.response && error.response.status === 409) {
                 setFieldError('productName', 'Product name already exists');
-              }
+            }
         }
         setSubmitting(false);
     };
@@ -383,6 +386,7 @@ const AddProduct = () => {
                 URL.revokeObjectURL(prevImages[index].preview);
             }
 
+            // This call must happen to update Formik's internal state
             setFieldValue('images', updatedImages);
             return updatedImages;
         });
@@ -540,6 +544,11 @@ const AddProduct = () => {
             setFieldValue('size', '');
         }
     };
+    useEffect(() => {
+        if (selectedImages.length > 0 && formikRef.current) {
+            formikRef.current.setFieldValue('images', selectedImages);
+        }
+    }, [selectedImages]);
     return (
         <>
             <div>
@@ -560,6 +569,7 @@ const AddProduct = () => {
                         <div className="mv_view_edit_profile">
                             <div className='mv_profile_type'>
                                 <Formik
+                                  innerRef={formikRef}
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
                                     onSubmit={handleSubmit}
