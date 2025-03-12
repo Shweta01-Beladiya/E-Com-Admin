@@ -272,7 +272,7 @@ const Help = () => {
                                     </div>
                                 </div>
                             </div>
-                            {paginatedData.length > 0 ? (
+                            {paginatedData?.length > 0 ? (
                                 <>
                                     <div className="mv_product_table_padd">
                                         <table className='mv_product_table mv_help_table justify-content-between'>

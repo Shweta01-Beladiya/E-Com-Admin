@@ -740,7 +740,7 @@ const AddProduct = () => {
                                                 <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Colors</label>
-                                                        <div className="color-box border rounded p-2 d-flex align-items-center flex-wrap">
+                                                        <div className="color-box mv_img_border p-2 d-flex align-items-center flex-wrap">
                                                             {colors?.map((color, index) => (
                                                                 <div key={index} className="color-circle me-2">
                                                                     <div
@@ -802,7 +802,7 @@ const AddProduct = () => {
                                                 <div className="col-12 mb-3">
                                                     <div className="mv_input_content">
                                                         <label className='mv_label_input'>Product Image</label>
-                                                        <div className="border rounded p-2 d-flex align-items-center justify-content-between">
+                                                        <div className="mv_img_border p-2 d-flex align-items-center justify-content-between">
                                                             <div className="d-flex flex-wrap gap-3">
                                                                 {selectedImages.map((image, index) => (
                                                                     <div key={index} className="d-flex align-items-center justify-content-between  rounded-1 p-1" style={{ width: '120px', backgroundColor: '#EAEAEA' }}>
