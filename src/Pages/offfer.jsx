@@ -7,8 +7,9 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
-import Addpopularbrands from './add_offer';
+// import Addpopularbrands from './add_offer';
 import NoResultsFound from '../Component/Noresult';
+import { Link, useLocation  } from 'react-router-dom';
 
 const Offer = () => {
 
@@ -27,11 +28,25 @@ const Offer = () => {
     });
     const [tempFilters, setTempFilters] = useState(filters);
     const [getofffer, setOffer] = useState(null);
+    const location = useLocation();
 
     // Edit Offer
-    const [showAddForm, setShowAddForm] = useState(false);
+    // const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [refreshData, setRefreshData] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
 
     // Updated useEffect for filtering
     useEffect(() => {
@@ -232,32 +247,32 @@ const Offer = () => {
     const handleShow = () => setShow(true);
 
     // Edit data
-    const handleEditClick = (brand) => {
-        setSelectedBrand(brand);
-        setShowAddForm(true);
-    };
+    // const handleEditClick = (brand) => {
+    //     setSelectedBrand(brand);
+    //     setShowAddForm(true);
+    // };
 
     // console.log("bran",selectedBrand)
 
     // Handle form submission callback
-    const handleFormSubmit = () => {
-        setShowAddForm(false);
-        setSelectedBrand(null);
-        setRefreshData(prev => !prev);
-    };
+    // const handleFormSubmit = () => {
+    //     setShowAddForm(false);
+    //     setSelectedBrand(null);
+    //     setRefreshData(prev => !prev);
+    // };
 
-    if (showAddForm) {
-        return (
-            <Addpopularbrands
-                editData={selectedBrand}
-                onCancel={() => {
-                    setShowAddForm(false);
-                    setSelectedBrand(null);
-                }}
-                onSubmitSuccess={handleFormSubmit}
-            />
-        );
-    }
+    // if (showAddForm) {
+    //     return (
+    //         <Addpopularbrands
+    //             editData={selectedBrand}
+    //             onCancel={() => {
+    //                 setShowAddForm(false);
+    //                 setSelectedBrand(null);
+    //             }}
+    //             onSubmitSuccess={handleFormSubmit}
+    //         />
+    //     );
+    // }
 
     // Format date function
     const formatDate = (dateString) => {
@@ -372,8 +387,8 @@ const Offer = () => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            {/* <Link to='/addoffer'><button onClick={() => setShowAddForm(true)}>+ Add</button></Link> */}
-                                            <button onClick={() => setShowAddForm(true)}>+ Add</button>
+                                            <Link to='/addoffer'><button>+ Add</button></Link>
+                                            {/* <button onClick={() => setShowAddForm(true)}>+ Add</button> */}
                                         </div>
                                     </div>
                                 </div>
@@ -426,8 +441,10 @@ const Offer = () => {
                                                             <div className="mv_pencil_icon" onClick={() => { setModalShow1(true); handlepersonaloffer(item._id) }}>
                                                                 <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                             </div>
-                                                            <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
-                                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                            <div className="mv_pencil_icon">
+                                                                <Link to='/addoffer' state={{ offerData: item, currentPage: currentPage }}>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>  
                                                             </div>
                                                             <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                                 <img src={require('../mv_img/trust_icon.png')} alt="" />

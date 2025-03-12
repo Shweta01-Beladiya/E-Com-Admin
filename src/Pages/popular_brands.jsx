@@ -9,6 +9,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 import Addpopularbrands from './add_popularbrands';
 import NoResultsFound from "../Component/Noresult";
+import { Link, useLocation  } from 'react-router-dom';
 
 const Popularbrands = () => {
 
@@ -23,11 +24,25 @@ const Popularbrands = () => {
     });
     const [tempFilters, setTempFilters] = useState(filters);
     const [shouldResetPage, setShouldResetPage] = useState(false);
+    const location = useLocation();
 
     // Edit Offer
-    const [showAddForm, setShowAddForm] = useState(false);
+    // const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [refreshData, setRefreshData] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
 
     // Search Data
     useEffect(() => {
@@ -44,6 +59,8 @@ const Popularbrands = () => {
             user.title?.includes(searchTerm)
           );
         }
+
+        setFilteredData(result);
     
         if (shouldResetPage) {
             setCurrentPage(1);
@@ -170,32 +187,32 @@ const Popularbrands = () => {
     const handleShow = () => setShow(true);
 
     // Edit data
-    const handleEditClick = (brand) => {
-        setSelectedBrand(brand);
-        setShowAddForm(true);
-    };
+    // const handleEditClick = (brand) => {
+    //     setSelectedBrand(brand);
+    //     setShowAddForm(true);
+    // };
 
     // console.log("bran",selectedBrand)
 
     // Handle form submission callback
-    const handleFormSubmit = () => {
-        setShowAddForm(false);
-        setSelectedBrand(null);
-        setRefreshData(prev => !prev);
-    };
+    // const handleFormSubmit = () => {
+    //     setShowAddForm(false);
+    //     setSelectedBrand(null);
+    //     setRefreshData(prev => !prev);
+    // };
 
-    if (showAddForm) {
-        return (
-            <Addpopularbrands 
-                editData={selectedBrand}
-                onCancel={() => {
-                    setShowAddForm(false);
-                    setSelectedBrand(null);
-                }}
-                onSubmitSuccess={handleFormSubmit}
-            />
-        );
-    }
+    // if (showAddForm) {
+    //     return (
+    //         <Addpopularbrands 
+    //             editData={selectedBrand}
+    //             onCancel={() => {
+    //                 setShowAddForm(false);
+    //                 setSelectedBrand(null);
+    //             }}
+    //             onSubmitSuccess={handleFormSubmit}
+    //         />
+    //     );
+    // }
 
     return (
         <>
@@ -261,8 +278,8 @@ const Popularbrands = () => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            {/* <Link to='/addpopularbrands'><button>+ Add</button></Link> */}
-                                            <button onClick={() => setShowAddForm(true)}>+ Add</button>
+                                            <Link to='/addpopularbrands'><button>+ Add</button></Link>
+                                            {/* <button onClick={() => setShowAddForm(true)}>+ Add</button> */}
                                         </div>
                                     </div>
                                 </div>
@@ -297,8 +314,10 @@ const Popularbrands = () => {
                                                     <td>{item?.offer}</td>
                                                     <td>{item?.title}</td>
                                                     <td className='d-flex align-items-center justify-content-end'>
-                                                        <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                        <div className="mv_pencil_icon">
+                                                            <Link to='/addpopularbrands' state={{ brandData: item, currentPage: currentPage }}>
+                                                                <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                            </Link>
                                                         </div>
                                                         <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                             <img src={require('../mv_img/trust_icon.png')} alt="" />
