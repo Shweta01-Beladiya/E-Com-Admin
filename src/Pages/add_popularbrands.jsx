@@ -4,11 +4,17 @@ import '../CSS/vaidik.css';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
+const Addpopularbrands = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const editData = location.state?.brandData || null;
 
     // State variables
     let [isedit, setisedit] = useState(false);
@@ -95,9 +101,12 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
 
                 if (response.data.status === 200 || response.data.status === 201) {
                     // Call the success callback provided by parent component
-                    if (onSubmitSuccess) {
-                        onSubmitSuccess();
-                    }
+                    navigate('/popularbrands', { 
+                        state: { 
+                            formSubmitted: true,
+                            currentPage: location.state?.currentPage || 1 
+                        } 
+                    });
                 }
             } catch (error) {
                 console.error("Error:", error);
@@ -109,6 +118,10 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
     });
     // **************************************************************************
 
+    const handleNavigateBack = () => {
+        navigate('/popularbrands');
+    }
+    
     return (
         <>
             <div>
@@ -307,7 +320,7 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
                                         </div>
                                         <div className='text-center mt-5'>
                                             <div className="mv_edit_profile">
-                                                <button onClick={onCancel} className='border-0 bg-transparent'>
+                                                <button onClick={handleNavigateBack} className='border-0 bg-transparent'>
                                                     Cancel
                                                 </button>
                                                 {editData ?

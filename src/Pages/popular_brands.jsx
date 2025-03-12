@@ -9,6 +9,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 import Addpopularbrands from './add_popularbrands';
 import NoResultsFound from "../Component/Noresult";
+import { Link, useLocation  } from 'react-router-dom';
 
 const Popularbrands = () => {
 
@@ -18,21 +19,33 @@ const Popularbrands = () => {
     const [toggle, seToggle] = useState(false)
     const [data, setData] = useState([]);
 
+
     // Edit Offer
-    const [showAddForm, setShowAddForm] = useState(false);
+    // const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [refreshData, setRefreshData] = useState(false);
+
 
     // Search and filter states
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCriteria, setFilterCriteria] = useState({
         brandName: ''
     });
-    
-    // ************************************** Show Data **************************************
-    const [filteredData, setFilteredData] = useState([]);
-
     useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
+
+    // Search Data
+   useEffect(() => {
         const fetchBrandData = async () => {
             try {
                 const response = await axios.get(`${BaseUrl}/api/getAllBrands`, {
@@ -176,30 +189,31 @@ const Popularbrands = () => {
     };
 
     // Edit data
-    const handleEditClick = (brand) => {
-        setSelectedBrand(brand);
-        setShowAddForm(true);
-    };
+    // const handleEditClick = (brand) => {
+    //     setSelectedBrand(brand);
+    //     setShowAddForm(true);
+    // };
 
     // Handle form submission callback
-    const handleFormSubmit = () => {
-        setShowAddForm(false);
-        setSelectedBrand(null);
-        setRefreshData(prev => !prev);
-    };
+    // const handleFormSubmit = () => {
+    //     setShowAddForm(false);
+    //     setSelectedBrand(null);
+    //     setRefreshData(prev => !prev);
+    // };
 
-    if (showAddForm) {
-        return (
-            <Addpopularbrands
-                editData={selectedBrand}
-                onCancel={() => {
-                    setShowAddForm(false);
-                    setSelectedBrand(null);
-                }}
-                onSubmitSuccess={handleFormSubmit}
-            />
-        );
-    }
+    // if (showAddForm) {
+    //     return (
+    //         <Addpopularbrands 
+    //             editData={selectedBrand}
+    //             onCancel={() => {
+    //                 setShowAddForm(false);
+    //                 setSelectedBrand(null);
+    //             }}
+    //             onSubmitSuccess={handleFormSubmit}
+    //         />
+    //     );
+    // }
+
 
     return (
         <>
@@ -269,7 +283,8 @@ const Popularbrands = () => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            <button onClick={() => setShowAddForm(true)}>+ Add</button>
+                                            <Link to='/addpopularbrands'><button>+ Add</button></Link>
+                                            {/* <button onClick={() => setShowAddForm(true)}>+ Add</button> */}
                                         </div>
                                     </div>
                                 </div>
