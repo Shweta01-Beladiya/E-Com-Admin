@@ -9,7 +9,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
 import Addpopularbrands from './add_popularbrands';
 import NoResultsFound from "../Component/Noresult";
-import { Link, useLocation  } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Popularbrands = () => {
 
@@ -19,12 +19,12 @@ const Popularbrands = () => {
     const [toggle, seToggle] = useState(false)
     const [data, setData] = useState([]);
 
-
+    const location = useLocation();
     // Edit Offer
     // const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [refreshData, setRefreshData] = useState(false);
-
+    const [filteredData, setFilteredData] = useState()
 
     // Search and filter states
     const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +45,7 @@ const Popularbrands = () => {
     }, [location.state]);
 
     // Search Data
-   useEffect(() => {
+    useEffect(() => {
         const fetchBrandData = async () => {
             try {
                 const response = await axios.get(`${BaseUrl}/api/getAllBrands`, {
@@ -70,7 +70,7 @@ const Popularbrands = () => {
         // Apply search term
         if (searchTerm.trim() !== '') {
             const searchLower = searchTerm.toLowerCase();
-            result = result.filter(item => 
+            result = result.filter(item =>
                 item.brandName.toLowerCase().includes(searchLower) ||
                 item.title.toLowerCase().includes(searchLower) ||
                 item.offer.toString().includes(searchLower)
@@ -108,7 +108,7 @@ const Popularbrands = () => {
                 if (updatedData.length === 0) {
                     setCurrentPage(1);
                 }
-    
+
                 setModalShow(false)
                 seToggle(prev => !prev);
             }
@@ -189,10 +189,9 @@ const Popularbrands = () => {
     };
 
     // Edit data
-    // const handleEditClick = (brand) => {
-    //     setSelectedBrand(brand);
-    //     setShowAddForm(true);
-    // };
+    const handleEditClick = (brand) => {
+        setSelectedBrand(brand);
+    };
 
     // Handle form submission callback
     // const handleFormSubmit = () => {
@@ -254,8 +253,8 @@ const Popularbrands = () => {
                                                 <div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Brand Name</label>
-                                                        <Form.Select 
-                                                            className="mb-3" 
+                                                        <Form.Select
+                                                            className="mb-3"
                                                             aria-label="Default select example"
                                                             name="brandName"
                                                             value={filterCriteria.brandName}
