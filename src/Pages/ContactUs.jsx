@@ -141,6 +141,7 @@ const ContactUs = () => {
         return buttons;
     };
     const paginatedData = data;
+
     // Modal
     const [modalShow, setModalShow] = React.useState(false);
     const [viewModal, setViewModal] = useState(false);

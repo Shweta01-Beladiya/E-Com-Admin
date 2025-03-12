@@ -246,6 +246,7 @@ const Cards = ({ editData }) => {
             user.subTitle?.includes(searchTerm)
           );
         }
+        setFilteredData(result); 
     
         if (shouldResetPage) {
             setCurrentPage(1);
@@ -419,25 +420,25 @@ const Cards = ({ editData }) => {
                             </InputGroup>
                             {errors.subTitle && touched.subTitle && <div className="text-danger small">{errors.subTitle}</div>}
                         </div>
-                         <div className="mv_input_content mb-3">
+                         <div className="mv_input_content mb-5">
                             <label className='mv_label_input'>Image</label>
                             <div className="position-relative">
-                                <div className="border border-black rounded w-100 p-1 d-flex align-items-center justify-content-between">
-                                    <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' :'transparent', width:'50%' }}>
+                                <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' :'transparent', width:'30%' }}>
                                         {addimg && (
                                             <>
                                                 <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
                                                     <img
                                                         src={brandImagePreview || `${BaseUrl}/${editData?.addcardimage}`}
                                                         alt="Preview"
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                        style={{ width: '100%' }}
                                                     />
                                                 </div>
                                                 <span className='text-truncate' style={{width:'100%'}}>{addimg}</span>
                                                 <button
                                                     type="button"
                                                     className="btn text-danger p-0 text-end "
-                                                    style={{ fontSize: '1.25rem', lineHeight: 1 }}
+                                                    style={{ fontSize: '1.50rem', lineHeight: .5 }}
                                                     onClick={() => {
                                                         setaddimg("");
                                                         setBrandImagePreview(null);
