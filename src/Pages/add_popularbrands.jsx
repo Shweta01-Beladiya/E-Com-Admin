@@ -133,18 +133,15 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                             <div className="mv_input_content mb-3">
                                                 <label className='mv_label_input'>Brand Name</label>
-                                                <Form.Select
-                                                    name="brandname"
-                                                    value={values.brandname}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    className='mv_form_select'>
-                                                    <option>Select</option>
-                                                    <option value="Apple">Apple</option>
-                                                    <option value="Noise">Noise</option>
-                                                    <option value="Asus">Asus</option>
-                                                    <option value="JBL">JBL</option>
-                                                </Form.Select>
+                                                <InputGroup className="">
+                                                    <Form.Control
+                                                        name="brandname"
+                                                        value={values.brandname}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        placeholder="Enter brandname"
+                                                    />
+                                                </InputGroup>
                                                 {errors.brandname && touched.brandname && <div className="text-danger small">{errors.brandname}</div>}
                                             </div>
                                         </div>
@@ -187,7 +184,7 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
                                                 <label className='mv_label_input'>Brand Logo</label>
                                                 <div className="position-relative">
                                                     <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
-                                                        <div className="d-flex align-items-center p-1" style={{ backgroundColor: brandimg ? '#EAEAEA' : 'transparent', width:'20%' }}>
+                                                        <div className="d-flex align-items-center p-1" style={{ backgroundColor: brandimg ? '#EAEAEA' : 'transparent' }}>
                                                             {brandimg && (
                                                                 <>
                                                                     <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
@@ -250,7 +247,7 @@ const Addpopularbrands = ({ editData, onCancel, onSubmitSuccess }) => {
                                                 <label className='mv_label_input'>Image</label>
                                                 <div className="position-relative">
                                                     <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
-                                                        <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' : 'transparent', width:'20%' }}>
+                                                        <div className="d-flex align-items-center p-1" style={{ backgroundColor: addimg ? '#EAEAEA' : 'transparent' }}>
                                                             {addimg && (
                                                                 <>
                                                                     <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>

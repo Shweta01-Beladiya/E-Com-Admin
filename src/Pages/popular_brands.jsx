@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
-import {  InputGroup } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
@@ -17,107 +17,90 @@ const Popularbrands = () => {
     const [deleteToggle, setDeleteToggle] = useState(null)
     const [toggle, seToggle] = useState(false)
     const [data, setData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filters, setFilters] = useState({
-        brandName: '',
-    });
-    const [tempFilters, setTempFilters] = useState(filters);
-    const [shouldResetPage, setShouldResetPage] = useState(false);
 
     // Edit Offer
     const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [refreshData, setRefreshData] = useState(false);
 
-    // Search Data
-    useEffect(() => {
-        let result = data;
-        // console.log("hihi" , result);
-        if (filters.brandName) {
-          result = result.filter(user => user.brandName === filters.brandName);
-        }
+    // Search and filter states
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterCriteria, setFilterCriteria] = useState({
+        brandName: ''
+    });
     
-        if (searchTerm) {
-          result = result.filter(user =>
-            user.brandName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.offer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.title?.includes(searchTerm)
-          );
-        }
-    
-        if (shouldResetPage) {
-            setCurrentPage(1);
-            setShouldResetPage(false);
-        }
-        
-        const newTotalPages = Math.ceil(result.length / itemsPerPage);
-        if (currentPage > newTotalPages && newTotalPages > 0) {
-            setCurrentPage(newTotalPages);
-        }
-    }, [data, filters, searchTerm, shouldResetPage]);
-
-    // Offcanvas Filter
-    const handleFilterChange = (field, value) => {
-        setTempFilters(prev => ({
-          ...prev,
-          [field]: value
-        }));
-    };
-
-    const handleApplyFilters = () => {
-        setFilters(tempFilters);
-        setShouldResetPage(true);
-        handleClose();
-    };
-
     // ************************************** Show Data **************************************
     const [filteredData, setFilteredData] = useState([]);
-    
-    useEffect(()=>{
-       const fetchBrandData = async () => {
-           try{
-              const response = await axios.get(`${BaseUrl}/api/getAllBrands`,{
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
-              })
-            //   console.log("data" , response?.data?.popularBrand);
-              setFilteredData(response?.data?.popularBrand)
-              setData(response?.data?.popularBrand)
-           }catch(error){
-              
-           }
-       }
 
-       fetchBrandData()
-       // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[toggle, refreshData])
+    useEffect(() => {
+        const fetchBrandData = async () => {
+            try {
+                const response = await axios.get(`${BaseUrl}/api/getAllBrands`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                setData(response?.data?.popularBrand)
+            } catch (error) {
+                console.error("Error fetching brand data:", error);
+            }
+        }
+
+        fetchBrandData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [toggle, refreshData])
+
+    // Apply search and filters whenever data, searchTerm, or filterCriteria changes
+    useEffect(() => {
+        let result = [...data];
+
+        // Apply search term
+        if (searchTerm.trim() !== '') {
+            const searchLower = searchTerm.toLowerCase();
+            result = result.filter(item => 
+                item.brandName.toLowerCase().includes(searchLower) ||
+                item.title.toLowerCase().includes(searchLower) ||
+                item.offer.toString().includes(searchLower)
+            );
+        }
+
+        // Apply filter
+        if (filterCriteria.brandName) {
+            result = result.filter(item => item.brandName === filterCriteria.brandName);
+        }
+
+        setFilteredData(result);
+        setCurrentPage(1); // Reset to first page when search/filter changes
+    }, [data, searchTerm, filterCriteria]);
+
     // ***************************************************************************************
 
     // ************************************** Delete Item **************************************
-    const handleManage = (id) =>{
+    const handleManage = (id) => {
         setModalShow(true)
         setDeleteToggle(id)
     }
 
     const handleDelete = async () => {
-        try{
-           const response = await axios.delete(`${BaseUrl}/api/deleteBrand/${deleteToggle}`,{
-               headers: {
-                   Authorization: `Bearer ${token}`,
-               }
-           })
-            const updatedData = filteredData.filter(item => item._id !== deleteToggle);
-            setFilteredData(updatedData);
-            setData(updatedData);
-            
-            if (updatedData.length === 0) {
-                setCurrentPage(1);
+        try {
+            const response = await axios.delete(`${BaseUrl}/api/deleteBrand/${deleteToggle}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            if (response.data.status === 200) {
+                const updatedData = filteredData.filter(item => item._id !== deleteToggle);
+                setFilteredData(updatedData);
+                setData(updatedData);
+                if (updatedData.length === 0) {
+                    setCurrentPage(1);
+                }
+    
+                setModalShow(false)
+                seToggle(prev => !prev);
             }
 
-           setModalShow(false)
-           seToggle(prev => !prev);
-        }catch(error){
+        } catch (error) {
             alert(error)
         }
     }
@@ -126,37 +109,36 @@ const Popularbrands = () => {
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
- 
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    // console.log("totalpage",totalPages)
- 
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-             setCurrentPage(newPage);
+            setCurrentPage(newPage);
         }
     };
- 
+
     const getPaginationButtons = () => {
         if (totalPages <= 4) {
-          return Array.from({ length: totalPages }, (_, i) => i + 1);
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
-      
+
         const buttons = [];
-      
+
         if (currentPage <= 2) {
-          buttons.push(1, 2, 3, "...");
+            buttons.push(1, 2, 3, "...");
         } else if (currentPage >= totalPages - 1) {
-          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
         } else {
-          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-      
+
         return buttons;
-      };
- 
+    };
+
     const paginatedData = filteredData.slice(
-         (currentPage - 1) * itemsPerPage,
-         currentPage * itemsPerPage
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
     // *******************************************************************************
 
@@ -169,13 +151,35 @@ const Popularbrands = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    // Search handlers
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    // Filter handlers
+    const handleFilterChange = (e) => {
+        setFilterCriteria({
+            ...filterCriteria,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const applyFilters = () => {
+        handleClose();
+    };
+
+    const resetFilters = () => {
+        setFilterCriteria({
+            brandName: ''
+        });
+        handleClose();
+    };
+
     // Edit data
     const handleEditClick = (brand) => {
         setSelectedBrand(brand);
         setShowAddForm(true);
     };
-
-    // console.log("bran",selectedBrand)
 
     // Handle form submission callback
     const handleFormSubmit = () => {
@@ -186,7 +190,7 @@ const Popularbrands = () => {
 
     if (showAddForm) {
         return (
-            <Addpopularbrands 
+            <Addpopularbrands
                 editData={selectedBrand}
                 onCancel={() => {
                     setShowAddForm(false);
@@ -216,14 +220,14 @@ const Popularbrands = () => {
                                 <div className="mv_product_search">
                                     <InputGroup>
                                         <Form.Control
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
                                         />
                                     </InputGroup>
                                 </div>
                                 <div className='d-flex'>
-                                <div className="mv_column_button mv_column_padd">
+                                    <div className="mv_column_button mv_column_padd">
                                         <Button variant="primary" onClick={handleShow}>
                                             <img src={require('../mv_img/filter.png')} alt="" />
                                             Filters
@@ -236,23 +240,27 @@ const Popularbrands = () => {
                                                 <div>
                                                     <div className="mv_input_content">
                                                         <label className='mv_offcanvas_filter_category'>Brand Name</label>
-                                                        <Form.Select className="mb-3" aria-label="Default select example" value={tempFilters.brandName}
-                                                            onChange={(e) => handleFilterChange('brandName', e.target.value)}>
-                                                            <option>Select</option>
-                                                            <option value="Apple">Apple</option>
-                                                            <option value="Noise">Noise</option>
-                                                            <option value="Asus">Asus</option>
-                                                            <option value="JBL">JBL</option>
+                                                        <Form.Select 
+                                                            className="mb-3" 
+                                                            aria-label="Default select example"
+                                                            name="brandName"
+                                                            value={filterCriteria.brandName}
+                                                            onChange={handleFilterChange}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {data.map((item) => (
+                                                                <option value={item.brandName} key={item._id}>{item.brandName}</option>
+                                                            ))}
                                                         </Form.Select>
                                                     </div>
                                                 </div>
                                                 <div className='mv_offcanvas_bottom_button'>
                                                     <div className='mv_logout_Model_button mv_cancel_apply_btn d-flex align-items-center justify-content-center'>
                                                         <div className="mv_logout_cancel">
-                                                            <button type="button" onClick={handleClose}>Cancel</button>
+                                                            <button type="button" onClick={resetFilters}>Cancel</button>
                                                         </div>
                                                         <div className="mv_logout_button">
-                                                            <button type="button" onClick={handleApplyFilters}>Apply</button>
+                                                            <button type="button" onClick={applyFilters}>Apply</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -261,7 +269,6 @@ const Popularbrands = () => {
                                     </div>
                                     <div className='mv_category_side mv_product_page_category d-flex align-items-center'>
                                         <div className="mv_add_category mv_add_subcategory mv_add_product">
-                                            {/* <Link to='/addpopularbrands'><button>+ Add</button></Link> */}
                                             <button onClick={() => setShowAddForm(true)}>+ Add</button>
                                         </div>
                                     </div>
@@ -282,51 +289,51 @@ const Popularbrands = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            {paginatedData.map((item, index) => {
-                                                // console.log(`${BaseUrl}/${item?.brandImage}`);
-                                                return(
-                                                <tr key={index}>
-                                                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                                    <td>
-                                                        <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandLogo }`}  alt="" />
-                                                        {item?.brandName}
-                                                    </td>
-                                                    <td>
-                                                        <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandImage}`}  alt="" />
-                                                    </td>
-                                                    <td>{item?.offer}</td>
-                                                    <td>{item?.title}</td>
-                                                    <td className='d-flex align-items-center justify-content-end'>
-                                                        <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
-                                                            <img src={require('../mv_img/pencil_icon.png')} alt="" />
-                                                        </div>
-                                                        <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
-                                                            <img src={require('../mv_img/trust_icon.png')} alt="" />
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                )})}
+                                                {paginatedData.map((item, index) => {
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                            <td>
+                                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandLogo}`} alt="" />
+                                                                {item?.brandName}
+                                                            </td>
+                                                            <td>
+                                                                <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.brandImage}`} alt="" />
+                                                            </td>
+                                                            <td>{item?.offer}</td>
+                                                            <td>{item?.title}</td>
+                                                            <td className='d-flex align-items-center justify-content-end'>
+                                                                <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
+                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </div>
+                                                                <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
+                                                                    <img src={require('../mv_img/trust_icon.png')} alt="" />
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
                                             </tbody>
                                         </table>
                                     </div>
                                     {totalPages > 1 && (
                                         <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
                                             {/* Previous Button */}
-                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
                                                 onClick={() => handlePageChange(currentPage - 1)}>
                                                 <MdOutlineKeyboardArrowLeft />
                                             </p>
                                             {/* Pagination Buttons */}
                                             {getPaginationButtons().map((page, index) => (
                                                 <p key={index}
-                                                className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                                onClick={() => typeof page === "number" && handlePageChange(page)}
-                                                style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                                {page}
+                                                    className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                    onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                    style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                    {page}
                                                 </p>
                                             ))}
                                             {/* Next Button */}
-                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
                                                 onClick={() => handlePageChange(currentPage + 1)} >
                                                 <MdOutlineKeyboardArrowRight />
                                             </p>
@@ -358,4 +365,4 @@ const Popularbrands = () => {
     );
 };
 
-export default Popularbrands
+export default Popularbrands;

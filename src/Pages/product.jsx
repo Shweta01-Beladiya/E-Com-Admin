@@ -188,7 +188,7 @@ const Product = () => {
             const response = await axios.get(`${BaseUrl}/api/allProduct`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // console.log("response", response.data.product);
+            console.log("response", response.data.product);
             setData(response.data.product);
         } catch (error) {
             console.error('Data Fetching Error:', error);
@@ -399,7 +399,7 @@ const Product = () => {
                                                         <td>
                                                             <div className='mv_rating_img'>
                                                                 <FaStar className='mv_star_yellow' />
-                                                                {item.rating || '0'}
+                                                                {item.ratingData[0]?.rating || '0'}
                                                             </div>
                                                         </td>
                                                         {/* <td>

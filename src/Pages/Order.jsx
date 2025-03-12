@@ -28,7 +28,7 @@ const Order = () => {
 
   useEffect(() => {
     applyFilters();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 
   }, [searchTerm, filterDate, filterStatus]);
 
@@ -45,15 +45,15 @@ const Order = () => {
       );
     }
 
-  // Date filter
-  if (filterDate) {
-    const selectedDate = new Date(filterDate).setHours(0, 0, 0, 0);
+    // Date filter
+    if (filterDate) {
+      const selectedDate = new Date(filterDate).setHours(0, 0, 0, 0);
 
-    results = results.filter(item => {
-      const orderDate = new Date(item.createdAt).setHours(0, 0, 0, 0);
-      return orderDate === selectedDate;
-    });
-  }
+      results = results.filter(item => {
+        const orderDate = new Date(item.createdAt).setHours(0, 0, 0, 0);
+        return orderDate === selectedDate;
+      });
+    }
 
     // Apply status filter
     if (filterStatus && filterStatus !== 'Select') {
@@ -100,9 +100,9 @@ const Order = () => {
     if (totalPages <= 4) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-  
+
     const buttons = [];
-  
+
     if (currentPage <= 2) {
       buttons.push(1, 2, 3, "...");
     } else if (currentPage >= totalPages - 1) {
@@ -110,7 +110,7 @@ const Order = () => {
     } else {
       buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
     }
-  
+
     return buttons;
   };
 
@@ -149,6 +149,77 @@ const Order = () => {
     setFilterDate('');
   };
 
+  const handlePrint = (orderData) => {
+    // Create a new window or tab for printing
+    const printWindow = window.open('', '_blank');
+
+    // Generate HTML content for printing
+    const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Order Details</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .order-info { margin-bottom: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div>
+          <h1>E Commerce</h1>
+        </div>
+        <div>
+          <p>Order ID: ${orderData._id}</p>
+          <p>Date: ${new Date(orderData.createdAt).toLocaleDateString('en-GB')}</p>
+        </div>
+      </div>
+      
+      <div class="order-info">
+        <h2>Customer Information</h2>
+        <p>Name: ${orderData.userData[0]?.name}</p>
+      </div>
+      
+      <h2>Order Details</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Order Date</th>
+            <th>Total Amount</th>
+            <th>Order Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>${orderData._id}</td>
+            <td>${orderData.userData[0]?.name}</td>
+            <td>${new Date(orderData.createdAt).toLocaleDateString('en-GB')}</td>
+            <td>${orderData.totalAmount}</td>
+            <td>${orderData.orderStatus}</td>
+          </tr>
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+    // Write the content to the new window
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Trigger print when content is loaded
+    printWindow.onload = function () {
+      printWindow.print();
+      // Optionally close the window after printing
+      printWindow.onafterprint = function() { printWindow.close(); };
+    };
+  };
   return (
     <>
       <div id='mv_container_fluid'>
@@ -177,8 +248,8 @@ const Order = () => {
                 <div className='d-flex'>
                   {filterDate ? (
                     <div className="mv_column_button mv_column_padd">
-                   <Button onClick={clearDateFilter}>Clear Date</Button>
-                  </div>
+                      <Button onClick={clearDateFilter}>Clear Date</Button>
+                    </div>
                   ) : (
                     <div className="sb_date_input ">
                       <input
@@ -244,7 +315,7 @@ const Order = () => {
                       <tbody>
                         {paginatedData.map((item, index) => (
                           <tr key={index}>
-                             <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                            <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                             <td>{item.userData[0]?.name}</td>
                             <td>{new Date(item.createdAt).toLocaleDateString('en-GB')}</td>
                             <td>{item.totalAmount}</td>
@@ -268,7 +339,8 @@ const Order = () => {
                                 </Link>
                               </div>
                               <div className="mv_pencil_icon">
-                                <img src={require('../mv_img/print.png')} alt="" />
+                                <img src={require('../mv_img/print.png')} alt="" onClick={() => handlePrint(item)}
+                                  style={{ cursor: 'pointer' }} />
                               </div>
                             </td>
                           </tr>
@@ -279,7 +351,7 @@ const Order = () => {
                   {totalPages > 1 && (
                     <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
                       {/* Previous Button */}
-                      <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                      <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
                         onClick={() => handlePageChange(currentPage - 1)}>
                         <MdOutlineKeyboardArrowLeft />
                       </p>
@@ -293,7 +365,7 @@ const Order = () => {
                         </p>
                       ))}
                       {/* Next Button */}
-                      <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                      <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
                         onClick={() => handlePageChange(currentPage + 1)} >
                         <MdOutlineKeyboardArrowRight />
                       </p>
@@ -309,7 +381,7 @@ const Order = () => {
       </div>
 
       {/* Delete Product Model */}
-      <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg"  centered >
+      <Modal className='mv_logout_dialog' show={modalShow} onHide={() => setModalShow(false)} size="lg" centered >
         <Modal.Body className='text-center mv_logout'>
           <h5 className='mb-2'>Delete</h5>
           <p>Are you sure you want to <br /> delete? </p>
