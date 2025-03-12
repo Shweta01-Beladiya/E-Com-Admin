@@ -24,7 +24,7 @@ const Popularbrands = () => {
     // const [showAddForm, setShowAddForm] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [refreshData, setRefreshData] = useState(false);
-    const [filteredData, setFilteredData] = useState()
+    const [filteredData, setFilteredData] = useState([]);
 
     // Search and filter states
     const [searchTerm, setSearchTerm] = useState('');
