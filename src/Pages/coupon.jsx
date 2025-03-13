@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
@@ -23,6 +23,21 @@ const Coupon = () => {
         couponType: '',
     });
     const [id, setId] = useState(null);
+    const location = useLocation();
+    const [refreshData, setRefreshData] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -85,7 +100,7 @@ const Coupon = () => {
         }
         fetchAllData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [refreshData]);
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
@@ -134,7 +149,9 @@ const Coupon = () => {
         }
 
         setFilteredData(filtered);
-        setCurrentPage(1);
+        if (!location.state?.formSubmitted) {
+            setCurrentPage(1);
+        }
     }, [searchTerm, filters, data]);
 
     const handleReset = () => {
@@ -303,7 +320,7 @@ const Coupon = () => {
                                                 </td>
                                                 <td className='d-flex align-items-center justify-content-end'>
                                                     <div className="mv_pencil_icon" >
-                                                        <Link to='/addcoupon' state={{ id: item._id }}>
+                                                        <Link to='/addcoupon' state={{ id: item._id, currentPage: currentPage }}>
                                                             <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                         </Link>
                                                     </div>

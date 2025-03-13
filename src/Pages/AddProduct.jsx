@@ -959,10 +959,11 @@ const AddProduct = () => {
                                                 </div>
                                                 <div className='text-center mt-5'>
                                                     <div className="mv_edit_profile">
-                                                        <button className='border-0 bg-transparent'>
-                                                            <Link to={'/product'} style={{ color: '#2B221E', textDecoration: 'none' }}>Cancel
-                                                            </Link>
-                                                        </button>
+                                                        <Link to={'/product'} style={{ color: '#2B221E', textDecoration: 'none' }}>
+                                                            <button className='border-0 bg-transparent'>
+                                                                Cancel
+                                                            </button>
+                                                        </Link>
                                                         {id ? <button className='border-0 bg-transparent' >
                                                             Update
                                                         </button> :
