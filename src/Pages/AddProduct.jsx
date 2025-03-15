@@ -16,10 +16,20 @@ const AddProduct = () => {
     const token = localStorage.getItem('token');
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { id } = useParams();
-    const query = new URLSearchParams(useLocation().search);
+    const query = new URLSearchParams(location.search);
     const variantId = query.get("productVariantId");
-    // console.log("variantId",variantId);
+    
+    // Get current page from URL or localStorage
+    const urlPage = query.get("page");
+    
+    // Store current page in localStorage on component mount
+    useEffect(() => {
+        if (urlPage) {
+            localStorage.setItem('currentProductPage', urlPage);
+        }
+    }, [urlPage]);
 
     // State variables
     const [colors, setColors] = useState([]);
@@ -36,7 +46,7 @@ const AddProduct = () => {
     const [size, setSize] = useState([]);
     const [filteredSizes, setFilteredSizes] = useState([]);
     const [unit, setUnit] = useState([]);
-
+    const [currentPage, setCurrentPage] = useState(localStorage.getItem('currentProductPage') || "1");
 
     // Initial form values
     const [initialValues, setInitialValues] = useState({
@@ -110,6 +120,13 @@ const AddProduct = () => {
         )
     });
 
+    useEffect(() => {
+        if (urlPage) {
+            localStorage.setItem('currentProductPage', urlPage);
+            setCurrentPage(urlPage); 
+        }
+    }, [urlPage]);
+
 
     const fetchProductData = async () => {
         if (!id) return;
@@ -164,7 +181,6 @@ const AddProduct = () => {
                         }));
                         setSelectedImages(imageObjects);
                     }
-                    // console.log("productName", product.productName);
 
                     // Set form values for Formik
                     const initialData = {
@@ -188,7 +204,6 @@ const AddProduct = () => {
                             ? Object.entries(variant.specifications).map(([key, value]) => ({ key, value }))
                             : [{ key: '', value: '' }]
                     };
-                    // console.log("initialData", initialData);
 
                     setInitialValues(initialData);
                 }
@@ -197,11 +212,14 @@ const AddProduct = () => {
             console.error('Error fetching product data:', error);
         }
     };
+    
     // Form submission handler
     const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
         try {
+            // Get the stored page number
+            const storedPage = localStorage.getItem('currentProductPage') || '1';
+            
             if (id) {
-                
                 // Update existing product
                 await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
                     mainCategoryId: values.mainCategoryId,
@@ -225,7 +243,6 @@ const AddProduct = () => {
                 .map(img => img.existingPath);
                 
                 formData.append("existingImages", JSON.stringify(existingImages));
-                // console.log("existingImages", existingImages);
                 
                 // Only append new file uploads to "images"
                 values.images.forEach((img) => {
@@ -259,9 +276,6 @@ const AddProduct = () => {
                     formData.append(`specifications[${key}]`, value);
                 });
 
-
-                // console.log("fromDarta",formData);
-
                 const variantResponse = await axios.put(`${BaseUrl}/api/updateProductVariant/${variantId}`, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -270,7 +284,9 @@ const AddProduct = () => {
                 });
 
                 if (variantResponse.data.status === 200) {
-                    navigate('/product');
+                    // Use the page number from localStorage or state
+                    const pageToNavigate = localStorage.getItem('currentProductPage') || currentPage;
+                    navigate(`/product?page=${pageToNavigate}`);
                 }
             } else {
                 // Create new product logic remains the same
@@ -319,7 +335,8 @@ const AddProduct = () => {
                 });
                 
                 if (proResponse.data.status === 200) {
-                    navigate('/product');
+                    // Navigate back to product list with the page parameter
+                    navigate(`/product?page=${storedPage}`);
                 }
             }
         } catch (error) {
@@ -549,6 +566,7 @@ const AddProduct = () => {
             formikRef.current.setFieldValue('images', selectedImages);
         }
     }, [selectedImages]);
+
     return (
         <>
             <div>
@@ -572,11 +590,14 @@ const AddProduct = () => {
                                   innerRef={formikRef}
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
-                                    onSubmit={handleSubmit}
+                                    onSubmit={(values, formikBag) => handleSubmit(values, formikBag, null)}
                                     enableReinitialize={true}
                                 >
                                     {({ handleSubmit, handleChange, values, setFieldValue }) => (
-                                        <form onSubmit={handleSubmit}>
+                                        <form onSubmit={(e) => {
+                                            e.preventDefault();  // Prevent default form submission
+                                            handleSubmit(e);     // Call Formik's handleSubmit
+                                        }}>
                                             <div className="row">
                                                 <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                                     <div className="mv_input_content mb-3">

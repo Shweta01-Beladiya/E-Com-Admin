@@ -63,16 +63,6 @@ const Accountpolicy = () => {
     const [modalShow, setModalShow] = React.useState(false);
     const [modalShow1, setModalShow1] = React.useState(false);
 
-    // const [values, setValues] = useState({
-    //     name: "",
-    //     name1: ""
-    // });
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setValues({ ...values, [name]: value });
-    // };
-
     // ******************************* Validation *******************************
     const [id, setId] = useState(null);
 
