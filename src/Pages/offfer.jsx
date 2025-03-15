@@ -87,8 +87,10 @@ const Offer = () => {
         }
 
         setFilteredData(result);
-        setCurrentPage(1); // Reset to first page when filters change
-    }, [data, filters, searchTerm]);
+        if (!location.state?.formSubmitted) {
+            setCurrentPage(1);
+        }
+    }, [data, filters, searchTerm, location.state]);
 
     // Offcanvas Filter
     const handleFilterChange = (field, value) => {

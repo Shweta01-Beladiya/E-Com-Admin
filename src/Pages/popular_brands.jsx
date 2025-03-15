@@ -7,7 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
-import Addpopularbrands from './add_popularbrands';
+// import Addpopularbrands from './add_popularbrands';
 import NoResultsFound from "../Component/Noresult";
 import { Link, useLocation } from 'react-router-dom';
 
@@ -83,8 +83,10 @@ const Popularbrands = () => {
         }
 
         setFilteredData(result);
-        setCurrentPage(1); // Reset to first page when search/filter changes
-    }, [data, searchTerm, filterCriteria]);
+        if (!location.state?.formSubmitted) {
+            setCurrentPage(1);
+        }
+    }, [data, searchTerm, filterCriteria, location.state]);
 
     // ***************************************************************************************
 
@@ -189,9 +191,9 @@ const Popularbrands = () => {
     };
 
     // Edit data
-    const handleEditClick = (brand) => {
-        setSelectedBrand(brand);
-    };
+    // const handleEditClick = (brand) => {
+    //     setSelectedBrand(brand);
+    // };
 
     // Handle form submission callback
     // const handleFormSubmit = () => {
@@ -317,8 +319,10 @@ const Popularbrands = () => {
                                                             <td>{item?.offer}</td>
                                                             <td>{item?.title}</td>
                                                             <td className='d-flex align-items-center justify-content-end'>
-                                                                <div className="mv_pencil_icon" onClick={() => handleEditClick(item)}>
-                                                                    <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                <div className="mv_pencil_icon" >
+                                                                    <Link to='/addpopularbrands' state={{ brandData: item, currentPage: currentPage }}>
+                                                                        <img src={require('../mv_img/pencil_icon.png')} alt="" />
+                                                                </Link>  
                                                                 </div>
                                                                 <div className="mv_pencil_icon" onClick={() => handleManage(item?._id)}>
                                                                     <img src={require('../mv_img/trust_icon.png')} alt="" />

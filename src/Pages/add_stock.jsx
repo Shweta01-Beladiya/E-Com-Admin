@@ -55,31 +55,32 @@ const Addstock = () => {
         onSubmit: async (values) => {
             // console.log(values);
             // addstock(values)
-            if (id) {
-                const response = await axios.put(`${BaseUrl}/api/updateStock/${id}`, values, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                // console.log("response",response.data);
-                if (response.data.status === 200) {
-                    navigate('/stock');
-                }
-            } else {
-                try {
-                    const response = await axios.post(`${BaseUrl}/api/createStock`, values, {
+            try {
+                let response;
+
+                if (id) {
+                    response = await axios.put(`${BaseUrl}/api/updateStock/${id}`, values, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                } else {
+                    response = await axios.post(`${BaseUrl}/api/createStock`, values, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-                    // console.log("Response", response.data);
-                    if (response.data.status === 201) {
-                        navigate('/stock');
-                    }
-                } catch (error) {
-                    console.error('Data Fetching Error:', error);
-                    if (error.response && error.response.status === 409) {
-                        setFieldError('stockStatus', 'Stock Alredy Exist');
-                      }
+                }
+                if (response.data.status === 200 || response.data.status === 201) {
+                    navigate('/stock', { 
+                        state: { 
+                            formSubmitted: true,
+                            currentPage: location.state?.currentPage || 1 
+                        } 
+                    });
+                }
+            }catch (error) {
+                console.error('Data Fetching Error:', error);
+                if (error.response && error.response.status === 409) {
+                    setFieldError('stockStatus', 'Stock Alredy Exist');
                 }
             }
-
         }
     })
     // **************************************************************************

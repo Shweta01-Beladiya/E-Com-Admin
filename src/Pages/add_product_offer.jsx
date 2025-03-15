@@ -13,6 +13,8 @@ const Addproductoffer = () => {
 
     const navigate = useNavigate();
 
+    // const editData = location.state?.id || null;
+
     const [mainCategory, setMainCategory] = useState([]);
     const [category, setCategory] = useState([]);
     const [subCategory, setSubCategory] = useState([]);
@@ -79,32 +81,30 @@ const Addproductoffer = () => {
                 startDate: values.startDate.split("-").reverse().join("-"), // Convert yyyy-mm-dd to dd-mm-yyyy
                 endDate: values.endDate.split("-").reverse().join("-"),
             };
-
-            if (id) {
-                try {
-                    const response = await axios.put(`${BaseUrl}/api/updateProductOffer/${id}`, formattedValues, {
+        
+            try {
+                let response;
+                
+                if (id) {
+                    response = await axios.put(`${BaseUrl}/api/updateProductOffer/${id}`, formattedValues, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-                    // console.log("reposne", response.data);
-                    if (response.data.status === 200) {
-                        navigate('/Productoffer');
-                    }
-                } catch (error) {
-                    console.error('Data Fetching Error:', error);
-                }
-            } else {
-                try {
-                    const response = await axios.post(`${BaseUrl}/api/createProductOffer`, formattedValues, {
+                } else {
+                    response = await axios.post(`${BaseUrl}/api/createProductOffer`, formattedValues, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-
-                    // console.log("response",response.data);
-                    if (response.data.status === 200) {
-                        navigate('/Productoffer');
-                    }
-                } catch (error) {
-                    console.error('Data Create and update error:', error);
                 }
+        
+                if (response.data.status === 200 || response.data.status === 201) {
+                    navigate('/Productoffer', { 
+                        state: { 
+                            formSubmitted: true,
+                            currentPage: location.state?.currentPage || 1 
+                        } 
+                    });
+                }
+            } catch (error) {
+                console.error('Data operation error:', error);
             }
         }
     })

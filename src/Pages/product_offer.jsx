@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import ReactSlider from 'react-slider';
@@ -35,6 +35,21 @@ const Productoffer = () => {
         maxPrice: 1200
     });
     const [getofffer,setOffer] = useState(null);
+    const location = useLocation();
+    const [refreshData, setRefreshData] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     // console.log("totalpage",totalPages)
@@ -145,7 +160,9 @@ const Productoffer = () => {
         // console.log("result>>>>>>>>>", result);
 
         setFilteredData(result);
-        setCurrentPage(1);
+        if (!location.state?.formSubmitted) {
+            setCurrentPage(1);
+        }
     };
 
     // Handle search input
@@ -229,7 +246,7 @@ const Productoffer = () => {
         fetchData();
         fetchAllSubCategory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [refreshData]);
 
     const handleDelete = async (id) => {
         setModalShow(true);
@@ -453,7 +470,7 @@ const Productoffer = () => {
                                                                     <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                             </div>
                                                             <div className="mv_pencil_icon" >
-                                                                <Link to='/addproductoffer' state={{ id: item._id }}>
+                                                                <Link to='/addproductoffer' state={{ id: item._id, currentPage: currentPage }}>
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>

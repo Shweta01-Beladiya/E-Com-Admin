@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Modal from 'react-bootstrap/Modal';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import axios from 'axios';
@@ -28,6 +28,21 @@ const Stock = () => {
     const [product, setProduct] = useState([]);
     const [id, setId] = useState(null);
     const [searchTerm, setSearchTerm] = useState(''); // Add search term state
+    const location = useLocation();
+    const [refreshData, setRefreshData] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
 
     // Add state for filtered dropdown options
     const [filteredCategories, setFilteredCategories] = useState([]);
@@ -142,7 +157,7 @@ const Stock = () => {
         fetchProduct();
         fetchStockData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [refreshData]);
 
     // Update filteredData when data or searchTerm changes
     useEffect(() => {
@@ -170,7 +185,9 @@ const Stock = () => {
     // Handle search input change
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1); // Reset to first page when searching
+        if (!location.state?.formSubmitted) {
+            setCurrentPage(1);
+        }
     };
 
     // Filter categories when main category is selected
@@ -518,7 +535,7 @@ const Stock = () => {
                                                     <td>{item.quantity}</td>
                                                     <td className='d-flex align-items-center justify-content-end'>
                                                         <div className="mv_pencil_icon">
-                                                            <Link to='/addstock' state={{ id: item._id }}>
+                                                            <Link to='/addstock' state={{ id: item._id, currentPage: currentPage }}>
                                                                 <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                             </Link>
                                                         </div>

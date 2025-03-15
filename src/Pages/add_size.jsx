@@ -69,7 +69,12 @@ const Addsize = () => {
             }
 
             if (response.data.status === 200 || response.data.status === 201) {
-                navigate('/size');
+                navigate('/size', { 
+                    state: { 
+                        formSubmitted: true,
+                        currentPage: location.state?.currentPage || 1 
+                    } 
+                });
             }
         }
     });

@@ -64,24 +64,26 @@ const Addcoupon = () => {
             // console.log(values);
 
             try {
+                let response;
+
                 if(id) {
-                    const response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, values, {
+                    response = await axios.put(`${BaseUrl}/api/updateSpecialOffer/${id}`, values, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    // console.log("resposne",response.data);
-                    if(response.data.status === 200) {
-                        navigate('/coupon');
-                    }
                 } else {
-                    const response = await axios.post(`${BaseUrl}/api/createSpecialOffer`, values, {
+                    response = await axios.post(`${BaseUrl}/api/createSpecialOffer`, values, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
                     });
-                    // console.log("response",response.data);
-                    if(response.data.status === 201){
-                        navigate('/coupon');
-                    }
+                }
+                if (response.data.status === 200 || response.data.status === 201) {
+                    navigate('/coupon', { 
+                        state: { 
+                            formSubmitted: true,
+                            currentPage: location.state?.currentPage || 1 
+                        } 
+                    });
                 }
             } catch (error) {
                 console.error('Data Create and update Error:',error);
