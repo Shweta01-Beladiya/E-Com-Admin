@@ -464,7 +464,7 @@ const SubCategory = () => {
                             onSubmit={handleSubmit}
                             enableReinitialize={true}
                         >
-                            {({ handleBlur,handleChange, handleSubmit, setFieldValue, values }) => (
+                            {({ isSubmitting, handleBlur,handleChange, handleSubmit, setFieldValue, values }) => (
                                 <FormikForm onSubmit={handleSubmit} className="r_form">
                                     <div className="mv_input_content mb-3">
                                         <label className='mv_label_input'>Main Category</label>
@@ -531,7 +531,7 @@ const SubCategory = () => {
                                         }} className="r_cancel">
                                             Cancel
                                         </Button>
-                                        <Button type="submit" className="r_delete">
+                                        <Button type="submit" className="r_delete" disabled={isSubmitting}>
                                             {id ? 'Update' : 'Add'}
                                         </Button>
                                     </div>

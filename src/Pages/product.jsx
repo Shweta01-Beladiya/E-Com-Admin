@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
@@ -7,7 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import ReactSlider from 'react-slider';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaStar } from "react-icons/fa";
 import NoResultsFound from '../Component/Noresult';
 import axios from 'axios';
@@ -16,6 +16,8 @@ const Product = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
+    const location = useLocation();
+    const [refreshData, setRefreshData] = useState(false);
 
     // ************************************** Pagination **************************************
     const itemsPerPage = 10;
@@ -23,6 +25,20 @@ const Product = () => {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Handle location state changes (coming back from add/edit pages)
+    useEffect(() => {
+        if (location.state?.formSubmitted) {
+            const savedPage = location.state?.currentPage;
+            if (savedPage) {
+                setCurrentPage(savedPage);
+            }
+            // Reset the location state to avoid refreshing on further navigation
+            window.history.replaceState({}, document.title);
+            // Refresh the data
+            setRefreshData(prev => !prev);
+        }
+    }, [location.state]);
 
     // Filter states
     const [selectedMainCategory, setSelectedMainCategory] = useState('');
@@ -80,7 +96,11 @@ const Product = () => {
         });
 
         setFilteredData(result);
-        setCurrentPage(1);
+        
+        // Only reset current page if not returning from form submit
+        if (!location.state?.formSubmitted) {
+            setCurrentPage(1);
+        }
     };
 
     const handleSearchChange = (e) => {
@@ -224,7 +244,7 @@ const Product = () => {
         fetchMainCategory();
         fetchCategory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [refreshData]);
 
     const handleDelete = (id, product) => {
         setModalShow(true);
