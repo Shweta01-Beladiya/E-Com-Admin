@@ -329,10 +329,11 @@ const Addsize = () => {
                                     </div>
                                     <div className='text-center mt-5'>
                                         <div className="mv_edit_profile">
-                                            <button type="button" className='border-0 bg-transparent'>
-                                            <Link to={'/size'} style={{ color: '#2B221E', textDecoration: 'none' }}>Cancel
+                                            <Link to={'/size'} style={{ color: '#2B221E', textDecoration: 'none' }}>
+                                                <button type="button" className='border-0 bg-transparent'>
+                                                    Cancel
+                                                </button>
                                             </Link>
-                                            </button>
                                             {id ?
                                                 <button type="submit" className='border-0 bg-transparent' onClick={change_edit}>
                                                     Update

@@ -8,6 +8,7 @@ import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import NoResultsFound from '../Component/Noresult';
 
+// E-commerce -> subcategory(edit data to set currentpage), view aboutus(add api and show data), view aboutus, view T&C(set cancel button) solve error and all page checking.
 
 const SubCategory = () => {
 
@@ -133,23 +134,30 @@ const SubCategory = () => {
     }, [filters.mainCategory, category]);
 
     const handleSubmit = async (values, { setFieldError }) => {
-        setId(id);
         try {
             if (id) {
                 const response = await axios.put(`${BaseUrl}/api/updateSubCategory/${id}`, values, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                // console.log("REsposne", response);
                 if (response.data.status === 200) {
+                    // Update the state directly without changing the page
+                    setSubCategories((prevSubCat) => 
+                        prevSubCat.map((sub) => 
+                            sub._id === id ? { 
+                                ...sub, 
+                                mainCategoryId: values.mainCategoryId,
+                                categoryId: values.categoryId,
+                                subCategoryName: values.subCategoryName 
+                            } : sub
+                        )
+                    );
                     setId(null);
                     setShowAddEditModal(false);
-                    setSubCategories((prevSubCat) => prevSubCat.map((sub) => sub._id === id ? { ...sub, ...values } : sub));
                 }
             } else {
                 const response = await axios.post(`${BaseUrl}/api/createSubCategory`, values, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                // console.log("response", response);
                 if (response.data.status === 201) {
                     setShowAddEditModal(false);
                     setSubCategories((prevSubCat) => [...prevSubCat, response.data.subCategory]);
@@ -200,7 +208,14 @@ const SubCategory = () => {
     useEffect(() => {
         const filtered = getFilteredData();
         setFilteredData(filtered);
-        setCurrentPage(1);
+        // Don't reset current page when data is updated
+        // Only reset when search or filters change
+        if (searchQuery !== '' || 
+            filters.mainCategory !== '' || 
+            filters.category !== '' || 
+            filters.status !== '') {
+            setCurrentPage(1);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, filters, subCategories]);
 
@@ -246,9 +261,19 @@ const SubCategory = () => {
         const response = await axios.delete(`${BaseUrl}/api/deleteSubCategory/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        // console.log("DeleteRespo", response.data);
         if (response.data.status === 200) {
-            setSubCategories((prevSubCat) => prevSubCat.filter((sub) => sub._id !== id));
+            setSubCategories((prevSubCat) => {
+                const newSubCategories = prevSubCat.filter((sub) => sub._id !== id);
+                const newTotalItems = newSubCategories.length;
+                const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
+                
+                // If current page exceeds the new total pages, adjust it
+                if (currentPage > newTotalPages && newTotalPages > 0) {
+                    setCurrentPage(newTotalPages);
+                }
+                
+                return newSubCategories;
+            });
             
             setShowDeleteModal(false);
             setSubCatToDelete(null);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Viewtermsconditions = () => {
     const [termsData, setTermsData] = useState([]);
@@ -50,13 +51,22 @@ const Viewtermsconditions = () => {
     return (
         <>
             <div id='mv_container_fluid'>
-                <div className="mv_main_heading mb-4 d-flex align-items-center justify-content-between">
-                    <div>
-                        <p className='mb-1'>View Terms & Conditions</p>
-                        <div className='d-flex align-items-center mv_view_term_and_con'>
-                            <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
-                            <p className='mv_dashboard_heading mv_term_condi_heading mb-0 ms-1'>Terms & Conditions /</p>
-                            <p className='mv_category_heading mv_subcategory_heading mv_view_term_heading mb-0'>View Terms & Conditions</p>
+                <div className="mv_main_heading mb-4">
+                    <div className='d-flex justify-content-between align-items-center mv_main_view_tc_heading'>
+                        <div className='mv_main_view_tc_subheading'>
+                            <p className='mb-1'>View Terms & Conditions</p>
+                            <div className='d-flex align-items-center mv_view_term_and_con'>
+                                <p className='mv_dashboard_heading mb-0'>Dashboard /</p>
+                                <p className='mv_dashboard_heading mv_term_condi_heading mb-0 ms-1'>Terms & Conditions /</p>
+                                <p className='mv_category_heading mv_subcategory_heading mv_view_term_heading mb-0'>View Terms & Conditions</p>
+                            </div>
+                        </div>
+                        <div className='mv_column_button'>
+                            <Link to={'/termsconditions'} style={{ color: '#2B221E', textDecoration: 'none' }}>
+                                <button type="button" className='border-0 bg-transparent me-0'>
+                                    Cancel
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
