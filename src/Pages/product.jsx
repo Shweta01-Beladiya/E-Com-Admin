@@ -1,4 +1,4 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../CSS/product.css';
 import Form from 'react-bootstrap/Form';
 import { InputGroup } from 'react-bootstrap';
@@ -28,17 +28,21 @@ const Product = () => {
 
     // Handle location state changes (coming back from add/edit pages)
     useEffect(() => {
-        if (location.state?.formSubmitted) {
-            const savedPage = location.state?.currentPage;
-            if (savedPage) {
-                setCurrentPage(savedPage);
+        // console.log("location.state", location.search);
+        
+        if (location.search) {
+            const query = new URLSearchParams(location.search);
+            const pageNumber = query.get('page');
+            // console.log("pageNumber",pageNumber);
+            
+            if (pageNumber) {
+                setCurrentPage(parseInt(pageNumber, 10));
+                // Store just the page number in localStorage if needed
+                localStorage.setItem('currentProductPage', pageNumber);
             }
-            // Reset the location state to avoid refreshing on further navigation
-            window.history.replaceState({}, document.title);
-            // Refresh the data
-            setRefreshData(prev => !prev);
+            
         }
-    }, [location.state]);
+    }, [location.search]);
 
     // Filter states
     const [selectedMainCategory, setSelectedMainCategory] = useState('');
@@ -96,11 +100,13 @@ const Product = () => {
         });
 
         setFilteredData(result);
-        
+
         // Only reset current page if not returning from form submit
-        if (!location.state?.formSubmitted) {
-            setCurrentPage(1);
-        }
+        const query = new URLSearchParams(location.search);
+    const pageParam = query.get('page');
+    if (!pageParam) {
+        setCurrentPage(1);
+    }
     };
 
     const handleSearchChange = (e) => {
@@ -165,6 +171,8 @@ const Product = () => {
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
+            // Update URL without full page reload
+            window.history.pushState({}, '', `/product?page=${newPage}`);
         }
     };
 
@@ -208,7 +216,7 @@ const Product = () => {
             const response = await axios.get(`${BaseUrl}/api/allProduct`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response", response.data.product);
+            // console.log("response", response.data.product);
             setData(response.data.product);
         } catch (error) {
             console.error('Data Fetching Error:', error);
@@ -442,7 +450,7 @@ const Product = () => {
                                                                 </Link>
                                                             </div>
                                                             <div className="mv_pencil_icon">
-                                                                <Link to={`/editProduct/${item._id}?productVariantId=${item.productVariantData?.[0]?._id || ''}`}>
+                                                                <Link to={`/editProduct/${item._id}?productVariantId=${item.productVariantData?.[0]?._id}&page=${currentPage}`}>
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>

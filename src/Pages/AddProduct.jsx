@@ -11,7 +11,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const AddProduct = () => {
     const formikRef = useRef(null);
-    
+
     const BaseUrl = process.env.REACT_APP_BASEURL;
     const token = localStorage.getItem('token');
 
@@ -20,16 +20,21 @@ const AddProduct = () => {
     const { id } = useParams();
     const query = new URLSearchParams(location.search);
     const variantId = query.get("productVariantId");
-    
+
     // Get current page from URL or localStorage
-    const urlPage = query.get("page");
-    
-    // Store current page in localStorage on component mount
-    useEffect(() => {
-        if (urlPage) {
-            localStorage.setItem('currentProductPage', urlPage);
-        }
-    }, [urlPage]);
+    // const urlPage = query.get("page");
+    // console.log("urlPage", urlPage);
+
+    // useEffect(() => {
+    //     // Use the URL page first, then fall back to localStorage
+    //     const storedPage = urlPage || localStorage.getItem('currentProductPage') || '1';
+    //     setCurrentPage(storedPage);
+        
+    //     // Update localStorage if urlPage exists
+    //     if (urlPage) {
+    //         localStorage.setItem('currentProductPage', urlPage);
+    //     }
+    // }, [urlPage]);
 
     // State variables
     const [colors, setColors] = useState([]);
@@ -120,13 +125,6 @@ const AddProduct = () => {
         )
     });
 
-    useEffect(() => {
-        if (urlPage) {
-            localStorage.setItem('currentProductPage', urlPage);
-            setCurrentPage(urlPage); 
-        }
-    }, [urlPage]);
-
 
     const fetchProductData = async () => {
         if (!id) return;
@@ -136,13 +134,11 @@ const AddProduct = () => {
             const response = await axios.get(`${BaseUrl}/api/getProduct/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("response>>>>>>>>>", response.data.product);
-
             // Fetch variant data
             const preResponse = await axios.get(`${BaseUrl}/api/getProductVariant/${variantId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log("preResponse", preResponse.data.productVariant);
+            // console.log("preResponse", preResponse.data.productVariant);
 
             if (response.data && response.data.product) {
                 const product = response.data.product[0];
@@ -212,13 +208,13 @@ const AddProduct = () => {
             console.error('Error fetching product data:', error);
         }
     };
-    
+
     // Form submission handler
     const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
         try {
             // Get the stored page number
             const storedPage = localStorage.getItem('currentProductPage') || '1';
-            
+
             if (id) {
                 // Update existing product
                 await axios.put(`${BaseUrl}/api/updateProduct/${id}`, {
@@ -229,21 +225,21 @@ const AddProduct = () => {
                 }, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                
+
                 // Use the variant ID from the URL params instead of from productData
                 if (!variantId) {
                     console.error('Variant ID not found for updating');
                     return;
                 }
-                
+
                 const formData = new FormData();
                 // For updating existing products
                 const existingImages = values.images
-                .filter(img => !img.file && img.existingPath)
-                .map(img => img.existingPath);
-                
+                    .filter(img => !img.file && img.existingPath)
+                    .map(img => img.existingPath);
+
                 formData.append("existingImages", JSON.stringify(existingImages));
-                
+
                 // Only append new file uploads to "images"
                 values.images.forEach((img) => {
                     if (img.file) {
@@ -282,10 +278,11 @@ const AddProduct = () => {
                         "Content-Type": "multipart/form-data"
                     }
                 });
-
+                // console.log("variantResponse",variantResponse.data);
+                
                 if (variantResponse.data.status === 200) {
-                    // Use the page number from localStorage or state
-                    const pageToNavigate = localStorage.getItem('currentProductPage') || currentPage;
+                    // Use the URL parameter value directly instead of the state
+                    const pageToNavigate = query.get("page") || localStorage.getItem('currentProductPage') || '1';
                     navigate(`/product?page=${pageToNavigate}`);
                 }
             } else {
@@ -326,17 +323,18 @@ const AddProduct = () => {
                 formData.append("returnPolicy", values.returnPolicy);
                 formData.append("manufacturingDetails", values.manufacturingDetails);
                 formData.append("specifications", JSON.stringify(specObject));
-                
+
                 const proResponse = await axios.post(`${BaseUrl}/api/createProductVariant`, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "multipart/form-data"
                     }
                 });
-                
+
                 if (proResponse.data.status === 200) {
-                    // Navigate back to product list with the page parameter
-                    navigate(`/product?page=${storedPage}`);
+                    // Use the same approach for consistency
+                    const pageToNavigate = query.get("page") || localStorage.getItem('currentProductPage') || '1';
+                    navigate(`/product?page=${pageToNavigate}`);
                 }
             }
         } catch (error) {
@@ -587,7 +585,7 @@ const AddProduct = () => {
                         <div className="mv_view_edit_profile">
                             <div className='mv_profile_type'>
                                 <Formik
-                                  innerRef={formikRef}
+                                    innerRef={formikRef}
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
                                     onSubmit={(values, formikBag) => handleSubmit(values, formikBag, null)}
