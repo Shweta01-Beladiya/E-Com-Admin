@@ -8,7 +8,7 @@ import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import NoResultsFound from '../Component/Noresult';
 
-// E-commerce -> subcategory(edit data to set currentpage), view aboutus(add api and show data), view aboutus, view T&C(set cancel button) solve error and all page checking.
+// E-commerce admin -> Product Offer(add, edit image category), complete & E-commerce user (women -> 2 section complete) api integration.
 
 const SubCategory = () => {
 
@@ -192,7 +192,7 @@ const SubCategory = () => {
     const getFilteredData = () => {
         return subCategories.filter((sub) => {
 
-            const matchesSearch = sub.subCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            const matchesSearch = sub.subCategoryName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 sub.mainCategoryData[0]?.mainCategoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 sub.categoriesData[0]?.categoryName.toLowerCase().includes(searchQuery.toLowerCase());
 
