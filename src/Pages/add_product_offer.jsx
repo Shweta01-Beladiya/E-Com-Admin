@@ -27,7 +27,7 @@ const Addproductoffer = () => {
 
     // Edit Product Offer
     const location = useLocation();
-    const id = location.state?.id;
+    const id = location.state.id;
     // console.log("id>>>>>>>>>",id);
 
     const handleDateChange = (e, type) => {
@@ -36,7 +36,25 @@ const Addproductoffer = () => {
         setFieldValue(type === "start" ? "startDate" : "endDate", selectedDate);
     };
 
+    // Select img
+    let [addimg, setaddimg] = useState("");
 
+    const [brandImagePreview, setBrandImagePreview] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (id && id.offerImage) {
+            try {
+                const filename = id.offerImage.split("\\").pop();
+                setaddimg(filename.substring(filename.indexOf('-') + 1));
+                setBrandImagePreview(`${BaseUrl}/${id.offerImage}`);
+            } catch (error) {
+                console.error("Error processing offerImg:", error);
+                setaddimg("");
+                setBrandImagePreview(null);
+            }
+        }
+    }, [id, BaseUrl]);
 
     // ******************************* Validation *******************************
     const [initialValues, setInitialValues] = useState({
@@ -45,6 +63,7 @@ const Addproductoffer = () => {
         subCategoryId: "",
         productId: "",
         offerName: "",
+        offerImage: "",
         code: "",
         discountPrice: "",
         price: "",
@@ -61,6 +80,7 @@ const Addproductoffer = () => {
         subCategoryId: Yup.string().required("Sub Category is required"),
         productId: Yup.string().required("Product is required"),
         offerName: Yup.string().required("Offer Name is required"),
+        offerImage: id ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
         code: Yup.string().required("Code is required"),
         discountPrice: Yup.string().required("Discount Price is required"),
         price: Yup.string().required("Price is required"),
@@ -81,20 +101,30 @@ const Addproductoffer = () => {
                 startDate: values.startDate.split("-").reverse().join("-"), // Convert yyyy-mm-dd to dd-mm-yyyy
                 endDate: values.endDate.split("-").reverse().join("-"),
             };
+
         
             try {
+                const formData = new FormData();
+                if (values.offerImage) {
+                    formData.append("offerImage", values.offerImage);
+                }
+                console.log("values.offerImage",values.offerImage);
                 let response;
                 
                 if (id) {
-                    response = await axios.put(`${BaseUrl}/api/updateProductOffer/${id}`, formattedValues, {
-                        headers: { Authorization: `Bearer ${token}` },
+                    response = await axios.put(`${BaseUrl}/api/updateProductOffer/${id._id}`, formattedValues, {
+                        headers: { Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        },
                     });
                 } else {
                     response = await axios.post(`${BaseUrl}/api/createProductOffer`, formattedValues, {
-                        headers: { Authorization: `Bearer ${token}` }
+                        headers: { Authorization: `Bearer ${token}`,
+                            "Content-Type": "multipart/form-data"
+                        }
                     });
                 }
-        
+                console.log("response",response.data);
                 if (response.data.status === 200 || response.data.status === 201) {
                     navigate('/Productoffer', { 
                         state: { 
@@ -169,10 +199,10 @@ const Addproductoffer = () => {
         const fetchSingleData = async () => {
             if (id) {
                 try {
-                    const response = await axios.get(`${BaseUrl}/api/getProductOffer/${id}`, {
+                    const response = await axios.get(`${BaseUrl}/api/getProductOffer/${id._id}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    // console.log("repsonse",response.data.productOffer);
+                    console.log("repsonse",response.data.productOffer[0].offerImage);
                     const data = response.data.productOffer;
                     // console.log("data",data[0].startDate);
 
@@ -187,6 +217,7 @@ const Addproductoffer = () => {
                         subCategoryId: data[0].subCategoryId,
                         productId: data[0].productId,
                         offerName: data[0].offerName,
+                        offerImage: data[0].offerImage,
                         code: data[0].code,
                         discountPrice: data[0].discountPrice,
                         price: data[0].price,
@@ -206,6 +237,7 @@ const Addproductoffer = () => {
                     subCategoryId: "",
                     productId: "",
                     offerName: "",
+                    offerImage: "",
                     code: "",
                     discountPrice: "",
                     price: "",
@@ -353,6 +385,71 @@ const Addproductoffer = () => {
                                                     />
                                                 </InputGroup>
                                                 {errors.offerName && touched.offerName && <div className="text-danger small">{errors.offerName}</div>}
+                                            </div>
+                                        </div>
+                                        <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                            <div className="mv_input_content mb-3">
+                                                <label className='mv_label_input'>Image</label>
+                                                <div className="position-relative">
+                                                    <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
+                                                        <div className="d-flex align-items-center p-1" style={{backgroundColor: addimg ? '#EAEAEA' :'transparent', width:'25%'}}>
+                                                            {addimg && (
+                                                                <>
+                                                                    <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                                        <img
+                                                                            src={brandImagePreview || `${BaseUrl}/${id?.offerImage}`}
+                                                                            alt="Preview"
+                                                                            style={{ width: '100%' }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className='text-truncate' style={{width:'100%'}}>{addimg}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn text-danger p-0 ms-2"
+                                                                        style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                                                                        onClick={() => {
+                                                                            setaddimg("");
+                                                                            setBrandImagePreview(null);
+                                                                            setFieldValue("offerImage", "");
+                                                                        }}
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {!addimg && (
+                                                                <span className="text-muted ">Choose Image</span>
+                                                            )}
+                                                        </div>
+                                                        <label className="btn" style={{
+                                                            backgroundColor: '#3A2C2C',
+                                                            color: 'white',
+                                                            borderRadius: '4px',
+                                                            padding: '3px 16px',
+                                                            marginLeft: '8px',
+                                                            cursor: 'pointer',
+                                                            fontSize:'12px'
+                                                        }}>
+                                                            Browse
+                                                            <input
+                                                                type="file"
+                                                                hidden
+                                                                accept="image/jpeg, image/png, image/jpg"
+                                                                onChange={(e) => {
+                                                                    const file = e.currentTarget.files[0];
+                                                                    if (file) {
+                                                                        setaddimg(file.name);
+                                                                        setFieldValue("offerImage", file);
+                                                                        setBrandImagePreview(URL.createObjectURL(file));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                {errors.offerImage && touched.offerImage &&
+                                                    <div className="text-danger small">{errors.offerImage}</div>
+                                                }
                                             </div>
                                         </div>
                                         <div className="col-xxl-4 col-xl-4 col-lg-4 col-md-6 col-sm-6">

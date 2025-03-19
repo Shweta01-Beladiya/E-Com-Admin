@@ -435,6 +435,7 @@ const Productoffer = () => {
                                             <thead>
                                                 <tr>
                                                     <th className=''>ID</th>
+                                                    <th className=''>Image</th>
                                                     <th className=''>Sub Category</th>
                                                     <th className=''>Product Name</th>
                                                     <th className=''>Code</th>
@@ -450,7 +451,10 @@ const Productoffer = () => {
                                                 {paginatedData.map((item, index) => (
                                                     <tr key={index}>
                                                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                                                        <td>{item.subCategoriesData[0].subCategoryName}</td>
+                                                        <td>
+                                                            <img className='mv_product_img mv_product_radius_img' src={`${BaseUrl}/${item?.offerImage}`} alt="" />
+                                                        </td>
+                                                        <td>{item.subCategoriesData[0]?.subCategoryName}</td>
                                                         <td>{item.productData[0]?.productName}</td>
                                                         <td>{item.code}</td>
                                                         <td>{item.discountPrice}%</td>
@@ -470,7 +474,7 @@ const Productoffer = () => {
                                                                     <img src={require('../mv_img/eyes_icon.png')} alt="" />
                                                             </div>
                                                             <div className="mv_pencil_icon" >
-                                                                <Link to='/addproductoffer' state={{ id: item._id, currentPage: currentPage }}>
+                                                                <Link to='/addproductoffer' state={{ id: item, currentPage: currentPage }}>
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>
