@@ -25,7 +25,8 @@ const MainCategory = () => {
     mainCategoryName: Yup.string()
       .min(2, 'Main Category name must be at least 2 characters')
       .max(50, 'Main Category name must be less than 50 characters')
-      .required('Main Category name is required')
+      .required('Main Category name is required'),
+    mainCategoryImage: id ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
   });
 
   const initialValues = ({
@@ -48,11 +49,21 @@ const MainCategory = () => {
 
   const handleSubmit = async (value, { resetForm, setFieldError }) => {
     try {
+      const formData = new FormData();
+      formData.append('mainCategoryName', value.mainCategoryName);
+
+      // Only append the image if it exists
+      if (value.mainCategoryImage) {
+        formData.append('mainCategoryImage', value.mainCategoryImage);
+      }
       if (id) {
         // console.log("id",id);
 
-        const response = await axios.put(`${BaseUrl}/api/updateMainCategory/${id}`, value, {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.put(`${BaseUrl}/api/updateMainCategory/${id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
         });
         // console.log("response",response.data);
         if (response.data.status === 200) {
@@ -66,8 +77,11 @@ const MainCategory = () => {
           resetForm();
         }
       } else {
-        const response = await axios.post(`${BaseUrl}/api/createMaincategory`, value, {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.post(`${BaseUrl}/api/createMaincategory`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
         })
         // console.log("Response", response.data);
         if (response.data.status === 201) {
@@ -296,9 +310,9 @@ const MainCategory = () => {
             onSubmit={handleSubmit}
             initialValues={initialValues}
           >
-            {({ handleBlur, handleChange, handleSubmit, values, setFieldError, touched }) => (
+            {({ handleBlur, handleChange, handleSubmit, values, setFieldValue }) => (
               <Form className="r_form" onSubmit={handleSubmit}>
-                <div className="mv_input_content mb-5">
+                <div className="mv_input_content mb-3">
                   <label className='mv_label_input'>Main Category</label>
                   <InputGroup className="">
                     <Form.Control
@@ -310,6 +324,92 @@ const MainCategory = () => {
                     />
                   </InputGroup>
                   <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
+                </div>
+                <div className="mv_input_content mb-5">
+                  <label className='mv_label_input'>Image</label>
+                  <div className="position-relative">
+                    <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
+                      <div className="d-flex align-items-center p-1" style={{ width: '30%' }}>
+
+                        {/* Show Preview if New File is Uploaded */}
+                        {values.mainCategoryImage instanceof File ? (
+                          <>
+                            <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                              <img
+                                src={URL.createObjectURL(values.mainCategoryImage)}
+                                alt="Preview"
+                                style={{ width: '100%' }}
+                              />
+                            </div>
+                            <span className='text-truncate' style={{ width: '100%' }}>
+                              {values.mainCategoryImage.name}
+                            </span>
+                            <button
+                              type="button"
+                              className="btn text-danger p-0 text-end"
+                              style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                              onClick={() => setFieldValue('mainCategoryImage', null)}
+                            >
+                              ×
+                            </button>
+                          </>
+                        ) : values.mainCategoryImage ? (
+                          // Show Existing Image from Server
+                          <>
+                            <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                              <img
+                                src={`${BaseUrl}/${values.mainCategoryImage}`}
+                                alt="Current"
+                                style={{ width: '100%' }}
+                              />
+                            </div>
+                            <span className='text-truncate' style={{ width: '100%' }}>
+                              {/* Get just the filename */}
+                              {(() => {
+                                const fullPath = values.mainCategoryImage;
+                                const parts = fullPath.split('\\');
+                                const fileWithTimestamp = parts[parts.length - 1];
+                                return fileWithTimestamp.replace(/^\d+-/, '');
+                              })()}
+                            </span>
+                            <button
+                              type="button"
+                              className="btn text-danger p-0 text-end"
+                              style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                              onClick={() => setFieldValue('mainCategoryImage', null)}
+                            >
+                              ×
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-muted">Choose Image</span>
+                        )}
+                      </div>
+
+                      {/* File Upload Button */}
+                      <label className="btn" style={{
+                        backgroundColor: '#3A2C2C',
+                        color: 'white',
+                        borderRadius: '4px',
+                        padding: '4px 16px',
+                        marginLeft: '8px',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}>
+                        Browse
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/jpeg, image/png, image/jpg"
+                          onChange={(e) => {
+                            if (e.target.files[0]) {
+                              setFieldValue('mainCategoryImage', e.target.files[0]);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </div>
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button
@@ -337,26 +437,26 @@ const MainCategory = () => {
         onHide={() => setShowEditModal(false)}
         centered
       >
-        <Modal.Header className='mv_edit_profile_header' closeButton>
-
-        </Modal.Header>
+        <Modal.Header className='mv_edit_profile_header' closeButton></Modal.Header>
         <Modal.Title className='mv_edit_profile_title' id="contained-modal-title-vcenter">
-          <p className="mb-0">Add Main Category</p>
+          <p className="mb-0">Edit Main Category</p>
         </Modal.Title>
         <Modal.Body className="r_modalbody">
           <Formik
             validationSchema={categorySchema}
             onSubmit={handleSubmit}
             initialValues={{
-              mainCategoryName: selectedCategory?.mainCategoryName || ''
+              mainCategoryName: selectedCategory?.mainCategoryName || '',
+              mainCategoryImage: selectedCategory?.mainCategoryImage || null
             }}
             enableReinitialize
           >
-            {({ handleBlur, handleChange, handleSubmit, values, errors, touched }) => (
+            {({ handleBlur, handleChange, handleSubmit, values, setFieldValue }) => (
               <Form className="r_form" onSubmit={handleSubmit}>
-                <div className="mv_input_content mb-5">
+                {/* Input Field for Category Name */}
+                <div className="mv_input_content mb-3">
                   <label className='mv_label_input'>Main Category</label>
-                  <InputGroup className="">
+                  <InputGroup>
                     <Form.Control
                       placeholder="Enter main category"
                       name='mainCategoryName'
@@ -367,6 +467,96 @@ const MainCategory = () => {
                   </InputGroup>
                   <ErrorMessage name="mainCategoryName" component="small" className="text-danger small" />
                 </div>
+
+                {/* File Upload Section */}
+                <div className="mv_input_content mb-5">
+                  <label className='mv_label_input'>Image</label>
+                  <div className="position-relative">
+                    <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
+                      <div className="d-flex align-items-center p-1" style={{ width: '30%' }}>
+
+                        {/* Show Preview if New File is Uploaded */}
+                        {values.mainCategoryImage instanceof File ? (
+                          <>
+                            <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                              <img
+                                src={URL.createObjectURL(values.mainCategoryImage)}
+                                alt="Preview"
+                                style={{ width: '100%' }}
+                              />
+                            </div>
+                            <span className='text-truncate' style={{ width: '100%' }}>
+                              {values.mainCategoryImage.name}
+                            </span>
+                            <button
+                              type="button"
+                              className="btn text-danger p-0 text-end"
+                              style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                              onClick={() => setFieldValue('mainCategoryImage', null)}
+                            >
+                              ×
+                            </button>
+                          </>
+                        ) : values.mainCategoryImage ? (
+                          // Show Existing Image from Server
+                          <>
+                            <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                              <img
+                                src={`${BaseUrl}/${values.mainCategoryImage}`}
+                                alt="Current"
+                                style={{ width: '100%' }}
+                              />
+                            </div>
+                            <span className='text-truncate' style={{ width: '100%' }}>
+                              {/* Get just the filename */}
+                              {(() => {
+                                const fullPath = values.mainCategoryImage;
+                                const parts = fullPath.split('\\');
+                                const fileWithTimestamp = parts[parts.length - 1];
+                                return fileWithTimestamp.replace(/^\d+-/, '');
+                              })()}
+                            </span>
+                            <button
+                              type="button"
+                              className="btn text-danger p-0 text-end"
+                              style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                              onClick={() => setFieldValue('mainCategoryImage', null)}
+                            >
+                              ×
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-muted">Choose Image</span>
+                        )}
+                      </div>
+
+                      {/* File Upload Button */}
+                      <label className="btn" style={{
+                        backgroundColor: '#3A2C2C',
+                        color: 'white',
+                        borderRadius: '4px',
+                        padding: '4px 16px',
+                        marginLeft: '8px',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}>
+                        Browse
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/jpeg, image/png, image/jpg"
+                          onChange={(e) => {
+                            if (e.target.files[0]) {
+                              setFieldValue('mainCategoryImage', e.target.files[0]);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
                 <div className='d-flex justify-content-center gap-3 mt-4'>
                   <Button onClick={() => setShowEditModal(false)} className="r_cancel">
                     Cancel

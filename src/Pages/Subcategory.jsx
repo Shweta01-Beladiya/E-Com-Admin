@@ -8,8 +8,6 @@ import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import NoResultsFound from '../Component/Noresult';
 
-// E-commerce admin -> Product Offer(add, edit image category), complete & E-commerce user (women -> 2 section complete) api integration.
-
 const SubCategory = () => {
 
     const BaseUrl = process.env.REACT_APP_BASEURL;
@@ -30,6 +28,7 @@ const SubCategory = () => {
         mainCategoryId: '',
         categoryId: '',
         subCategoryName: '',
+        subCategoryImage: '',
     });
 
     const validationSchema = Yup.object().shape({
@@ -38,6 +37,7 @@ const SubCategory = () => {
         subCategoryName: Yup.string().min(2, 'Too Short!')
             .max(50, 'Too Long!')
             .required('Sub Category Name is required'),
+            subCategoryImage: id ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
     });
 
     useEffect(() => {
@@ -93,7 +93,8 @@ const SubCategory = () => {
                     setInitialValues({
                         mainCategoryId: subcategoryData.mainCategoryId,
                         categoryId: subcategoryData.categoryId,
-                        subCategoryName: subcategoryData.subCategoryName
+                        subCategoryName: subcategoryData.subCategoryName,
+                        subCategoryImage: subcategoryData.subCategoryImage || null
                     });
 
                     // When editing, filter categories based on the mainCategoryId
@@ -105,7 +106,8 @@ const SubCategory = () => {
                 setInitialValues({
                     mainCategoryId: '',
                     categoryId: '',
-                    subCategoryName: ''
+                    subCategoryName: '',
+                    subCategoryImage: null
                 });
                 setFilteredCategories([]);
             }
@@ -133,11 +135,24 @@ const SubCategory = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters.mainCategory, category]);
 
-    const handleSubmit = async (values, { setFieldError }) => {
+    const handleSubmit = async (values, { resetForm, setFieldError }) => {
         try {
+            const formData = new FormData();
+            formData.append('mainCategoryId', values.mainCategoryId);
+            formData.append('categoryId', values.categoryId);
+            formData.append('subCategoryName', values.subCategoryName);
+
+            // Only append the image if it exists
+            if (values.subCategoryImage) {
+                formData.append('subCategoryImage', values.subCategoryImage);
+            }
+
             if (id) {
-                const response = await axios.put(`${BaseUrl}/api/updateSubCategory/${id}`, values, {
-                    headers: { Authorization: `Bearer ${token}` }
+                const response = await axios.put(`${BaseUrl}/api/updateSubCategory/${id}`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
                 });
                 if (response.data.status === 200) {
                     // Update the state directly without changing the page
@@ -147,20 +162,26 @@ const SubCategory = () => {
                                 ...sub, 
                                 mainCategoryId: values.mainCategoryId,
                                 categoryId: values.categoryId,
-                                subCategoryName: values.subCategoryName 
+                                subCategoryName: values.subCategoryName,
+                                subCategoryImage: values.subCategoryImage,
                             } : sub
                         )
                     );
+                    resetForm();
                     setId(null);
                     setShowAddEditModal(false);
                 }
             } else {
-                const response = await axios.post(`${BaseUrl}/api/createSubCategory`, values, {
-                    headers: { Authorization: `Bearer ${token}` }
+                const response = await axios.post(`${BaseUrl}/api/createSubCategory`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
                 });
                 if (response.data.status === 201) {
                     setShowAddEditModal(false);
                     setSubCategories((prevSubCat) => [...prevSubCat, response.data.subCategory]);
+                    resetForm();
                 }
             }
         } catch (error) {
@@ -535,7 +556,7 @@ const SubCategory = () => {
                                         <ErrorMessage name="categoryId" component="small" className="text-danger" />
                                     </div>
 
-                                    <div className="mv_input_content mb-5">
+                                    <div className="mv_input_content mb-3">
                                         <label className='mv_label_input'>Sub Category</label>
                                         <InputGroup className="">
                                             <Form.Control
@@ -547,6 +568,87 @@ const SubCategory = () => {
                                             />
                                         </InputGroup>
                                         <ErrorMessage name="subCategoryName" component="small" className="text-danger" />
+                                    </div>
+
+                                    <div className="mv_input_content mb-5">
+                                        <label className='mv_label_input'>Image</label>
+                                        <div className="position-relative">
+                                            <div className="mv_img_border w-100 p-1 d-flex align-items-center justify-content-between">
+                                                <div className="d-flex align-items-center p-1" style={{ width: '30%' }}>
+                                                    {/* Show Preview if New File is Uploaded */}
+                                                    {values.subCategoryImage instanceof File ? (
+                                                        <>
+                                                            <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                                <img
+                                                                    src={URL.createObjectURL(values.subCategoryImage)}
+                                                                    alt="Preview"
+                                                                    style={{ width: '100%' }}
+                                                                />
+                                                            </div>
+                                                            <span className='text-truncate' style={{ width: '100%' }}>
+                                                                {values.subCategoryImage.name}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn text-danger p-0 text-end"
+                                                                style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                                                                onClick={() => setFieldValue('subCategoryImage', null)}
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </>
+                                                    ) : values.subCategoryImage ? (
+                                                        // Show Existing Image from Server
+                                                        <>
+                                                            <div className="me-2" style={{ width: '24px', height: '24px', overflow: 'hidden' }}>
+                                                                <img
+                                                                    src={`${BaseUrl}/${values.subCategoryImage}`}
+                                                                    alt="Current"
+                                                                    style={{ width: '100%' }}
+                                                                />
+                                                            </div>
+                                                            <span className='text-truncate' style={{ width: '100%' }}>
+                                                                {values.subCategoryImage.split('\\').pop().replace(/^\d+-/, '')}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn text-danger p-0 text-end"
+                                                                style={{ fontSize: '1.50rem', lineHeight: .5 }}
+                                                                onClick={() => setFieldValue('subCategoryImage', null)}
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-muted">Choose Image</span>
+                                                    )}
+                                                </div>
+                                                
+                                                {/* File Upload Button */}
+                                                <label className="btn" style={{
+                                                    backgroundColor: '#3A2C2C',
+                                                    color: 'white',
+                                                    borderRadius: '4px',
+                                                    padding: '4px 16px',
+                                                    marginLeft: '8px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '12px'
+                                                }}>
+                                                    Browse
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                        accept="image/jpeg, image/png, image/jpg"
+                                                        onChange={(e) => {
+                                                            if (e.target.files[0]) {
+                                                                setFieldValue('subCategoryImage', e.target.files[0]);
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <ErrorMessage name="subCategoryImage" component="small" className="text-danger small" />
                                     </div>
 
                                     <div className="d-flex justify-content-center gap-2 mt-4">
