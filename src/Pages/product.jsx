@@ -29,18 +29,18 @@ const Product = () => {
     // Handle location state changes (coming back from add/edit pages)
     useEffect(() => {
         // console.log("location.state", location.search);
-        
+
         if (location.search) {
             const query = new URLSearchParams(location.search);
             const pageNumber = query.get('page');
             // console.log("pageNumber",pageNumber);
-            
+
             if (pageNumber) {
                 setCurrentPage(parseInt(pageNumber, 10));
                 // Store just the page number in localStorage if needed
                 localStorage.setItem('currentProductPage', pageNumber);
             }
-            
+
         }
     }, [location.search]);
 
@@ -103,10 +103,10 @@ const Product = () => {
 
         // Only reset current page if not returning from form submit
         const query = new URLSearchParams(location.search);
-    const pageParam = query.get('page');
-    if (!pageParam) {
-        setCurrentPage(1);
-    }
+        const pageParam = query.get('page');
+        if (!pageParam) {
+            setCurrentPage(1);
+        }
     };
 
     const handleSearchChange = (e) => {
@@ -450,7 +450,7 @@ const Product = () => {
                                                                 </Link>
                                                             </div>
                                                             <div className="mv_pencil_icon">
-                                                                <Link to={`/editProduct/${item._id}?productVariantId=${item.productVariantData?.[0]?._id}&page=${currentPage}`}>
+                                                                <Link to={`/editProduct/${item._id}?page=${currentPage}`}>
                                                                     <img src={require('../mv_img/pencil_icon.png')} alt="" />
                                                                 </Link>
                                                             </div>
