@@ -151,9 +151,13 @@ const Size = () => {
             setFilteredData(data);
         } else {
             const filtered = data.filter((item) =>
-                item.mainCategoryData[0].mainCategoryName.toLowerCase().includes(term.toLowerCase()) ||
-                item.categoryData[0].categoryName.toLowerCase().includes(term.toLowerCase()) ||
-                item.subCategoryData[0].subCategoryName.toLowerCase().includes(term.toLowerCase())
+                (item.mainCategoryData && item.mainCategoryData[0] &&
+                    item.mainCategoryData[0].mainCategoryName.toLowerCase().includes(term.toLowerCase())) ||
+                (item.categoryData && item.categoryData[0] &&
+                    item.categoryData[0].categoryName.toLowerCase().includes(term.toLowerCase())) ||
+                (item.subCategoryData && item.subCategoryData[0] &&
+                    item.subCategoryData[0].subCategoryName.toLowerCase().includes(term.toLowerCase())) ||
+                (item.sizeName && item.sizeName.toLowerCase().includes(term.toLowerCase()))
             );
             setFilteredData(filtered);
         }
@@ -225,19 +229,19 @@ const Size = () => {
 
     const getPaginationButtons = () => {
         if (totalPages <= 4) {
-          return Array.from({ length: totalPages }, (_, i) => i + 1);
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
-      
+
         const buttons = [];
-      
+
         if (currentPage <= 2) {
-          buttons.push(1, 2, 3, "...");
+            buttons.push(1, 2, 3, "...");
         } else if (currentPage >= totalPages - 1) {
-          buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
+            buttons.push("...", totalPages - 2, totalPages - 1, totalPages);
         } else {
-          buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
+            buttons.push(currentPage - 1, currentPage, currentPage + 1, "...");
         }
-      
+
         return buttons;
     };
 
@@ -439,21 +443,21 @@ const Size = () => {
                                     {totalPages > 1 && (
                                         <div className="mv_other_category d-flex align-items-center justify-content-end pb-4 mt-4">
                                             {/* Previous Button */}
-                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`} 
+                                            <p className={`mb-0 ${currentPage === 1 ? 'disabled' : ''}`}
                                                 onClick={() => handlePageChange(currentPage - 1)}>
                                                 <MdOutlineKeyboardArrowLeft />
                                             </p>
                                             {/* Pagination Buttons */}
                                             {getPaginationButtons().map((page, index) => (
                                                 <p key={index}
-                                                className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
-                                                onClick={() => typeof page === "number" && handlePageChange(page)}
-                                                style={{ cursor: page === "..." ? "default" : "pointer" }}>
-                                                {page}
+                                                    className={`mb-0 ${currentPage === page ? "mv_active" : ""}`}
+                                                    onClick={() => typeof page === "number" && handlePageChange(page)}
+                                                    style={{ cursor: page === "..." ? "default" : "pointer" }}>
+                                                    {page}
                                                 </p>
                                             ))}
                                             {/* Next Button */}
-                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`} 
+                                            <p className={`mb-0 ${currentPage === totalPages ? 'disabled' : ''}`}
                                                 onClick={() => handlePageChange(currentPage + 1)} >
                                                 <MdOutlineKeyboardArrowRight />
                                             </p>

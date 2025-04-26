@@ -233,7 +233,7 @@ const Faqs = (props) => {
             user.answer?.toLowerCase().includes(searchTerm.toLowerCase())
           );
         }
-    
+        setFilteredData(result);
         if (shouldResetPage) {
             setCurrentPage(1);
             setShouldResetPage(false);

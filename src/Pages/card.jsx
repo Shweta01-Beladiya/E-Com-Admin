@@ -87,7 +87,8 @@ const Cards = ({ editData }) => {
     const validate = Yup.object().shape({
         title: Yup.string().required("Title is required"),
         subTitle: Yup.string().required("subTitle is required"),
-        addcardimage: editData ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
+        addcardimage: id ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
+
     });
     
     const formik = useFormik({

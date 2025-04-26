@@ -38,7 +38,7 @@ const Category = () => {
             .min(2, 'Too Short!')
             .max(50, 'Too Long!')
             .required('Category Name is required'),
-            categoryImage: id ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
+        categoryImage: id ? Yup.mixed().optional() : Yup.mixed().required("Image is required"),
     });
 
     useEffect(() => {
@@ -127,12 +127,12 @@ const Category = () => {
             const formData = new FormData();
             formData.append('mainCategoryId', values.mainCategoryId);
             formData.append('categoryName', values.categoryName);
-    
+
             // Only append the image if it exists
             if (values.categoryImage) {
                 formData.append('categoryImage', values.categoryImage);
             }
-    
+
             if (id) {
                 const response = await axios.put(`${BaseUrl}/api/updateCategry/${id}`, formData, {
                     headers: {
@@ -140,7 +140,7 @@ const Category = () => {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                
+
                 if (response.data.status === 200) {
                     setShowAddModal(false);
                     setId(null);
@@ -158,7 +158,7 @@ const Category = () => {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-    
+
                 if (response.data.status === 201) {
                     setShowAddModal(false);
                     setCategories((prevCategories) => [...prevCategories, response.data.category]);
@@ -179,7 +179,7 @@ const Category = () => {
         });
         if (response.data.status === 200) {
             setCategories((prevCategories) => {
-                
+
                 const newCategories = prevCategories.filter((cat) => cat._id !== id);
                 const newTotalItems = newCategories.length;
                 const newTotalPages = Math.ceil(newTotalItems / itemsPerPage);
@@ -202,8 +202,11 @@ const Category = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const filteredCategories = categories.filter((cat) => {
+        const matchMainCategory = mainCategory.find(mainCat => mainCat._id === cat.mainCategoryId);
+        const mainCategoryName = matchMainCategory?.mainCategoryName || '';
+
         const matchesSearch = searchTerm ? (
-            cat.mainCategoryData[0].mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            mainCategoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             cat.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
         ) : true;
 
@@ -537,7 +540,7 @@ const Category = () => {
                                                     <span className="text-muted">Choose Image</span>
                                                 )}
                                             </div>
-                                            
+
                                             {/* File Upload Button */}
                                             <label className="btn" style={{
                                                 backgroundColor: '#3A2C2C',

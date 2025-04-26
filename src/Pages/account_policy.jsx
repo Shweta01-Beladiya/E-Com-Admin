@@ -206,13 +206,14 @@ const Accountpolicy = () => {
     // Search Data
     useEffect(() => {
         let result = data;
+   ;
     
         if (searchTerm) {
           result = result.filter(user =>
             user.policyName?.toLowerCase().includes(searchTerm.toLowerCase())
           );
         }
-    
+        setFilteredData(result);
         if (shouldResetPage) {
             setCurrentPage(1);
             setShouldResetPage(false);

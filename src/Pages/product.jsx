@@ -404,7 +404,7 @@ const Product = () => {
                                                     <th className=''>Price</th>
                                                     <th className=''>Rating</th>
                                                     {/* <th className=''>Stock Status</th> */}
-                                                    <th className='d-flex align-items-center justify-content-end'>Action</th>
+                                                    <th className='text-center'>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

@@ -133,7 +133,7 @@ const Cancelorder = () => {
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Customer name</th>
+                                                <th>Customer Name</th>
                                                 <th>Product</th>
                                                 <th>Date</th>
                                                 <th>Comment</th>

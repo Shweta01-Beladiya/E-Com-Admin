@@ -241,7 +241,7 @@ const Aboutus = ({ editData }) => {
         if (searchTerm) {
             result = result.filter(user =>
                 user.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.description?.includes(searchTerm)
+                user.description?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
     

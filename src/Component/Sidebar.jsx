@@ -1,5 +1,5 @@
 // Sidebar.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   List,
@@ -70,7 +70,7 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
-  
+
   ...(open && {
     ...openedMixin(theme),
     '& .MuiDrawer-paper': openedMixin(theme),
@@ -81,7 +81,7 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const StyledListItemButton = styled(ListItemButton)(({ theme, isActive,open }) => ({
+const StyledListItemButton = styled(ListItemButton)(({ theme, isActive, open }) => ({
   minHeight: 48,
   justifyContent: 'initial',
   borderRadius: isActive ? '7px' : 'none',
@@ -99,8 +99,8 @@ const StyledListItemButton = styled(ListItemButton)(({ theme, isActive,open }) =
       content: '""',
       position: 'absolute',
       top: 0,
-      left: open ?'-8%' :'0',
-      width: open ? '5px': '2px',
+      left: open ? '-8%' : '0',
+      width: open ? '5px' : '2px',
       height: '100%',
       backgroundColor: 'white',
       borderRadius: '5px',
@@ -113,8 +113,8 @@ const StyledListItemButton = styled(ListItemButton)(({ theme, isActive,open }) =
       content: '""',
       position: 'absolute',
       top: 0,
-      left: open ?'-8%' :'0',
-      width: open ? '5px': '2px',
+      left: open ? '-8%' : '0',
+      width: open ? '5px' : '2px',
       height: '100%',
       backgroundColor: 'white',
       borderRadius: '5px',
@@ -135,7 +135,7 @@ const menuItems = [
   { text: 'Stock', icon: <BsBoxSeamFill size={20} />, path: '/stock' },
   { text: 'Order', icon: <BsBoxes size={20} />, path: '/order' },
   { text: 'Review', icon: <GiStarsStack size={20} />, path: '/review' },
-  { text: 'Coupen', icon: <BiSolidDiscount size={20} />, path: '/coupon' },
+  { text: 'Coupon', icon: <BiSolidDiscount size={20} />, path: '/coupon' },
   {
     text: 'Offers',
     icon: <RiDiscountPercentFill size={20} />,
@@ -177,6 +177,12 @@ const Sidebar = ({ open, handleDrawerClose, theme }) => {
     setOffersOpen(!offersOpen);
   };
 
+  useEffect(() => {
+    if (!open) {
+      setOffersOpen(false);
+    }
+  }, [open]);
+
   return (
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
@@ -192,22 +198,22 @@ const Sidebar = ({ open, handleDrawerClose, theme }) => {
 
       <List className="bg-[#2B221E] h-full">
         {menuItems.map((item, index) => {
-      const isActive = 
-      location.pathname === item.path || 
-      (item.path === "/dashboard" && location.pathname.startsWith("/view_profile")) ||
-      (item.path === "/product" && location.pathname.startsWith("/viewProduct"))||
-      (item.path === "/size" && location.pathname.includes("/addsize"))||
-      (item.path === "/stock" && location.pathname.includes("/addstock"))||
-      (item.path === "/coupon" && location.pathname.includes("/addcoupon"))||
-      (item.path === "/returnorder" && location.pathname.includes("/viewstatus"))||
-      (item.path === "/Productoffer" && location.pathname.startsWith("/viewproductoffer"));
+          const isActive =
+            location.pathname === item.path ||
+            (item.path === "/dashboard" && location.pathname.startsWith("/view_profile")) ||
+            (item.path === "/product" && location.pathname.startsWith("/viewProduct")) ||
+            (item.path === "/size" && location.pathname.includes("/addsize")) ||
+            (item.path === "/stock" && location.pathname.includes("/addstock")) ||
+            (item.path === "/coupon" && location.pathname.includes("/addcoupon")) ||
+            (item.path === "/returnorder" && location.pathname.includes("/viewstatus")) ||
+            (item.path === "/Productoffer" && location.pathname.startsWith("/viewproductoffer"));
 
           return (
             <React.Fragment key={item.text || index}>
               <ListItem disablePadding>
                 <StyledListItemButton
                   isActive={isActive}
-                  open={open} 
+                  open={open}
                   onClick={item.dropdown ? toggleOffersDropdown : () => handleNavigation(item.path)}
                 >
                   <ListItemIcon

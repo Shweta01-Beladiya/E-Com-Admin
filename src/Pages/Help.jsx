@@ -224,7 +224,7 @@ const Help = () => {
         if (searchTerm) {
           result = result.filter(user =>
             user.helpQuestion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.answer?.includes(searchTerm)
+            user.answer?.toLowerCase().includes(searchTerm.toLowerCase())
           );
         }
     
@@ -237,6 +237,8 @@ const Help = () => {
         if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
         }
+        setFilteredData(result);
+
     }, [data, searchTerm, shouldResetPage]);
 
     return (
